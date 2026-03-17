@@ -35,10 +35,12 @@
 }
 
 html {
-  scroll-behavior: auto; /* Lenis handles smooth scroll */
+  scroll-behavior: auto;
+  /* Lenis handles smooth scroll */
 }
 
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
 
@@ -59,7 +61,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-family-heading);
 }
 
@@ -92,12 +99,12 @@ a {
 
 .glow-accent {
   box-shadow: 0 0 20px var(--color-accent-glow),
-              0 0 60px rgba(108, 99, 255, 0.15);
+    0 0 60px rgba(108, 99, 255, 0.15);
 }
 
 .text-glow {
   text-shadow: 0 0 20px var(--color-accent-glow),
-               0 0 40px rgba(108, 99, 255, 0.2);
+    0 0 40px rgba(108, 99, 255, 0.2);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -144,6 +151,7 @@ a {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -151,28 +159,48 @@ a {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 20px var(--color-accent-glow);
   }
+
   50% {
     box-shadow: 0 0 40px var(--color-accent-glow),
-                0 0 80px rgba(108, 99, 255, 0.2);
+      0 0 80px rgba(108, 99, 255, 0.2);
   }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-fade-in-up {
@@ -261,7 +289,8 @@ a {
 
 @media (min-width: 1280px) {
   .section {
-    min-height: min(100vh, 760px); /* menos vertical space en pantallas muy grandes */
+    min-height: min(100vh, 760px);
+    /* menos vertical space en pantallas muy grandes */
   }
 }
 
@@ -296,7 +325,7 @@ a {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1));
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -328,3 +357,17 @@ a {
 }
 
 
+.space-mt {
+  padding-top: 10%;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   HERO SECTION STYLES DESKTOP
+   ═══════════════════════════════════════════════════ */
+
+@media (min-width: 800px) {
+  .responsive-hero-desktop {
+    padding-left: 10%;
+  }
+}

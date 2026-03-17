@@ -2,7 +2,7 @@
 
 import React, { useRef, useMemo, useState, useCallback } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
-import { Float, Text } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import * as THREE from "three";
 import { projects } from "@/data/projects";
 import { useStore } from "@/hooks/useStore";
@@ -17,38 +17,66 @@ function ProjectCard3D({
   totalProjects: number;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const selectProject = useStore((s) => s.selectProject);
 
   const color = useMemo(() => new THREE.Color(project.color), [project.color]);
 
-  // Position in a spiral/tunnel arrangement
-  const position = useMemo((): [number, number, number] => {
+  // Posición base en arreglo circular
+  const basePosition = useMemo((): [number, number, number] => {
     const angle = (index / totalProjects) * Math.PI * 2;
-    const radius = 2.5;
+    const radius = 3.2;
     return [
       Math.sin(angle) * radius,
-      (index - totalProjects / 2) * 1.8,
-      Math.cos(angle) * radius - 3,
+      (index - totalProjects / 2) * 2.0,
+      Math.cos(angle) * radius,
     ];
   }, [index, totalProjects]);
 
+  // Rotación para que cada card mire hacia el centro
   const rotation = useMemo((): [number, number, number] => {
     const angle = (index / totalProjects) * Math.PI * 2;
-    return [0, -angle + Math.PI, 0];
+    return [0, -angle, 0];
   }, [index, totalProjects]);
 
   useFrame((state) => {
-    if (!meshRef.current) return;
+    if (!meshRef.current || !groupRef.current) return;
     const time = state.clock.getElapsedTime();
-    const targetScale = hovered ? 1.15 : 1;
+
+    // Float suave: solo modifica Y localmente dentro del grupo
+    groupRef.current.position.set(
+      basePosition[0],
+      basePosition[1] + Math.sin(time * 0.5 + index * 1.1) * 0.12,
+      basePosition[2]
+    );
+
+    // Scale interpolado en hover
+    const targetScale = hovered ? 1.12 : 1;
     meshRef.current.scale.lerp(
       new THREE.Vector3(targetScale, targetScale, targetScale),
+      0.08
+    );
+
+    // Emissive interpolado
+    const mat = meshRef.current.material as THREE.MeshStandardMaterial;
+    mat.emissiveIntensity = THREE.MathUtils.lerp(
+      mat.emissiveIntensity,
+      hovered ? 0.6 : 0.18,
       0.1
     );
-    // Gentle float
-    meshRef.current.position.y =
-      position[1] + Math.sin(time * 0.5 + index) * 0.1;
+    mat.opacity = THREE.MathUtils.lerp(mat.opacity, hovered ? 0.95 : 0.78, 0.1);
+
+    // Glow
+    if (glowRef.current) {
+      const glowMat = glowRef.current.material as THREE.MeshBasicMaterial;
+      glowMat.opacity = THREE.MathUtils.lerp(
+        glowMat.opacity,
+        hovered ? 0.25 : 0,
+        0.1
+      );
+    }
   });
 
   const handleClick = useCallback(
@@ -60,78 +88,101 @@ function ProjectCard3D({
   );
 
   return (
-    <Float speed={1} rotationIntensity={0.1} floatIntensity={0.1}>
-      <group position={position} rotation={rotation}>
-        <mesh
-          ref={meshRef}
-          onClick={handleClick}
-          onPointerOver={(e) => {
-            e.stopPropagation();
-            setHovered(true);
-            document.body.style.cursor = "pointer";
-          }}
-          onPointerOut={() => {
-            setHovered(false);
-            document.body.style.cursor = "default";
-          }}
-        >
-          <planeGeometry args={[2.2, 1.4]} />
-          <meshStandardMaterial
-            color={color}
-            emissive={color}
-            emissiveIntensity={hovered ? 0.5 : 0.15}
-            roughness={0.4}
-            metalness={0.6}
-            transparent
-            opacity={hovered ? 0.95 : 0.75}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
+    // Este group se encarga del float y la posición base
+    <group ref={groupRef} rotation={rotation}>
+      {/* Glow de fondo — siempre montado, opacity animada */}
+      <mesh ref={glowRef} position={[0, 0, -0.02]}>
+        <planeGeometry args={[2.5, 1.65]} />
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
 
-        {/* Project title */}
-        <Text
-          position={[0, -0.9, 0.01]}
-          fontSize={0.14}
-          color="white"
-          anchorX="center"
-          anchorY="top"
-          maxWidth={2}
-        >
-          {project.title}
-        </Text>
+      {/* Card principal */}
+      <mesh
+        ref={meshRef}
+        onClick={handleClick}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={() => {
+          setHovered(false);
+          document.body.style.cursor = "default";
+        }}
+      >
+        <planeGeometry args={[2.2, 1.4]} />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.18}
+          roughness={0.35}
+          metalness={0.65}
+          transparent
+          opacity={0.78}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
 
-        {/* Outline glow */}
-        {hovered && (
-          <mesh position={[0, 0, -0.01]}>
-            <planeGeometry args={[2.3, 1.5]} />
-            <meshBasicMaterial
-              color={color}
-              transparent
-              opacity={0.2}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
-        )}
-      </group>
-    </Float>
+      {/* Título del proyecto — posición fija relativa al grupo */}
+      <Text
+        position={[0, -0.85, 0.02]}
+        fontSize={0.13}
+        color="white"
+        anchorX="center"
+        anchorY="top"
+        maxWidth={2}
+        font={undefined} // usa tu fuente o elimina esta línea
+      >
+        {project.title}
+      </Text>
+    </group>
   );
 }
 
 export default function Gallery() {
   const groupRef = useRef<THREE.Group>(null);
+  const targetRotY = useRef(0);
 
   useFrame((state) => {
     if (!groupRef.current) return;
     const time = state.clock.getElapsedTime();
-    groupRef.current.rotation.y = time * 0.05;
+
+    // Rotación automática suave
+    targetRotY.current = time * 0.04;
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(
+      groupRef.current.rotation.y,
+      targetRotY.current,
+      0.05
+    );
   });
 
   return (
     <group ref={groupRef}>
-      {/* Lighting for gallery */}
-      <ambientLight intensity={0.3} />
-      <pointLight position={[0, 5, 0]} color="#6c63ff" intensity={2} distance={15} />
-      <pointLight position={[0, -5, 0]} color="#00d4ff" intensity={1.5} distance={15} />
+      <ambientLight intensity={0.4} />
+      <pointLight
+        position={[0, 6, 0]}
+        color="#6c63ff"
+        intensity={3}
+        distance={20}
+      />
+      <pointLight
+        position={[0, -6, 0]}
+        color="#00d4ff"
+        intensity={2}
+        distance={20}
+      />
+      <pointLight
+        position={[5, 0, 5]}
+        color="#ff6c9d"
+        intensity={1.5}
+        distance={15}
+      />
 
       {projects.map((project, i) => (
         <ProjectCard3D

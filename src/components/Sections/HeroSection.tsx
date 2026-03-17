@@ -68,12 +68,12 @@ export default function HeroSection() {
 
       {/* Content — centered on all viewports */}
       <div ref={textRef} className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 w-full">
-        <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 lg:max-w-2xl">
+        <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 lg:max-w-2xl responsive-hero-desktop">
           <p
             className="hero-subtitle text-accent-secondary text-xs md:text-sm font-semibold tracking-[0.2em] uppercase mb-4 md:mb-6"
             style={{ opacity: 0 }}
           >
-            Frontend Developer & Creative Engineer
+            Frontend Developer & Mobile Engineer
           </p>
 
           <h1
@@ -89,11 +89,11 @@ export default function HeroSection() {
             style={{ opacity: 0 }}
           >
             Construyo experiencias web inmersivas con{" "}
-            <span className="text-accent-primary font-medium">React</span>,{" "}
-            <span className="text-accent-secondary font-medium">Three.js</span>{" "}
+            <span className="text-accent-tertiary font-medium">React</span>,{" "}
+            <span className="text-accent-secondary font-medium">Javascript</span>{" "}
             y{" "}
             <span className="text-accent-tertiary font-medium">
-              creatividad sin límites
+              React Native
             </span>
             .
           </p>

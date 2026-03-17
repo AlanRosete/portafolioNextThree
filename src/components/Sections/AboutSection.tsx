@@ -30,6 +30,14 @@ const ICON_EXCEPTIONS: Record<string, string> = {
   sass: "iconSass.png",
   angular: "iconAngular.svg",
   amazon: "iconAmazon.svg",
+  redux: "iconRedux.svg",
+  gsap: "iconGsap.svg",
+  threejs: "iconThreejs.png",
+  android: "iconAndroid.svg",
+  sqlserver: "iconMicrosoftSql.svg",
+  aws: "iconAmazon.svg",
+  swift: "iconSwift.svg",
+  nextjs: "iconNext.svg",
 };
 
 function normalizeName(name: string) {
@@ -41,7 +49,7 @@ function normalizeName(name: string) {
 
 function buildCandidates(name: string) {
   const n = name.toLowerCase().trim();
-  
+
   // Buscar match exacto primero
   if (ICON_EXCEPTIONS[n]) {
     return [`/icons/${ICON_EXCEPTIONS[n]}`];
@@ -51,7 +59,7 @@ function buildCandidates(name: string) {
   const partialKey = Object.keys(ICON_EXCEPTIONS).find(
     (key) => n.includes(key) || key.includes(n.replace(/[.\s]/g, "").toLowerCase())
   );
-  
+
   if (partialKey) {
     return [`/icons/${ICON_EXCEPTIONS[partialKey]}`];
   }
@@ -246,17 +254,17 @@ export default function AboutSection() {
           <span className="gradient-text-alt">Sobre Mí</span>
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-start">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-start space-mt">
           {/* Bio */}
           <div className="about-bio" style={{ opacity: 0 }}>
-            <div className="glass rounded-2xl p-6 md:p-8 lg:p-10">
+            <div className="glass rounded-2xl p-6 md:p-8 lg:p-10" style={{ padding: "5%" }}>
               <h3
                 className="text-2xl font-bold mb-4 text-text-primary"
                 style={{ fontFamily: "var(--font-family-heading)" }}
               >
                 Frontend Developer
               </h3>
-
+              <br />
               {/* Updated paragraph (your requested version) */}
               <p className="text-text-secondary leading-relaxed mb-4">
                 I’m <strong>Alan Rosete Mendoza</strong>, a frontend developer with
@@ -275,7 +283,7 @@ export default function AboutSection() {
                 exploring WebGL shaders and performance optimizations when not
                 coding.
               </p>
-
+              <br />
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4 lg:gap-6 mt-8 pt-6 border-t border-white/10">
                 {stats.map((s) => (
@@ -296,11 +304,7 @@ export default function AboutSection() {
           <div className="skills-grid space-y-6">
             {categories.map((category, ci) => (
               <div key={category}>
-                <h4 className="text-sm font-semibold text-accent-secondary tracking-widest uppercase mb-3">
-                  {category}
-                </h4>
-
-                <div className="flex flex-wrap gap-4 items-center">
+                <div className="flex flex-wrap gap-4 items-center" style={ci > 0 ? { paddingTop: "100px" } : undefined}>
                   {skills
                     .filter((s) => s.category === category)
                     .map((skill, i) => (

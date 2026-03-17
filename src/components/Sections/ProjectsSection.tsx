@@ -55,19 +55,19 @@ export default function ProjectsSection() {
     <section
       id="projects"
       ref={sectionRef}
-      className="section relative"
+      className="section relative flex flex-col justify-center items-center gap-12 sm:gap-16 md:gap-24 lg:gap-32"
       style={{ minHeight: "100vh" }}
     >
       {/* Title */}
-      <div className="text-center mb-8 md:mb-16 relative z-10 max-w-4xl mx-auto">
+      <div className="text-center relative z-10 w-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-4 sm:gap-6">
         <h2
-          className="projects-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-5"
+          className="projects-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
           style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
         >
           <span className="gradient-text">Mis Proyectos</span>
         </h2>
         <p
-          className="projects-subtitle text-text-secondary text-sm md:text-base lg:text-lg max-w-xl mx-auto"
+          className="projects-subtitle text-text-secondary text-sm md:text-base lg:text-lg"
           style={{ opacity: 0 }}
         >
           Haz clic en cualquier proyecto para ver los detalles. Gira la galería
@@ -76,10 +76,12 @@ export default function ProjectsSection() {
       </div>
 
       {/* 3D Gallery */}
-      <div className="w-full max-w-6xl mx-auto h-[500px] sm:h-[550px] md:h-[650px] lg:h-[700px] xl:h-[750px] relative">
-        <ThreeScene className="w-full h-full" interactive>
-          <Gallery />
-        </ThreeScene>
+      <div className="w-full flex justify-center items-center">
+        <div className="w-full max-w-6xl h-[500px] sm:h-[550px] md:h-[650px] lg:h-[700px] xl:h-[750px] relative">
+          <ThreeScene className="w-full h-full" interactive>
+            <Gallery />
+          </ThreeScene>
+        </div>
       </div>
     </section>
   );

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { useStore } from "@/hooks/useStore";
 import { gsap } from "@/lib/gsap";
+import Image from "next/image";
 
 export default function Modal() {
   const { selectedProject, isModalOpen, closeModal } = useStore();
@@ -71,13 +72,22 @@ export default function Modal() {
 
         {/* Project Image */}
         <div
-          className="w-full h-48 rounded-xl mb-6 flex items-center justify-center text-6xl"
+          className="w-full h-48 rounded-xl mb-6 flex items-center justify-center text-6xl relative overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${selectedProject.color}33, ${selectedProject.color}11)`,
             border: `1px solid ${selectedProject.color}44`,
           }}
         >
-          🚀
+        {selectedProject.image ? (
+          <Image
+            src={selectedProject.image}
+            alt={selectedProject.title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <span>🚀</span>
+        )}
         </div>
 
         {/* Title */}

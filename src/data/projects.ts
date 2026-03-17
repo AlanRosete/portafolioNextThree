@@ -3,12 +3,12 @@ import { Project } from "@/hooks/useStore";
 export const projects: Project[] = [
   {
     id: "project-1",
-    title: "E-Commerce Platform",
+    title: "GeoWeather",
     description: "Full-stack e-commerce con React, Node.js y Stripe.",
     longDescription:
       "Plataforma e-commerce completa con carrito de compras, sistema de pagos con Stripe, panel de administración, y dashboard de analítica. Arquitectura microservicios con API REST y WebSockets para actualizaciones en tiempo real.",
     tags: ["React", "Node.js", "Stripe", "MongoDB", "WebSocket"],
-    image: "/projects/project-1.jpg",
+    image: "/imgPortfolio/geoWeatherReact.png",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com",
     color: "#6c63ff",
@@ -49,12 +49,12 @@ export const projects: Project[] = [
   },
   {
     id: "project-5",
-    title: "DevOps Platform",
+    title: "Ecommerce Shoes",
     description: "Plataforma de CI/CD con monitoreo y despliegue automatizado.",
     longDescription:
-      "Plataforma DevOps con pipeline CI/CD visual, monitoreo de infraestructura, alertas inteligentes, y despliegue automatizado a múltiples entornos. Integración con GitHub Actions, Docker y Kubernetes.",
+      "Plataforma e-commerce completa con carrito de compras, sistema de pagos con Stripe, panel de administración, y dashboard de analítica. Arquitectura microservicios con API REST y WebSockets para actualizaciones en tiempo real.",
     tags: ["Go", "Docker", "K8s", "React", "GraphQL"],
-    image: "/projects/project-5.jpg",
+    image: "/imgPortfolio/ecommerceReact.png",
     repoUrl: "https://github.com",
     color: "#50fa7b",
   },
@@ -79,8 +79,8 @@ export const skills: Skill[] = [
   { name: "TailwindCSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg", color: "#06B6D4", category: "Frontend" },
   { name: "Sass", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/sass/sass-original.svg", color: "#CC6699", category: "Frontend" },
   { name: "Redux", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redux/redux-original.svg", color: "#764ABC", category: "Frontend" },
-  { name: "Three.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/threejs/threejs-original.svg", color: "#ffffff", category: "Frontend" },
-  { name: "GSAP", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/greensock/greensock-original.svg", color: "#88CE02", category: "Frontend" },
+  // { name: "Three.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/threejs/threejs-original.svg", color: "#ffffff", category: "Frontend" },
+  // { name: "GSAP", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/greensock/greensock-original.svg", color: "#88CE02", category: "Frontend" },
   // Backend
   { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg", color: "#339933", category: "Backend" },
   { name: "Firebase", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg", color: "#FFCA28", category: "Backend" },
@@ -89,9 +89,9 @@ export const skills: Skill[] = [
   { name: "AWS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg", color: "#FF9900", category: "Backend" },
   { name: "C#", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/csharp/csharp-original.svg", color: "#239120", category: "Backend" },
   // Mobile
-  { name: "React Native", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg", color: "#61DAFB", category: "Mobile" },
-  { name: "Android", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/android/android-original.svg", color: "#3DDC84", category: "Mobile" },
-  { name: "iOS / Swift", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/swift/swift-original.svg", color: "#F05138", category: "Mobile" },
+  // { name: "React Native", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg", color: "#61DAFB", category: "Mobile" },
+  // { name: "Android", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/android/android-original.svg", color: "#3DDC84", category: "Mobile" },
+  // { name: "iOS / Swift", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/swift/swift-original.svg", color: "#F05138", category: "Mobile" },
 ];
 
 export const navLinks = [
