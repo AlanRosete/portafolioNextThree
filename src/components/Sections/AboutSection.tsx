@@ -251,7 +251,7 @@ export default function AboutSection() {
           className="about-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 md:mb-14 text-center"
           style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
         >
-          <span className="gradient-text-alt">Sobre Mí</span>
+          <span className="gradient-text-alt">About Me</span>
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-start space-mt">
@@ -304,7 +304,7 @@ export default function AboutSection() {
           <div className="skills-grid space-y-6">
             {categories.map((category, ci) => (
               <div key={category}>
-                <div className="flex flex-wrap gap-4 items-center" style={ci > 0 ? { paddingTop: "100px" } : undefined}>
+                <div className="flex flex-wrap gap-8 items-center justify-center" style={ci > 0 ? { paddingTop: "100px" } : undefined}>
                   {skills
                     .filter((s) => s.category === category)
                     .map((skill, i) => (

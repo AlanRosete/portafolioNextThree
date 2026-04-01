@@ -52,15 +52,15 @@ export default function ContactSection() {
     const newErrors = { name: "", email: "", message: "" };
 
     if (!formState.name.trim()) {
-      newErrors.name = "El nombre es requerido";
+      newErrors.name = "The name is required";
       valid = false;
     }
     if (!formState.email.trim() || !/\S+@\S+\.\S+/.test(formState.email)) {
-      newErrors.email = "Email válido es requerido";
+      newErrors.email = "A valid email address is required";
       valid = false;
     }
     if (!formState.message.trim()) {
-      newErrors.message = "El mensaje es requerido";
+      newErrors.message = "The message is required";
       valid = false;
     }
 
@@ -115,10 +115,10 @@ export default function ContactSection() {
             className="contact-title text-4xl md:text-6xl font-bold mb-4"
             style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
           >
-            <span className="gradient-text">Hablemos</span>
+            <span className="gradient-text">Let's talk</span>
           </h2>
           <p className="contact-title text-text-secondary text-lg" style={{ opacity: 0 }}>
-            ¿Tienes un proyecto en mente? ¡Me encantaría escucharte!
+            Do you have a project in mind? I'd love to hear from you!
           </p>
         </div>
         {/* Form */}
@@ -131,7 +131,7 @@ export default function ContactSection() {
                   htmlFor="name"
                   className="block text-text-secondary text-sm font-medium mb-2"
                 >
-                  Nombre
+                  Name
                 </label>
                 <input
                   id="name"
@@ -140,7 +140,7 @@ export default function ContactSection() {
                   value={formState.name}
                   onChange={(e) => setFormState((s) => ({ ...s, name: e.target.value }))}
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/50 transition-all duration-300"
-                  placeholder="Tu nombre"
+                  placeholder="Your name"
                 />
                 {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
               </div>
@@ -159,7 +159,7 @@ export default function ContactSection() {
                   value={formState.email}
                   onChange={(e) => setFormState((s) => ({ ...s, email: e.target.value }))}
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/50 transition-all duration-300"
-                  placeholder="tu@email.com"
+                  placeholder="[EMAIL_ADDRESS]"
                 />
                 {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
               </div>
@@ -170,7 +170,7 @@ export default function ContactSection() {
                 htmlFor="message"
                 className="block text-text-secondary text-sm font-medium mb-2"
               >
-                Mensaje
+                Message
               </label>
               <textarea
                 id="message"
@@ -179,12 +179,12 @@ export default function ContactSection() {
                 value={formState.message}
                 onChange={(e) => setFormState((s) => ({ ...s, message: e.target.value }))}
                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/50 transition-all duration-300 resize-y min-h-[120px] md:min-h-[180px]" // Mejora: resize-y y min-h responsivo
-                placeholder="Cuéntame sobre tu proyecto..."
+                placeholder="Tell me about your project..."
               />
               {errors.message && <p className="text-red-400 text-sm mt-1">{errors.message}</p>}
             </div>
             {/* Submit */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 justify-center">
               <button
                 type="submit"
                 disabled={status === "sending"}
@@ -207,13 +207,13 @@ export default function ContactSection() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    Enviar Mensaje
+                    Send Message
                   </>
                 )}
               </button>
               {status === "error" && (
                 <p role="status" className="text-red-400 text-sm">
-                  Error al enviar. Intenta de nuevo.
+                  Error sending. Please try again.
                 </p>
               )}
             </div>

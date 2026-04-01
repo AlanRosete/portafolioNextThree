@@ -79,7 +79,7 @@ export default function Header() {
             href="/game"
             className="text-sm font-medium px-4 py-2 rounded-lg border border-accent-primary/30 text-accent-primary hover:bg-accent-primary/10 transition-all duration-300"
           >
-            🎮 Mini-Game
+            📑 Download CV
           </a>
         </nav>
 
@@ -143,7 +143,7 @@ export default function Header() {
             transition: "all 0.4s ease",
           }}
         >
-          🎮 Mini-Game
+          📑 Download CV
         </a>
       </div>
     </header>

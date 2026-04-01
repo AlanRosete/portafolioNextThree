@@ -1,314 +1,550 @@
 "use client";
 
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import "./game.css";
+import React, { useRef, useEffect, useState, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Text, Float } from "@react-three/drei";
 import * as THREE from "three";
-import { useStore } from "@/hooks/useStore";
 import Link from "next/link";
+import imgProfile8Bits from "../../../public/icons/iconDev8Bits.gif";
 
-/* ═══════════════════════════════════════════════════
-   PLAYER COMPONENT
-   ═══════════════════════════════════════════════════ */
-
-function Player({
-  position,
+function ElectronOrbit({
+  radiusX,
+  radiusY,
+  rotationAxis,
+  rotationAngle,
+  speed,
+  color,
+  electronColor,
 }: {
-  position: React.MutableRefObject<THREE.Vector3>;
+  radiusX: number;
+  radiusY: number;
+  rotationAxis: THREE.Vector3;
+  rotationAngle: number;
+  speed: number;
+  color: string;
+  electronColor: string;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const electronRef = useRef<THREE.Mesh>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
+  const angleRef = useRef(Math.random() * Math.PI * 2);
 
-  useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.position.lerp(position.current, 0.1);
-      meshRef.current.rotation.z += 0.02;
+  const orbitLine = useMemo(() => {
+    const points: THREE.Vector3[] = [];
+    const segments = 128;
+    for (let i = 0; i <= segments; i++) {
+      const theta = (i / segments) * Math.PI * 2;
+      points.push(
+        new THREE.Vector3(
+          Math.cos(theta) * radiusX,
+          Math.sin(theta) * radiusY,
+          0
+        )
+      );
+    }
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.25 });
+    return new THREE.Line(geo, mat);
+  }, [radiusX, radiusY, color]);
+
+  useFrame((_, delta) => {
+    angleRef.current += speed * delta;
+
+    const x = Math.cos(angleRef.current) * radiusX;
+    const y = Math.sin(angleRef.current) * radiusY;
+
+    if (electronRef.current) {
+      electronRef.current.position.set(x, y, 0);
+    }
+    if (glowRef.current) {
+      glowRef.current.position.set(x, y, 0);
     }
   });
 
+  const quaternion = useMemo(() => {
+    const q = new THREE.Quaternion();
+    q.setFromAxisAngle(rotationAxis.normalize(), rotationAngle);
+    return q;
+  }, [rotationAxis, rotationAngle]);
+
   return (
-    <mesh ref={meshRef}>
-      <octahedronGeometry args={[0.3, 0]} />
-      <meshStandardMaterial
-        color="#6c63ff"
-        emissive="#6c63ff"
-        emissiveIntensity={0.5}
-        roughness={0.3}
-        metalness={0.8}
-      />
-    </mesh>
+    <group quaternion={quaternion}>
+      <primitive object={orbitLine} />
+
+      {/* Electron */}
+      <mesh ref={electronRef}>
+        <sphereGeometry args={[0.08, 16, 16]} />
+        <meshStandardMaterial
+          color={electronColor}
+          emissive={electronColor}
+          emissiveIntensity={2}
+          toneMapped={false}
+        />
+      </mesh>
+
+      {/* Electron glow */}
+      <mesh ref={glowRef}>
+        <sphereGeometry args={[0.15, 100, 100]} />
+        <meshBasicMaterial
+          color={electronColor}
+          transparent
+          opacity={0.15}
+        />
+      </mesh>
+    </group>
   );
 }
 
-/* ═══════════════════════════════════════════════════
-   TOKEN COMPONENT
-   ═══════════════════════════════════════════════════ */
-
-function Token({
-  position,
-  color,
-  label,
-  onCollect,
-  collected,
-}: {
-  position: [number, number, number];
-  color: string;
-  label: string;
-  onCollect: () => void;
-  collected: boolean;
-}) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [localCollected, setLocalCollected] = useState(false);
+function AtomScene() {
+  const groupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
-    if (meshRef.current && !localCollected) {
-      meshRef.current.rotation.y += 0.03;
-      meshRef.current.position.y =
-        position[1] + Math.sin(state.clock.getElapsedTime() * 2) * 0.2;
+    if (groupRef.current) {
+      groupRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.3) * 0.15;
+      groupRef.current.rotation.x = Math.cos(state.clock.getElapsedTime() * 0.2) * 0.1;
     }
-  });
-
-  if (collected || localCollected) return null;
-
-  return (
-    <Float speed={1.5} floatIntensity={0.3}>
-      <group position={position}>
-        <mesh
-          ref={meshRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            setLocalCollected(true);
-            onCollect();
-          }}
-          onPointerOver={() => {
-            document.body.style.cursor = "pointer";
-          }}
-          onPointerOut={() => {
-            document.body.style.cursor = "default";
-          }}
-        >
-          <dodecahedronGeometry args={[0.25, 0]} />
-          <meshStandardMaterial
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.6}
-            roughness={0.2}
-            metalness={0.9}
-          />
-        </mesh>
-        <Text
-          position={[0, 0.5, 0]}
-          fontSize={0.12}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
-        >
-          {label}
-        </Text>
-      </group>
-    </Float>
-  );
-}
-
-/* ═══════════════════════════════════════════════════
-   GAME SCENE
-   ═══════════════════════════════════════════════════ */
-
-function GameScene() {
-  const playerPos = useRef(new THREE.Vector3(0, 0, 0));
-  const keysPressed = useRef<Set<string>>(new Set());
-  const { collectToken, gameTokens, isGameComplete } = useStore();
-  const [collectedSet, setCollectedSet] = useState<Set<number>>(new Set());
-
-  const speed = 0.08;
-
-  const tokens = [
-    { position: [3, 0, -2] as [number, number, number], color: "#6c63ff", label: "React" },
-    { position: [-3, 0, 1] as [number, number, number], color: "#00d4ff", label: "Three.js" },
-    { position: [1, 0, 3] as [number, number, number], color: "#ff6b9d", label: "GSAP" },
-    { position: [-2, 0, -3] as [number, number, number], color: "#ffd93d", label: "Node.js" },
-    { position: [4, 0, 2] as [number, number, number], color: "#50fa7b", label: "TypeScript" },
-  ];
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      keysPressed.current.add(e.key.toLowerCase());
-    };
-    const handleKeyUp = (e: KeyboardEvent) => {
-      keysPressed.current.delete(e.key.toLowerCase());
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
-  }, []);
-
-  useFrame(() => {
-    const keys = keysPressed.current;
-    const dir = new THREE.Vector3();
-
-    if (keys.has("w") || keys.has("arrowup")) dir.z -= speed;
-    if (keys.has("s") || keys.has("arrowdown")) dir.z += speed;
-    if (keys.has("a") || keys.has("arrowleft")) dir.x -= speed;
-    if (keys.has("d") || keys.has("arrowright")) dir.x += speed;
-
-    playerPos.current.add(dir);
-
-    // Clamp position
-    playerPos.current.x = THREE.MathUtils.clamp(playerPos.current.x, -6, 6);
-    playerPos.current.z = THREE.MathUtils.clamp(playerPos.current.z, -6, 6);
-
-    // Check collision with tokens
-    tokens.forEach((token, i) => {
-      if (collectedSet.has(i)) return;
-      const dist = playerPos.current.distanceTo(
-        new THREE.Vector3(...token.position)
-      );
-      if (dist < 0.6) {
-        setCollectedSet((prev) => new Set([...prev, i]));
-        collectToken();
-      }
-    });
   });
 
   return (
     <>
       <ambientLight intensity={0.3} />
-      <pointLight position={[0, 10, 0]} color="#6c63ff" intensity={3} />
-      <pointLight position={[5, 5, 5]} color="#00d4ff" intensity={2} />
+      <pointLight position={[0, 0, 5]} color="#6c63ff" intensity={2} />
+      <pointLight position={[3, 3, 3]} color="#00d4ff" intensity={1} />
 
-      {/* Floor grid */}
-      <gridHelper args={[14, 14, "#6c63ff", "#1a1a2e"]} rotation={[0, 0, 0]} />
+      <group ref={groupRef}>
+        <mesh>
+          <sphereGeometry args={[0.2, 32, 32]} />
+          <meshStandardMaterial
+            color="#6c63ff"
+            emissive="#6c63ff"
+            emissiveIntensity={3}
+            toneMapped={false}
+          />
+        </mesh>
 
-      {/* Player */}
-      <Player position={playerPos} />
-
-      {/* Tokens */}
-      {tokens.map((token, i) => (
-        <Token
-          key={i}
-          position={token.position}
-          color={token.color}
-          label={token.label}
-          collected={collectedSet.has(i)}
-          onCollect={() => {}}
-        />
-      ))}
-
-      {/* Boundary walls (visual) */}
-      {[
-        [0, 0.5, -7],
-        [0, 0.5, 7],
-        [-7, 0.5, 0],
-        [7, 0.5, 0],
-      ].map((pos, i) => (
-        <mesh
-          key={`wall-${i}`}
-          position={pos as [number, number, number]}
-          rotation={[0, i < 2 ? 0 : Math.PI / 2, 0]}
-        >
-          <planeGeometry args={[14, 1]} />
+        <mesh>
+          <sphereGeometry args={[0.35, 32, 32]} />
           <meshBasicMaterial
             color="#6c63ff"
             transparent
-            opacity={0.1}
-            side={THREE.DoubleSide}
+            opacity={0.08}
           />
         </mesh>
-      ))}
+
+        <ElectronOrbit
+          radiusX={1.4}
+          radiusY={1.2}
+          rotationAxis={new THREE.Vector3(0.2, 1, 0.3)}
+          rotationAngle={0.4}
+          speed={1.8}
+          color="#6c63ff"
+          electronColor="#a78bfa"
+        />
+
+        <ElectronOrbit
+          radiusX={1.5}
+          radiusY={1.1}
+          rotationAxis={new THREE.Vector3(1, 0.3, 0.1)}
+          rotationAngle={1.2}
+          speed={1.4}
+          color="#00d4ff"
+          electronColor="#22d3ee"
+        />
+
+        <ElectronOrbit
+          radiusX={1.3}
+          radiusY={1.4}
+          rotationAxis={new THREE.Vector3(0.5, 0.8, 1)}
+          rotationAngle={2.1}
+          speed={2.1}
+          color="#ff6b9d"
+          electronColor="#fb7185"
+        />
+      </group>
     </>
   );
 }
 
-/* ═══════════════════════════════════════════════════
-   GAME PAGE
-   ═══════════════════════════════════════════════════ */
+function useTypewriter(lines: string[], speed = 35, lineDelay = 300) {
+  const [displayedLines, setDisplayedLines] = useState<string[]>(() => 
+    new Array(lines.length).fill("")
+  );
+  const [currentLine, setCurrentLine] = useState(0);
+  const [currentChar, setCurrentChar] = useState(0);
+  const [isDone, setIsDone] = useState(false);
 
-export default function GamePage() {
-  const { gameTokens, maxTokens, isGameComplete, resetGame } = useStore();
+  useEffect(() => {
+    if (currentLine >= lines.length) {
+      setIsDone(true);
+      return;
+    }
+
+    const line = lines[currentLine];
+
+    if (line.length === 0 && currentChar === 0) {
+      setDisplayedLines((prev) => {
+        const updated = [...prev];
+        updated[currentLine] = "";
+        return updated;
+      });
+      const skipTimer = setTimeout(() => {
+        setCurrentLine((l) => l + 1);
+      }, lineDelay / 2);
+      return () => clearTimeout(skipTimer);
+    }
+
+    if (currentChar === 0 && currentLine > 0) {
+      const lineTimer = setTimeout(() => {
+        setCurrentChar(1);
+      }, lineDelay);
+      return () => clearTimeout(lineTimer);
+    }
+
+    if (currentChar <= line.length) {
+      const charTimer = setTimeout(() => {
+        setDisplayedLines((prev) => {
+          const updated = [...prev];
+          updated[currentLine] = line.slice(0, currentChar);
+          return updated;
+        });
+        setCurrentChar((c) => c + 1);
+      }, speed);
+      return () => clearTimeout(charTimer);
+    } else {
+      setCurrentLine((l) => l + 1);
+      setCurrentChar(0);
+    }
+  }, [currentLine, currentChar, lines, speed, lineDelay]);
+
+  const visibleLines = displayedLines.slice(0, currentLine + (isDone ? 0 : 1));
+
+  return { displayedLines: visibleLines, isDone };
+}
+
+const NEOFETCH_LINES = [
+  "alan@portfolio",
+  "───────────────────────",
+  "OS        Alan OS v3.0 LTS",
+  "Host      portfolio.dev",
+  "Kernel    frontend-core 3.2.1",
+  "Uptime    3 years, 6 months",
+  "Packages  47 (npm)",
+  "Shell     zsh 5.9",
+  "Resolution 1920x1080",
+  "DE        VS Code",
+  "WM        Chrome 120",
+  "Terminal  Hyper",
+  "CPU       Coffee-powered @ 3.0GHz",
+  "Memory    1337MB / ∞",
+];
+
+const NEOFETCH_COLORS = [
+  "#6c63ff", "#00d4ff", "#ff6b9d", "#ffd93d",
+  "#50fa7b", "#a78bfa", "#f472b6", "#6c63ff",
+];
+
+function NeofetchPanel() {
+  const { displayedLines, isDone } = useTypewriter(NEOFETCH_LINES, 25, 120);
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "var(--color-bg-primary)" }}>
-      {/* Top bar */}
-      <div className="glass-strong p-4 flex items-center justify-between z-10">
-        <Link
-          href="/"
-          className="text-text-secondary hover:text-text-primary transition-colors flex items-center gap-2"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          Volver al Portfolio
-        </Link>
-
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            {Array.from({ length: maxTokens }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                  i < gameTokens
-                    ? "bg-accent-primary glow-accent scale-110"
-                    : "bg-white/10"
-                }`}
-              />
-            ))}
+    <div className="neofetch-panel">
+      <div className="neofetch-content">
+        {displayedLines.map((line, i) => (
+          <div key={i} className="neofetch-line">
+            {i === 0 ? (
+              <span className="neofetch-user">
+                <span style={{ color: "#00d4ff" }}>alan</span>
+                <span style={{ color: "#6b6b80" }}>@</span>
+                <span style={{ color: "#6c63ff" }}>portfolio</span>
+              </span>
+            ) : i === 1 ? (
+              <span className="neofetch-separator">{line}</span>
+            ) : (
+              <>
+                <span className="neofetch-key">
+                  {line.split(/\s{2,}/)[0]}
+                </span>
+                <span className="neofetch-value">
+                  {line.split(/\s{2,}/).slice(1).join(" ")}
+                </span>
+              </>
+            )}
           </div>
-          <span className="text-text-secondary text-sm">
-            {gameTokens}/{maxTokens}
-          </span>
-        </div>
+        ))}
 
-        <button onClick={resetGame} className="btn-secondary text-sm py-2 px-4">
-          Reiniciar
-        </button>
-      </div>
+        {!isDone && <span className="terminal-cursor">▋</span>}
 
-      {/* Game canvas */}
-      <div className="flex-1 relative">
-        <Canvas camera={{ position: [0, 8, 8], fov: 50 }}>
-          <GameScene />
-        </Canvas>
-
-        {/* Instructions overlay */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 glass rounded-xl px-6 py-3 text-center">
-          <p className="text-text-secondary text-sm">
-            Usa <span className="text-accent-primary font-bold">WASD</span> o las{" "}
-            <span className="text-accent-primary font-bold">flechas</span> para moverte.
-            Recoge los <span className="text-accent-secondary font-bold">5 tokens</span> para
-            desbloquear el CV.
-          </p>
-        </div>
-
-        {/* Victory modal */}
-        {isGameComplete && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="glass-strong rounded-2xl p-8 text-center max-w-md animate-fade-in-up">
-              <div className="text-6xl mb-4">🎉</div>
-              <h2
-                className="text-3xl font-bold gradient-text mb-4"
-                style={{ fontFamily: "var(--font-family-heading)" }}
-              >
-                ¡Completado!
-              </h2>
-              <p className="text-text-secondary mb-6">
-                Has recogido todos los tokens. ¡Aquí está tu recompensa!
-              </p>
-              <div className="flex flex-col gap-3">
-                <a href="/cv.pdf" download className="btn-primary justify-center">
-                  📄 Descargar CV
-                </a>
-                <button onClick={resetGame} className="btn-secondary justify-center">
-                  Jugar de nuevo
-                </button>
-              </div>
+        {isDone && (
+          <div className="neofetch-colors">
+            <div className="color-row">
+              {NEOFETCH_COLORS.map((c, i) => (
+                <div key={i} className="color-block" style={{ background: c }} />
+              ))}
+            </div>
+            <div className="color-row">
+              {NEOFETCH_COLORS.map((c, i) => (
+                <div key={i} className="color-block" style={{ background: c, opacity: 0.5 }} />
+              ))}
             </div>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+const CODE_LINES = [
+  'const ProfileCard = () => {',
+  '  const [status] = useState("available");',
+  '',
+  '  return (',
+  '    <Card className="glass-profile">',
+  '      <Avatar src="/alan.jpg" />',
+  '      <Badge status={status} />',
+  '      <h3>Alan Rosete</h3>',
+  '      <p>Frontend Developer</p>',
+  '      <DownloadCV />',
+  '    </Card>',
+  '  );',
+  '};',
+];
+
+function LiveTerminal() {
+  const { displayedLines, isDone } = useTypewriter(CODE_LINES, 30, 150);
+  const [showRender, setShowRender] = useState(false);
+
+  useEffect(() => {
+    if (isDone) {
+      const timer = setTimeout(() => setShowRender(true), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [isDone]);
+
+  return (
+    <div className="live-terminal">
+      <div className="terminal-header">
+        <div className="terminal-dots">
+          <span className="dot dot-red" />
+          <span className="dot dot-yellow" />
+          <span className="dot dot-green" />
+        </div>
+        <span className="terminal-title">~/portfolio/ProfileCard.tsx</span>
+        <div style={{ width: 52 }} />
+      </div>
+
+      <div className="terminal-body">
+        <div className="code-area">
+          {displayedLines.map((line, i) => (
+            <div key={i} className="code-line">
+              <span className="line-number">{i + 1}</span>
+              <span className="code-text">
+                <CodeHighlight line={line} />
+              </span>
+            </div>
+          ))}
+          {!isDone && (
+            <div className="code-line">
+              <span className="line-number">{displayedLines.length + 1}</span>
+              <span className="terminal-cursor">▋</span>
+            </div>
+          )}
+        </div>
+
+        {isDone && (
+          <div className="render-separator">
+            <span className="render-arrow">▼</span>
+            <span className="render-label">Live Output</span>
+            <span className="render-arrow">▼</span>
+          </div>
+        )}
+
+        {showRender && (
+          <div className="render-output animate-fade-in-up">
+            <ProfileCardRendered />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CodeHighlight({ line }: { line: string }) {
+  if (!line) return <span>&nbsp;</span>;
+
+  const tokens: { text: string; type: string }[] = [];
+  let remaining = line;
+
+  while (remaining.length > 0) {
+    let matched = false;
+
+    const kwMatch = remaining.match(/^(const|return|useState|import|from|export|default|function)\b/);
+    if (kwMatch) {
+      tokens.push({ text: kwMatch[0], type: "keyword" });
+      remaining = remaining.slice(kwMatch[0].length);
+      matched = true;
+      continue;
+    }
+
+    const strMatch = remaining.match(/^"[^"]*"/);
+    if (strMatch) {
+      tokens.push({ text: strMatch[0], type: "string" });
+      remaining = remaining.slice(strMatch[0].length);
+      matched = true;
+      continue;
+    }
+
+    const tagMatch = remaining.match(/^(<\/?[A-Z]\w*|<\/?[a-z]\w*)/);
+    if (tagMatch) {
+      tokens.push({ text: tagMatch[0], type: "tag" });
+      remaining = remaining.slice(tagMatch[0].length);
+      matched = true;
+      continue;
+    }
+
+    const closeMatch = remaining.match(/^\/>/);
+    if (closeMatch) {
+      tokens.push({ text: closeMatch[0], type: "tag" });
+      remaining = remaining.slice(closeMatch[0].length);
+      matched = true;
+      continue;
+    }
+
+    const arrowMatch = remaining.match(/^=>/);
+    if (arrowMatch) {
+      tokens.push({ text: arrowMatch[0], type: "keyword" });
+      remaining = remaining.slice(arrowMatch[0].length);
+      matched = true;
+      continue;
+    }
+
+    if ('{}()[]'.includes(remaining[0])) {
+      tokens.push({ text: remaining[0], type: "brace" });
+      remaining = remaining.slice(1);
+      matched = true;
+      continue;
+    }
+
+    if (remaining[0] === '>' || remaining[0] === '<') {
+      tokens.push({ text: remaining[0], type: "tag" });
+      remaining = remaining.slice(1);
+      matched = true;
+      continue;
+    }
+
+    if (!matched) {
+      const plainMatch = remaining.match(/^[^<>"{}()[\]=>]+/);
+      if (plainMatch) {
+        tokens.push({ text: plainMatch[0], type: "plain" });
+        remaining = remaining.slice(plainMatch[0].length);
+      } else {
+        tokens.push({ text: remaining[0], type: "plain" });
+        remaining = remaining.slice(1);
+      }
+    }
+  }
+
+  const colorMap: Record<string, string> = {
+    keyword: "#c792ea",
+    string: "#c3e88d",
+    tag: "#ff6b9d",
+    brace: "#ffd93d",
+    plain: "inherit",
+  };
+
+  return (
+    <span>
+      {tokens.map((token, i) => (
+        <span key={i} style={{ color: colorMap[token.type] || "inherit", fontWeight: token.type === "keyword" ? 600 : undefined }}>
+          {token.text}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function ProfileCardRendered() {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div className="profile-card glass">
+      <div className="profile-card-inner">
+        {/* Avatar */}
+        <div className="profile-avatar">
+          <img src={imgProfile8Bits.src} width={80} height={80} alt="" />
+        </div>
+
+        {/* Info */}
+        <div className="profile-info">
+          <h3 className="profile-name">Alan Rosete</h3>
+          <p className="profile-role">Frontend Developer</p>
+          <p className="profile-open">Open to new opportunities</p>
+        </div>
+      </div>
+
+      <a
+        href="/PDF/Alan Rosete Front CV.pdf"
+        download
+        className="cv-download-btn"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <svg
+          className="cv-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          />
+        </svg>
+        Download CV
+        {hovered && <span className="cv-shimmer" />}
+      </a>
+    </div>
+  );
+}
+
+export default function GamePage() {
+  return (
+    <div className="neofetch-page">
+      <header className="neofetch-topbar glass-strong">
+        <Link
+          href="/"
+          className="back-link"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Portfolio
+        </Link>
+
+        <div className="topbar-tag">
+          <span className="tag-dot" />
+          terminal v1.0
+        </div>
+      </header>
+
+      <main className="neofetch-main">
+        <div className="neofetch-row">
+          <div className="atom-container">
+            <Canvas
+              camera={{ position: [0, 0, 4], fov: 45 }}
+              dpr={[1, 1.5]}
+              gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+              style={{ background: "transparent" }}
+            >
+              <AtomScene />
+            </Canvas>
+          </div>
+          <NeofetchPanel />
+        </div>
+        <LiveTerminal />
+      </main>
     </div>
   );
 }

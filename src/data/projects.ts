@@ -95,8 +95,8 @@ export const skills: Skill[] = [
 ];
 
 export const navLinks = [
-  { label: "Inicio", href: "#hero" },
-  { label: "Proyectos", href: "#projects" },
-  { label: "Sobre Mí", href: "#about" },
-  { label: "Contacto", href: "#contact" },
+  { label: "Home", href: "#hero" },
+  { label: "Proyects", href: "#projects" },
+  { label: "About Me", href: "#about" },
+  { label: "Contact", href: "#contact" },
 ];

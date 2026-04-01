@@ -64,14 +64,13 @@ export default function ProjectsSection() {
           className="projects-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
           style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
         >
-          <span className="gradient-text">Mis Proyectos</span>
+          <span className="gradient-text">My Projects</span>
         </h2>
         <p
           className="projects-subtitle text-text-secondary text-sm md:text-base lg:text-lg"
           style={{ opacity: 0 }}
         >
-          Haz clic en cualquier proyecto para ver los detalles. Gira la galería
-          con el cursor.
+          Click on any project to view the details. Use your mouse to scroll through the gallery.
         </p>
       </div>
 

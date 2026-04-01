@@ -80,7 +80,7 @@ export default function HeroSection() {
             className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[0.95] mb-5 md:mb-8"
             style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
           >
-            <span className="block text-text-primary">Hola, soy</span>
+            <span className="block text-text-primary">Hi, I'm</span>
             <span className="block gradient-text text-glow">Alan Rosete</span>
           </h1>
 
@@ -88,10 +88,10 @@ export default function HeroSection() {
             className="hero-desc text-text-secondary text-base md:text-lg lg:text-xl leading-relaxed mb-8 md:mb-10 max-w-lg mx-auto md:mx-0"
             style={{ opacity: 0 }}
           >
-            Construyo experiencias web inmersivas con{" "}
+            I build immersive web experiences with{" "}
             <span className="text-accent-tertiary font-medium">React</span>,{" "}
             <span className="text-accent-secondary font-medium">Javascript</span>{" "}
-            y{" "}
+            and{" "}
             <span className="text-accent-tertiary font-medium">
               React Native
             </span>
@@ -100,7 +100,7 @@ export default function HeroSection() {
 
           <div className="hero-cta flex flex-wrap gap-4 justify-center md:justify-start" style={{ opacity: 0 }}>
             <a href="#projects" className="btn-primary">
-              Ver Proyectos
+              View projects
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -116,7 +116,7 @@ export default function HeroSection() {
               </svg>
             </a>
             <a href="#contact" className="btn-secondary">
-              Contáctame
+              Contact me
             </a>
           </div>
         </div>

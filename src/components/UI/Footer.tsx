@@ -71,7 +71,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-text-muted text-sm">
-            © {currentYear} Alan Rosete. Todos los derechos reservados.
+            © {currentYear} Alan Rosete. All rights reserved.
           </p>
         </div>
       </div>
