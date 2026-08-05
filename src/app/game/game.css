@@ -46,13 +46,13 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #50fa7b;
-  animation: pulse-glow-dot 2s ease-in-out infinite;
+  background: var(--color-accent-primary);
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
-@keyframes pulse-glow-dot {
-  0%, 100% { box-shadow: 0 0 4px #50fa7b; opacity: 1; }
-  50% { box-shadow: 0 0 12px #50fa7b; opacity: 0.7; }
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 .neofetch-main {
@@ -103,8 +103,8 @@
 
 .neofetch-panel {
   flex: 1;
-  background: rgba(10, 10, 15, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-line);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
   font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
@@ -142,7 +142,7 @@
 }
 
 .neofetch-key {
-  color: var(--color-accent-primary);
+  color: var(--color-text-primary);
   font-weight: 600;
   min-width: 100px;
   display: inline-block;
@@ -183,10 +183,10 @@
 }
 
 .live-terminal {
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-line);
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(10, 10, 15, 0.8);
+  background: var(--color-bg-secondary);
 }
 
 .terminal-header {
@@ -194,8 +194,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background: rgba(26, 26, 46, 0.6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-line);
 }
 
 .terminal-dots {
@@ -208,9 +208,9 @@
   height: 10px;
   border-radius: 50%;
 }
-.dot-red { background: #ff5f56; }
-.dot-yellow { background: #ffbd2e; }
-.dot-green { background: #27c93f; }
+.dot-red { background: #474747; }
+.dot-yellow { background: #5e5e5e; }
+.dot-green { background: #757575; }
 
 .terminal-title {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -253,18 +253,20 @@
   color: var(--color-text-secondary);
 }
 
+/* Tonos aclarados respecto al acento base: el código va a 0.8rem
+   y #e8175d solo daba 3.82:1 sobre el panel. */
 .syn-keyword {
-  color: #c792ea;
+  color: #d97f9c;
   font-weight: 600;
 }
 .syn-string {
-  color: #c3e88d;
+  color: #a8a7a8;
 }
 .syn-tag {
-  color: #ff6b9d;
+  color: #ef4a7b;
 }
 .syn-brace {
-  color: #ffd93d;
+  color: #898989;
 }
 
 .render-separator {
@@ -273,7 +275,7 @@
   justify-content: center;
   gap: 0.75rem;
   margin: 1rem 0;
-  color: var(--color-accent-secondary);
+  color: var(--color-text-muted);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -292,28 +294,27 @@
 
 .render-label {
   padding: 0.2rem 0.6rem;
-  background: rgba(0, 212, 255, 0.1);
-  border: 1px solid rgba(0, 212, 255, 0.2);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-line);
   border-radius: 4px;
 }
 
 .render-output {
   margin-top: 0.5rem;
   padding: 0.75rem;
-  border: 1px dashed rgba(108, 99, 255, 0.3);
+  border: 1px dashed var(--color-line-strong);
   border-radius: 10px;
-  background: rgba(108, 99, 255, 0.03);
+  background: transparent;
 }
 
 .profile-card {
   border-radius: 14px;
   padding: 1.25rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.2s ease;
 }
 
 .profile-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(108, 99, 255, 0.15);
+  border-color: var(--color-line-strong);
 }
 
 .profile-card-inner {
@@ -342,11 +343,10 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-accent-secondary));
+  background: var(--color-accent-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 20px var(--color-accent-glow);
 }
 
 .avatar-initials {
@@ -366,14 +366,13 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #50fa7b;
-  box-shadow: 0 0 8px rgba(80, 250, 123, 0.6);
-  animation: pulse-glow-dot 2s ease-in-out infinite;
+  background: var(--color-accent-primary);
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
 .status-text {
   font-size: 0.65rem;
-  color: #50fa7b;
+  color: var(--color-accent-text);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -392,7 +391,7 @@
 }
 
 .profile-role {
-  color: var(--color-accent-secondary);
+  color: var(--color-text-secondary);
   font-size: 0.85rem;
   font-weight: 500;
   margin-bottom: 0.25rem;
@@ -410,23 +409,22 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--color-accent-primary), #8b83ff);
-  color: white;
+  background: var(--color-accent-primary);
+  color: #ffffff;
   border: none;
-  border-radius: 10px;
+  border-radius: 6px;
   font-family: var(--font-family-body);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
   position: relative;
   overflow: hidden;
   text-decoration: none;
 }
 
 .cv-download-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--color-accent-glow);
+  background: #cc134f;
 }
 
 .cv-icon {

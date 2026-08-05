@@ -40,7 +40,7 @@ export default function Header() {
     <header
       ref={headerRef}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        scrolled ? "glass-strong shadow-lg" : ""
+        scrolled ? "glass-strong" : ""
       }`}
       style={{ opacity: 0 }}
     >
@@ -55,8 +55,8 @@ export default function Header() {
           className="text-2xl font-bold tracking-tight"
           style={{ fontFamily: "var(--font-family-heading)" }}
         >
-          <span className="gradient-text">Alan</span>
-          <span className="text-text-secondary">.dev</span>
+          <span className="text-text-primary">Alan</span>
+          <span className="text-text-muted">.dev</span>
         </a>
 
         {/* Desktop Nav */}
@@ -72,14 +72,14 @@ export default function Header() {
               className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300 relative group"
             >
               {link.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-accent-primary to-accent-secondary transition-all duration-300 group-hover:w-full" />
+              <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent-primary transition-all duration-300 group-hover:w-full" />
             </a>
           ))}
           <a
             href="/game"
-            className="text-sm font-medium px-4 py-2 rounded-lg border border-accent-primary/30 text-accent-primary hover:bg-accent-primary/10 transition-all duration-300"
+            className="text-sm font-medium px-4 py-2 rounded-md border border-line-strong text-text-primary hover:border-accent-primary hover:text-accent-text transition-colors duration-200"
           >
-            📑 Download CV
+            Download CV
           </a>
         </nav>
 
@@ -136,14 +136,14 @@ export default function Header() {
         ))}
         <a
           href="/game"
-          className="text-xl font-bold text-accent-primary"
+          className="text-xl font-medium text-accent-text"
           style={{
             transitionDelay: isMobileMenuOpen ? `${navLinks.length * 100}ms` : "0ms",
             opacity: isMobileMenuOpen ? 1 : 0,
             transition: "all 0.4s ease",
           }}
         >
-          📑 Download CV
+          Download CV
         </a>
       </div>
     </header>

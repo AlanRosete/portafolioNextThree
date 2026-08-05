@@ -70,7 +70,7 @@ export default function HeroSection() {
       <div ref={textRef} className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 w-full">
         <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 lg:max-w-2xl responsive-hero-desktop">
           <p
-            className="hero-subtitle text-accent-secondary text-xs md:text-sm font-semibold tracking-[0.2em] uppercase mb-4 md:mb-6"
+            className="hero-subtitle text-text-muted text-xs md:text-sm font-medium tracking-[0.2em] uppercase mb-4 md:mb-6"
             style={{ opacity: 0 }}
           >
             Frontend Developer & Mobile Engineer
@@ -80,8 +80,8 @@ export default function HeroSection() {
             className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[0.95] mb-5 md:mb-8"
             style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
           >
-            <span className="block text-text-primary">Hi, I'm</span>
-            <span className="block gradient-text text-glow">Alan Rosete</span>
+            <span className="block text-text-secondary font-normal">Hi, I'm</span>
+            <span className="block text-text-primary">Alan Rosete</span>
           </h1>
 
           <p
@@ -89,10 +89,10 @@ export default function HeroSection() {
             style={{ opacity: 0 }}
           >
             I build immersive web experiences with{" "}
-            <span className="text-accent-tertiary font-medium">React</span>,{" "}
-            <span className="text-accent-secondary font-medium">Javascript</span>{" "}
+            <span className="text-text-primary font-medium">React</span>,{" "}
+            <span className="text-text-primary font-medium">Javascript</span>{" "}
             and{" "}
-            <span className="text-accent-tertiary font-medium">
+            <span className="text-text-primary font-medium">
               React Native
             </span>
             .
@@ -126,8 +126,8 @@ export default function HeroSection() {
           <span className="text-text-muted text-xs tracking-widest uppercase">
             Scroll
           </span>
-          <div className="w-6 h-10 border-2 border-text-muted/30 rounded-full flex items-start justify-center p-1.5">
-            <div className="w-1.5 h-1.5 bg-accent-primary rounded-full animate-bounce" />
+          <div className="w-6 h-10 border border-line-strong rounded-full flex items-start justify-center p-1.5">
+            <div className="w-1.5 h-1.5 bg-text-muted rounded-full animate-bounce" />
           </div>
         </div>
       </div>

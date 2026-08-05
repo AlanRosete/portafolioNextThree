@@ -26,13 +26,13 @@ function StarField({ count = 2000 }: { count?: number }) {
       pos[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       pos[i * 3 + 2] = radius * Math.cos(phi);
 
-      // Star colors: white, blue-white, warm-white, faint blue
+      // Estrellas en escala de grises: blanco puro a gris medio, sin tintes de color
       const colorChoices = [
         [1, 1, 1],
-        [0.85, 0.9, 1],
-        [1, 0.95, 0.85],
-        [0.7, 0.8, 1],
-        [0.95, 0.95, 1],
+        [0.85, 0.85, 0.85],
+        [0.97, 0.97, 0.97],
+        [0.66, 0.65, 0.66],
+        [0.54, 0.54, 0.54],
       ];
       const c = colorChoices[Math.floor(Math.random() * colorChoices.length)];
       col[i * 3] = c[0];
@@ -151,10 +151,10 @@ function GalaxySpiral({ count = 3000 }: { count?: number }) {
       pos[i * 3 + 1] = (Math.random() - 0.5) * 0.3 * (1 / (1 + radius * 0.5));
       pos[i * 3 + 2] = Math.sin(angle) * radius;
 
-      // Core = warm (white/yellow), edges = cool (blue/purple)
+      // Núcleo claro → bordes grises. Galaxia monocroma.
       const t = radius / 6;
-      const innerColor = new THREE.Color("#fff8e7");
-      const outerColor = new THREE.Color("#6c63ff");
+      const innerColor = new THREE.Color("#f8f8f8");
+      const outerColor = new THREE.Color("#898989");
       const mixed = innerColor.clone().lerp(outerColor, t * 0.7);
 
       col[i * 3] = mixed.r;
@@ -282,20 +282,20 @@ export default function HeroScene() {
       {/* Galaxy spiral in the center */}
       <GalaxySpiral count={4000} />
 
-      {/* Nebula gas clouds */}
-      <NebulaCloud position={[4, 2, -8]} color="#6c63ff" scale={3} speed={0.8} />
-      <NebulaCloud position={[-5, -1, -10]} color="#00d4ff" scale={4} speed={0.6} />
-      <NebulaCloud position={[0, 3, -12]} color="#ff6b9d" scale={2.5} speed={1} />
-      <NebulaCloud position={[-3, -3, -6]} color="#9333ea" scale={2} speed={0.9} />
-      <NebulaCloud position={[6, 0, -15]} color="#2563eb" scale={3.5} speed={0.5} />
+      {/* Nebulosas: grises neutros y una sola con el acento carmín */}
+      <NebulaCloud position={[4, 2, -8]} color="#a8a7a8" scale={3} speed={0.8} />
+      <NebulaCloud position={[-5, -1, -10]} color="#898989" scale={4} speed={0.6} />
+      <NebulaCloud position={[0, 3, -12]} color="#e8175d" scale={2.5} speed={1} />
+      <NebulaCloud position={[-3, -3, -6]} color="#474747" scale={2} speed={0.9} />
+      <NebulaCloud position={[6, 0, -15]} color="#a8a7a8" scale={3.5} speed={0.5} />
 
       {/* Shooting stars */}
       <ShootingStars count={6} />
 
       {/* Subtle ambient glow */}
       <ambientLight intensity={0.05} />
-      <pointLight position={[0, 0, -5]} color="#6c63ff" intensity={0.5} distance={20} />
-      <pointLight position={[3, 2, -3]} color="#00d4ff" intensity={0.3} distance={15} />
+      <pointLight position={[0, 0, -5]} color="#ffffff" intensity={0.5} distance={20} />
+      <pointLight position={[3, 2, -3]} color="#e8175d" intensity={0.25} distance={15} />
     </group>
   );
 }

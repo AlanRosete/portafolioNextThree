@@ -15,8 +15,8 @@ interface ParticlesProps {
 export default function Particles({
   count = 500,
   size = 0.015,
-  color1 = "#6c63ff",
-  color2 = "#00d4ff",
+  color1 = "#f8f8f8",
+  color2 = "#898989",
   spread = 15,
 }: ParticlesProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);

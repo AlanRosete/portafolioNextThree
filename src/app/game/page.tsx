@@ -107,15 +107,16 @@ function AtomScene() {
   return (
     <>
       <ambientLight intensity={0.3} />
-      <pointLight position={[0, 0, 5]} color="#6c63ff" intensity={2} />
-      <pointLight position={[3, 3, 3]} color="#00d4ff" intensity={1} />
+      <pointLight position={[0, 0, 5]} color="#ffffff" intensity={2} />
+      <pointLight position={[3, 3, 3]} color="#e8175d" intensity={1} />
 
       <group ref={groupRef}>
+        {/* Núcleo: único punto con el acento */}
         <mesh>
           <sphereGeometry args={[0.2, 32, 32]} />
           <meshStandardMaterial
-            color="#6c63ff"
-            emissive="#6c63ff"
+            color="#e8175d"
+            emissive="#e8175d"
             emissiveIntensity={3}
             toneMapped={false}
           />
@@ -124,20 +125,21 @@ function AtomScene() {
         <mesh>
           <sphereGeometry args={[0.35, 32, 32]} />
           <meshBasicMaterial
-            color="#6c63ff"
+            color="#e8175d"
             transparent
             opacity={0.08}
           />
         </mesh>
 
+        {/* Órbitas en gris; los electrones varían solo en tono */}
         <ElectronOrbit
           radiusX={1.4}
           radiusY={1.2}
           rotationAxis={new THREE.Vector3(0.2, 1, 0.3)}
           rotationAngle={0.4}
           speed={1.8}
-          color="#6c63ff"
-          electronColor="#a78bfa"
+          color="#474747"
+          electronColor="#f8f8f8"
         />
 
         <ElectronOrbit
@@ -146,8 +148,8 @@ function AtomScene() {
           rotationAxis={new THREE.Vector3(1, 0.3, 0.1)}
           rotationAngle={1.2}
           speed={1.4}
-          color="#00d4ff"
-          electronColor="#22d3ee"
+          color="#474747"
+          electronColor="#a8a7a8"
         />
 
         <ElectronOrbit
@@ -156,8 +158,8 @@ function AtomScene() {
           rotationAxis={new THREE.Vector3(0.5, 0.8, 1)}
           rotationAngle={2.1}
           speed={2.1}
-          color="#ff6b9d"
-          electronColor="#fb7185"
+          color="#474747"
+          electronColor="#cc527a"
         />
       </group>
     </>
@@ -237,9 +239,10 @@ const NEOFETCH_LINES = [
   "Memory    1337MB / ∞",
 ];
 
+// Rampa de grises + el acento al final, como una paleta de terminal sobria
 const NEOFETCH_COLORS = [
-  "#6c63ff", "#00d4ff", "#ff6b9d", "#ffd93d",
-  "#50fa7b", "#a78bfa", "#f472b6", "#6c63ff",
+  "#141414", "#2e2e2e", "#474747", "#898989",
+  "#a8a7a8", "#f8f8f8", "#cc527a", "#e8175d",
 ];
 
 function NeofetchPanel() {
@@ -252,9 +255,9 @@ function NeofetchPanel() {
           <div key={i} className="neofetch-line">
             {i === 0 ? (
               <span className="neofetch-user">
-                <span style={{ color: "#00d4ff" }}>alan</span>
-                <span style={{ color: "#6b6b80" }}>@</span>
-                <span style={{ color: "#6c63ff" }}>portfolio</span>
+                <span style={{ color: "#f8f8f8" }}>alan</span>
+                <span style={{ color: "#898989" }}>@</span>
+                <span style={{ color: "#ef4a7b" }}>portfolio</span>
               </span>
             ) : i === 1 ? (
               <span className="neofetch-separator">{line}</span>
@@ -442,11 +445,12 @@ function CodeHighlight({ line }: { line: string }) {
     }
   }
 
+  // Debe coincidir con las clases .syn-* de game.css
   const colorMap: Record<string, string> = {
-    keyword: "#c792ea",
-    string: "#c3e88d",
-    tag: "#ff6b9d",
-    brace: "#ffd93d",
+    keyword: "#d97f9c",
+    string: "#a8a7a8",
+    tag: "#ef4a7b",
+    brace: "#898989",
     plain: "inherit",
   };
 

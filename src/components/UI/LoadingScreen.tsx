@@ -45,18 +45,18 @@ export default function LoadingScreen() {
           className="text-5xl font-bold"
           style={{ fontFamily: "var(--font-family-heading)" }}
         >
-          <span className="gradient-text">Alan</span>
-          <span className="text-text-secondary">.dev</span>
+          <span className="text-text-primary">Alan</span>
+          <span className="text-text-muted">.dev</span>
         </h1>
       </div>
 
       {/* Progress Bar */}
-      <div className="loading-text w-48 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
+      <div className="loading-text w-48 h-px overflow-hidden" style={{ background: "var(--color-line)" }}>
         <div
-          className="loading-progress h-full rounded-full"
+          className="loading-progress h-full"
           style={{
             width: "0%",
-            background: "linear-gradient(90deg, var(--color-accent-primary), var(--color-accent-secondary))",
+            background: "var(--color-accent-primary)",
           }}
         />
       </div>

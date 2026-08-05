@@ -64,7 +64,7 @@ export default function ProjectsSection() {
           className="projects-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold"
           style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
         >
-          <span className="gradient-text">My Projects</span>
+          <span className="text-text-primary">My Projects</span>
         </h2>
         <p
           className="projects-subtitle text-text-secondary text-sm md:text-base lg:text-lg"

@@ -77,13 +77,7 @@ function buildCandidates(name: string) {
 }
 
 /** PlanetSkill: intenta cargar varias variantes de filename y hace fallback a iniciales */
-function PlanetSkill({
-  name,
-  colorIndex,
-}: {
-  name: string;
-  colorIndex: number;
-}) {
+function PlanetSkill({ name }: { name: string }) {
   const candidates = buildCandidates(name);
   const [srcIndex, setSrcIndex] = useState(0);
   const [errorCount, setErrorCount] = useState(0);
@@ -102,31 +96,17 @@ function PlanetSkill({
     .join("")
     .toUpperCase();
 
-  // colores suaves por índice (puedes personalizar)
-  const colorPalettes = [
-    "from-[#7C4DFF] to-[#5BC0F8]",
-    "from-[#FF6B6B] to-[#FFD166]",
-    "from-[#6EE7B7] to-[#34D399]",
-    "from-[#F472B6] to-[#A78BFA]",
-    "from-[#60A5FA] to-[#38BDF8]",
-    "from-[#FDBA74] to-[#FB7185]",
-  ];
-  const palette = colorPalettes[colorIndex % colorPalettes.length];
-
   return (
     <div
-      className="planet-skill group w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center relative shadow-2xl transform-gpu"
+      className="planet-skill group w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center relative transform-gpu"
       style={{ willChange: "transform" }}
     >
+      {/* Superficie plana con hairline: mantiene la silueta de planeta sin el halo difuso */}
       <div
-        className={`absolute inset-0 rounded-full blur-xl opacity-30 bg-gradient-to-br ${palette}`}
-        aria-hidden
-      />
-      <div
-        className={`relative z-10 w-full h-full rounded-full flex items-center justify-center border border-white/6 bg-white/5 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105`}
+        className={`relative z-10 w-full h-full rounded-full flex items-center justify-center border border-line bg-bg-secondary transition-colors duration-300 group-hover:border-line-strong`}
       >
         {errorCount >= candidates.length ? (
-          <div className="text-xs font-semibold text-white">{initials}</div>
+          <div className="text-xs font-semibold text-text-primary">{initials}</div>
         ) : (
           // no uso next/image aquí por simplicidad y porque assets están en public
           <img
@@ -236,12 +216,12 @@ export default function AboutSection() {
 
   return (
     <section id="about" ref={sectionRef} className="section relative">
-      {/* Background gradient */}
+      {/* Halo neutro muy tenue: da profundidad sin teñir la sección */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 20% 50%, rgba(108, 99, 255, 0.04) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 20% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%)",
         }}
       />
 
@@ -251,7 +231,7 @@ export default function AboutSection() {
           className="about-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 md:mb-14 text-center"
           style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
         >
-          <span className="gradient-text-alt">About Me</span>
+          <span className="text-text-primary">About Me</span>
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-start space-mt">
@@ -285,10 +265,10 @@ export default function AboutSection() {
               </p>
               <br />
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 lg:gap-6 mt-8 pt-6 border-t border-white/10">
+              <div className="grid grid-cols-3 gap-4 lg:gap-6 mt-8 pt-6 border-t border-line">
                 {stats.map((s) => (
                   <div key={s.label} className="text-center">
-                    <div className="text-2xl lg:text-3xl font-bold gradient-text">
+                    <div className="text-2xl lg:text-3xl font-semibold text-text-primary">
                       {s.value}
                     </div>
                     <div className="text-text-muted text-xs lg:text-sm mt-1">
@@ -307,9 +287,9 @@ export default function AboutSection() {
                 <div className="flex flex-wrap gap-8 items-center justify-center" style={ci > 0 ? { paddingTop: "100px" } : undefined}>
                   {skills
                     .filter((s) => s.category === category)
-                    .map((skill, i) => (
+                    .map((skill) => (
                       <div key={skill.name}>
-                        <PlanetSkill name={skill.name} colorIndex={i + ci} />
+                        <PlanetSkill name={skill.name} />
                       </div>
                     ))}
                 </div>

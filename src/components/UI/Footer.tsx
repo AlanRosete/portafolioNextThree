@@ -36,7 +36,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative z-10 border-t border-white/5">
+    <footer className="relative z-10 border-t border-line">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
@@ -45,8 +45,8 @@ export default function Footer() {
               className="text-xl font-bold mb-1"
               style={{ fontFamily: "var(--font-family-heading)" }}
             >
-              <span className="gradient-text">Alan</span>
-              <span className="text-text-secondary">.dev</span>
+              <span className="text-text-primary">Alan</span>
+              <span className="text-text-muted">.dev</span>
             </h3>
             <p className="text-text-muted text-sm">
               Construyendo experiencias digitales increíbles
@@ -62,7 +62,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.name}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-text-secondary hover:text-accent-primary border border-white/10 hover:border-accent-primary/50 transition-all duration-300 hover:-translate-y-1"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-text-secondary hover:text-accent-primary border border-line hover:border-accent-primary transition-colors duration-200"
               >
                 {social.icon}
               </a>

@@ -164,23 +164,23 @@ export default function Gallery() {
 
   return (
     <group ref={groupRef}>
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={0.5} />
       <pointLight
         position={[0, 6, 0]}
-        color="#6c63ff"
+        color="#ffffff"
         intensity={3}
         distance={20}
       />
       <pointLight
         position={[0, -6, 0]}
-        color="#00d4ff"
+        color="#a8a7a8"
         intensity={2}
         distance={20}
       />
       <pointLight
         position={[5, 0, 5]}
-        color="#ff6c9d"
-        intensity={1.5}
+        color="#e8175d"
+        intensity={1.2}
         distance={15}
       />
 

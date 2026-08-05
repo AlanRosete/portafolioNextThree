@@ -12,7 +12,7 @@ interface ThreeSceneProps {
 
 function WebGLFallback() {
   return (
-    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-bg-primary to-bg-secondary">
+    <div className="w-full h-full flex items-center justify-center bg-bg-primary">
       <div className="text-center">
         <div className="text-6xl mb-4">🌌</div>
         <p className="text-text-secondary">Tu navegador no soporta WebGL</p>

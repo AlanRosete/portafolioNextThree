@@ -100,12 +100,12 @@ export default function ContactSection() {
       ref={sectionRef}
       className="section relative min-h-screen flex items-center justify-center" // Mejora: min-h-screen y centering para mejor height en desktop
     >
-      {/* Background gradient */}
+      {/* Halo neutro muy tenue: da profundidad sin teñir la sección */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 80% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 80% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%)",
         }}
       />
       <div className="max-w-4xl mx-auto relative z-10 w-full px-4 sm:px-6 lg:px-8"> {/* Ajuste: paddings responsivos */}
@@ -115,7 +115,7 @@ export default function ContactSection() {
             className="contact-title text-4xl md:text-6xl font-bold mb-4"
             style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
           >
-            <span className="gradient-text">Let's talk</span>
+            <span className="text-text-primary">Let's talk</span>
           </h2>
           <p className="contact-title text-text-secondary text-lg" style={{ opacity: 0 }}>
             Do you have a project in mind? I'd love to hear from you!
@@ -139,10 +139,10 @@ export default function ContactSection() {
                   aria-required="true"
                   value={formState.name}
                   onChange={(e) => setFormState((s) => ({ ...s, name: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/50 transition-all duration-300"
+                  className="w-full px-4 py-3 rounded-md bg-bg-primary border border-line text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none transition-colors duration-200"
                   placeholder="Your name"
                 />
-                {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
+                {errors.name && <p className="text-accent-text text-sm mt-1">{errors.name}</p>}
               </div>
               {/* Email */}
               <div>
@@ -158,10 +158,10 @@ export default function ContactSection() {
                   aria-required="true"
                   value={formState.email}
                   onChange={(e) => setFormState((s) => ({ ...s, email: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/50 transition-all duration-300"
+                  className="w-full px-4 py-3 rounded-md bg-bg-primary border border-line text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none transition-colors duration-200"
                   placeholder="[EMAIL_ADDRESS]"
                 />
-                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
+                {errors.email && <p className="text-accent-text text-sm mt-1">{errors.email}</p>}
               </div>
             </div>
             {/* Message */}
@@ -178,10 +178,10 @@ export default function ContactSection() {
                 rows={6} // Mejora: Aumentado a 6 para mejor height base, pero responsivo
                 value={formState.message}
                 onChange={(e) => setFormState((s) => ({ ...s, message: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none focus:ring-1 focus:ring-accent-primary/50 transition-all duration-300 resize-y min-h-[120px] md:min-h-[180px]" // Mejora: resize-y y min-h responsivo
+                className="w-full px-4 py-3 rounded-md bg-bg-primary border border-line text-text-primary placeholder-text-muted focus:border-accent-primary focus:outline-none transition-colors duration-200 resize-y min-h-[120px] md:min-h-[180px]" // Mejora: resize-y y min-h responsivo
                 placeholder="Tell me about your project..."
               />
-              {errors.message && <p className="text-red-400 text-sm mt-1">{errors.message}</p>}
+              {errors.message && <p className="text-accent-text text-sm mt-1">{errors.message}</p>}
             </div>
             {/* Submit */}
             <div className="flex items-center gap-4 justify-center">
@@ -212,7 +212,7 @@ export default function ContactSection() {
                 )}
               </button>
               {status === "error" && (
-                <p role="status" className="text-red-400 text-sm">
+                <p role="status" className="text-accent-text text-sm">
                   Error sending. Please try again.
                 </p>
               )}

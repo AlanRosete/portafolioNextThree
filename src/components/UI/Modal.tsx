@@ -50,19 +50,19 @@ export default function Modal() {
       style={{ opacity: 0 }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/80" />
 
       {/* Content */}
       <div
         ref={contentRef}
-        className="relative glass-strong rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8"
+        className="relative bg-bg-secondary border border-line rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8"
         onClick={(e) => e.stopPropagation()}
         style={{ opacity: 0 }}
       >
         {/* Close button */}
         <button
           onClick={closeModal}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-white/10 transition-all duration-300"
+          className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-card transition-colors duration-200"
           aria-label="Close modal"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,13 +71,7 @@ export default function Modal() {
         </button>
 
         {/* Project Image */}
-        <div
-          className="w-full h-48 rounded-xl mb-6 flex items-center justify-center text-6xl relative overflow-hidden"
-          style={{
-            background: `linear-gradient(135deg, ${selectedProject.color}33, ${selectedProject.color}11)`,
-            border: `1px solid ${selectedProject.color}44`,
-          }}
-        >
+        <div className="w-full h-48 rounded-xl mb-6 flex items-center justify-center text-6xl relative overflow-hidden bg-bg-card border border-line">
         {selectedProject.image ? (
           <Image
             src={selectedProject.image}
@@ -103,12 +97,7 @@ export default function Modal() {
           {selectedProject.tags.map((tag) => (
             <span
               key={tag}
-              className="px-3 py-1 rounded-full text-xs font-medium"
-              style={{
-                background: `${selectedProject.color}22`,
-                color: selectedProject.color,
-                border: `1px solid ${selectedProject.color}44`,
-              }}
+              className="px-3 py-1 rounded-full text-xs font-medium bg-bg-card border border-line text-text-secondary"
             >
               {tag}
             </span>

@@ -11,7 +11,7 @@ export const projects: Project[] = [
     image: "/imgPortfolio/geoWeatherReact.png",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com",
-    color: "#6c63ff",
+    color: "#f8f8f8",
   },
   {
     id: "project-2",
@@ -23,7 +23,7 @@ export const projects: Project[] = [
     image: "/projects/project-2.jpg",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com",
-    color: "#00d4ff",
+    color: "#a8a7a8",
   },
   {
     id: "project-3",
@@ -33,7 +33,7 @@ export const projects: Project[] = [
       "Aplicación social completa con sistema de posts, stories ephemeral, chat en tiempo real con Socket.io, sistema de followers, notificaciones push y feed algorítmico personalizado.",
     tags: ["React Native", "Firebase", "Socket.io", "Redis"],
     image: "/projects/project-3.jpg",
-    color: "#ff6b9d",
+    color: "#e8175d",
   },
   {
     id: "project-4",
@@ -45,7 +45,7 @@ export const projects: Project[] = [
     image: "/projects/project-4.jpg",
     liveUrl: "https://example.com",
     repoUrl: "https://github.com",
-    color: "#ffd93d",
+    color: "#898989",
   },
   {
     id: "project-5",
@@ -56,7 +56,7 @@ export const projects: Project[] = [
     tags: ["Go", "Docker", "K8s", "React", "GraphQL"],
     image: "/imgPortfolio/ecommerceReact.png",
     repoUrl: "https://github.com",
-    color: "#50fa7b",
+    color: "#cc527a",
   },
 ];
 
