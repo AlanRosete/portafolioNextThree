@@ -247,13 +247,13 @@ export default function ContactSection() {
               </div>
 
               <div
-                className="contact-field mt-8 pt-8 border-t border-line flex flex-col sm:flex-row sm:items-center gap-4"
+                className="contact-field mt-8 pt-8 border-t border-line flex flex-col sm:flex-row sm:items-center"
                 style={{ opacity: 0 }}
               >
                 <button
                   type="submit"
                   disabled={status === "sending"}
-                  className="btn-primary justify-center w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="btn-primary justify-center w-full disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {status === "sending" ? (
                     <>

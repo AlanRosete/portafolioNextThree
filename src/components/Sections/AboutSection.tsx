@@ -97,26 +97,30 @@ function PlanetSkill({ name }: { name: string }) {
     .toUpperCase();
 
   return (
-    <div
-      className="planet-skill group w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center relative transform-gpu"
-      style={{ willChange: "transform" }}
-    >
-      {/* Superficie plana con hairline: mantiene la silueta de planeta sin el halo difuso */}
+    <div className="skill-node" tabIndex={0} aria-label={name}>
+      <span className="skill-tooltip" role="tooltip">
+        {name}
+      </span>
+
       <div
-        className={`relative z-10 w-full h-full rounded-full flex items-center justify-center border border-line bg-bg-secondary transition-colors duration-300 group-hover:border-line-strong`}
+        className="planet-skill w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center relative transform-gpu"
+        style={{ willChange: "transform" }}
       >
-        {errorCount >= candidates.length ? (
-          <div className="text-xs font-semibold text-text-primary">{initials}</div>
-        ) : (
-          // no uso next/image aquí por simplicidad y porque assets están en public
-          <img
-            src={candidates[srcIndex]}
-            alt={name}
-            onError={onError}
-            className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
-            draggable={false}
-          />
-        )}
+        {/* Superficie plana con hairline: mantiene la silueta de planeta sin el halo difuso */}
+        <div className="skill-orbit relative z-10 w-full h-full rounded-full flex items-center justify-center border border-line bg-bg-secondary">
+          {errorCount >= candidates.length ? (
+            <div className="text-xs font-semibold text-text-primary">{initials}</div>
+          ) : (
+            // no uso next/image aquí por simplicidad y porque assets están en public
+            <img
+              src={candidates[srcIndex]}
+              alt={name}
+              onError={onError}
+              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+              draggable={false}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

@@ -297,6 +297,14 @@ a {
 }
 
 /* ═══════════════════════════════════════════════════
+   BUTTON REMOVE DEFAULT STYLES
+   ═══════════════════════════════════════════════════ */
+
+.clean-styles {
+  gap: 0px !important;
+}
+
+/* ═══════════════════════════════════════════════════
    FORM FIELDS
    Un solo lugar donde vive la métrica del formulario:
    misma altura, mismo radio y mismo foco en input y textarea.
@@ -357,6 +365,79 @@ textarea.field-input {
 
 .space-mt {
   padding-top: 10%;
+}
+
+
+/* ═══════════════════════════════════════════════════
+   SKILLS — órbitas + tooltip
+   Hover: tinte carmín sutil (el acento único, nunca saturado).
+   ═══════════════════════════════════════════════════ */
+
+.skill-node {
+  position: relative;
+  outline: none;
+}
+
+.skill-node:focus-visible .skill-orbit {
+  border-color: var(--color-accent-primary);
+}
+
+.skill-orbit {
+  transition: border-color 0.3s ease, background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.skill-node:hover .skill-orbit {
+  border-color: color-mix(in srgb, var(--color-accent-primary) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent-primary) 7%, var(--color-bg-secondary));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent-primary) 12%, transparent),
+    0 6px 22px -8px color-mix(in srgb, var(--color-accent-primary) 40%, transparent);
+}
+
+.skill-orbit img {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.skill-node:hover .skill-orbit img {
+  transform: scale(1.06);
+  filter: saturate(1.05);
+}
+
+/* Tooltip: vive fuera del elemento animado por GSAP para no heredar la
+   rotación de flotación. */
+.skill-tooltip {
+  position: absolute;
+  bottom: calc(100% + 0.6rem);
+  left: 50%;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--color-line);
+  border-radius: 0.5rem;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  z-index: 30;
+}
+
+.skill-node:hover .skill-tooltip,
+.skill-node:focus-visible .skill-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-tooltip,
+  .skill-orbit,
+  .skill-orbit img {
+    transition-duration: 0.01ms;
+  }
 }
 
 

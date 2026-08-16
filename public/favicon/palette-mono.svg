@@ -1,0 +1,39 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <title>Alan.dev — paleta (carmín)</title>
+  <!--
+    Variante monocroma de des-palette.
+    Mismo dibujo; solo cambia el color: cuerpo #e8175d, manchas #f8f8f8.
+    El cuerpo va en carmín (no en blanco) porque el carmín contrasta contra
+    fondo claro Y oscuro: la silueta nunca se disuelve en la barra de
+    pestañas, pase lo que pase con el tema del navegador.
+    El agujero del pulgar es un subpath con fill-rule evenodd, así que se
+    recorta de verdad y deja pasar el fondo de la pestaña.
+    El grupo escala 1.111 para que el arte llene el lienzo: a 16px cada
+    píxel de silueta cuenta.
+  -->
+  <g transform="translate(2, 5.33) scale(1.111)" fill-rule="evenodd">
+    <!-- Cuerpo de la paleta + agujero del pulgar -->
+    <path
+      fill="#e8175d"
+      d="M10,40 C7.791,40 6,38.209 6,36 C6,33.791 7.791,32 10,32 C12.209,32 14,33.791 14,36 C14,38.209 12.209,40 10,40 M24,0 C9,0 0,11 0,26 C0,38 4,48 13,48 C23,48 14,29 23,29 C32,29 31,43 45,43 C50,43 54,40 54,31 C54,12 40,0 24,0"
+    />
+
+    <!-- Manchas de pintura, en el claro de la paleta del sitio -->
+    <path
+      fill="#f8f8f8"
+      d="M20,12 C20,14.209 18.657,16 17,16 C15.343,16 14,14.209 14,12 C14,9.791 15.343,8 17,8 C18.657,8 20,9.791 20,12"
+    />
+    <path
+      fill="#f8f8f8"
+      d="M31.5576,10.9297 C30.6936,13.0777 28.8466,14.4027 27.4336,13.8897 C26.0216,13.3767 25.5766,11.2177 26.4426,9.0707 C27.3066,6.9217 29.1536,5.5977 30.5666,6.1107 C31.9796,6.6247 32.4236,8.7827 31.5576,10.9297"
+    />
+    <path
+      fill="#f8f8f8"
+      d="M47.9277,33.3213 C47.4187,35.4053 44.3527,36.5043 41.0767,35.7743 C37.8037,35.0453 35.5627,32.7633 36.0727,30.6793 C36.5807,28.5943 39.6477,27.4963 42.9227,28.2253 C46.1967,28.9553 48.4377,31.2363 47.9277,33.3213"
+    />
+    <path
+      fill="#f8f8f8"
+      d="M43.748,15.1992 C44.611,16.6792 43.186,19.2102 40.563,20.8492 C37.942,22.4882 35.116,22.6172 34.252,21.1362 C33.389,19.6562 34.814,17.1262 37.436,15.4862 C40.058,13.8472 42.884,13.7192 43.748,15.1992"
+    />
+  </g>
+</svg>
