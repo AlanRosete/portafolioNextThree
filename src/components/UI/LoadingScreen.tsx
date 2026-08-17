@@ -39,19 +39,18 @@ export default function LoadingScreen() {
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
       style={{ background: "var(--color-bg-primary)" }}
     >
-      {/* Logo */}
-      <div className="loading-text mb-8">
-        <h1
-          className="text-5xl font-bold"
-          style={{ fontFamily: "var(--font-family-heading)" }}
-        >
-          <span className="text-text-primary">Alan</span>
-          <span className="text-text-muted">.dev</span>
-        </h1>
+      {/* Orbe */}
+      <div className="loading-text mb-8!" role="status" aria-label="Cargando">
+        <div className="loader-orb">
+          <span className="loader-orb__glow" />
+          <span className="loader-orb__glow" />
+          <span className="loader-orb__glow" />
+          <span className="loader-orb__glow" />
+        </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="loading-text w-48 h-px overflow-hidden" style={{ background: "var(--color-line)" }}>
+      <div className="loading-text w-40 sm:w-48 h-px overflow-hidden" style={{ background: "var(--color-line)" }}>
         <div
           className="loading-progress h-full"
           style={{
@@ -62,7 +61,7 @@ export default function LoadingScreen() {
       </div>
 
       {/* Loading Text */}
-      <p className="loading-text text-text-muted text-sm mt-4 tracking-widest uppercase">
+      <p className="loading-text text-text-muted text-xs sm:text-sm mt-4! tracking-widest uppercase">
         Cargando experiencia
       </p>
     </div>

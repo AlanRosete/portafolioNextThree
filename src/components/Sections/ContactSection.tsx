@@ -164,7 +164,7 @@ export default function ContactSection() {
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="glass rounded-2xl p-6 sm:p-8 lg:p-10"
+              className="glass rounded-2xl p-[30px]!"
             >
               {/* Honeypot — invisible para personas, no para bots. */}
               <input

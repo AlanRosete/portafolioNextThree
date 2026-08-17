@@ -28,6 +28,16 @@ export default function Header() {
     }
   }, []);
 
+  // Bloquea el scroll del documento mientras el menú móvil está abierto.
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isMobileMenuOpen]);
+
   const handleNavClick = (href: string) => {
     closeMobileMenu();
     const el = document.querySelector(href);
@@ -37,98 +47,122 @@ export default function Header() {
   };
 
   return (
-    <header
-      ref={headerRef}
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-        scrolled ? "glass-strong" : ""
-      }`}
-      style={{ opacity: 0 }}
-    >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <a
-          href="#hero"
-          onClick={(e) => {
-            e.preventDefault();
-            handleNavClick("#hero");
-          }}
-          className="text-2xl font-bold tracking-tight"
-          style={{ fontFamily: "var(--font-family-heading)" }}
-        >
-          <span className="text-text-primary">Alan</span>
-          <span className="text-text-muted">.dev</span>
-        </a>
-
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick(link.href);
-              }}
-              className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300 relative group"
-            >
-              {link.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent-primary transition-all duration-300 group-hover:w-full" />
-            </a>
-          ))}
+    <>
+      <header
+        ref={headerRef}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+          scrolled && !isMobileMenuOpen ? "glass-strong" : ""
+        }`}
+        style={{ opacity: 0 }}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          {/* Logo */}
           <a
-            href="/game"
-            className="text-sm font-medium px-4 py-2 rounded-md border border-line-strong text-text-primary hover:border-accent-primary hover:text-accent-text transition-colors duration-200"
+            href="#hero"
+            onClick={(e) => {
+              e.preventDefault();
+              handleNavClick("#hero");
+            }}
+            className="text-2xl font-bold tracking-tight"
+            style={{ fontFamily: "var(--font-family-heading)" }}
           >
-            Download CV
+            <span className="text-text-primary">Alan</span>
+            <span className="text-text-muted">.dev</span>
           </a>
-        </nav>
 
-        {/* Mobile Hamburger */}
-        <button
-          onClick={toggleMobileMenu}
-          className="md:hidden flex flex-col gap-1.5 p-2 z-50"
-          aria-label="Toggle menu"
-        >
-          <span
-            className={`block w-6 h-0.5 bg-text-primary transition-all duration-300 ${
-              isMobileMenuOpen ? "rotate-45 translate-y-2" : ""
-            }`}
-          />
-          <span
-            className={`block w-6 h-0.5 bg-text-primary transition-all duration-300 ${
-              isMobileMenuOpen ? "opacity-0" : ""
-            }`}
-          />
-          <span
-            className={`block w-6 h-0.5 bg-text-primary transition-all duration-300 ${
-              isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""
-            }`}
-          />
-        </button>
-      </div>
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(link.href);
+                }}
+                className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300 relative group"
+              >
+                {link.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent-primary transition-all duration-300 group-hover:w-full" />
+              </a>
+            ))}
+            <a
+              href="/game"
+              className="text-sm font-medium px-4 py-2 rounded-md border border-line-strong text-text-primary hover:border-accent-primary hover:text-accent-text transition-colors duration-200"
+            >
+              Download CV
+            </a>
+          </nav>
 
-      {/* Mobile Menu */}
+          {/* Mobile Hamburger */}
+          <button
+            onClick={toggleMobileMenu}
+            className="md:hidden relative flex h-6 w-6 items-center justify-center"
+            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            <span
+              className="absolute block h-0.5 w-6 transition-all duration-300"
+              style={{
+                background: isMobileMenuOpen
+                  ? "var(--color-accent-primary)"
+                  : "var(--color-text-primary)",
+                transform: isMobileMenuOpen
+                  ? "rotate(45deg)"
+                  : "translateY(-7px)",
+              }}
+            />
+            <span
+              className="absolute block h-0.5 w-6 bg-text-primary transition-all duration-300"
+              style={{ opacity: isMobileMenuOpen ? 0 : 1 }}
+            />
+            <span
+              className="absolute block h-0.5 w-6 transition-all duration-300"
+              style={{
+                background: isMobileMenuOpen
+                  ? "var(--color-accent-primary)"
+                  : "var(--color-text-primary)",
+                transform: isMobileMenuOpen
+                  ? "rotate(-45deg)"
+                  : "translateY(7px)",
+              }}
+            />
+          </button>
+        </div>
+      </header>
+
+      {/*
+        El menú vive fuera del <header> a propósito: GSAP deja un transform
+        inline en el header y eso lo convierte en bloque contenedor de sus
+        hijos `fixed`, lo que rompía el inset-0 del overlay en móvil.
+      */}
       <div
-        className={`md:hidden fixed inset-0 glass-strong z-40 flex flex-col items-center justify-center gap-8 transition-all duration-500 ${
+        className={`md:hidden fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 px-6 transition-opacity duration-300 ${
           isMobileMenuOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
         }`}
+        style={{ background: "var(--color-bg-primary)" }}
+        aria-hidden={!isMobileMenuOpen}
       >
         {navLinks.map((link, i) => (
           <a
             key={link.href}
             href={link.href}
+            tabIndex={isMobileMenuOpen ? 0 : -1}
             onClick={(e) => {
               e.preventDefault();
               handleNavClick(link.href);
             }}
-            className="text-3xl font-bold text-text-primary hover:text-accent-primary transition-colors"
+            className="text-3xl font-bold text-center"
             style={{
-              transitionDelay: isMobileMenuOpen ? `${i * 100}ms` : "0ms",
-              transform: isMobileMenuOpen ? "translateY(0)" : "translateY(20px)",
+              color: "var(--color-accent-primary)",
+              transform: isMobileMenuOpen
+                ? "translateY(0)"
+                : "translateY(20px)",
               opacity: isMobileMenuOpen ? 1 : 0,
               transition: "all 0.4s ease",
+              transitionDelay: isMobileMenuOpen ? `${i * 70}ms` : "0ms",
             }}
           >
             {link.label}
@@ -136,16 +170,24 @@ export default function Header() {
         ))}
         <a
           href="/game"
-          className="text-xl font-medium text-accent-text"
+          tabIndex={isMobileMenuOpen ? 0 : -1}
+          onClick={closeMobileMenu}
+          className="mt-2 rounded-md border px-6 py-3 text-lg font-medium"
           style={{
-            transitionDelay: isMobileMenuOpen ? `${navLinks.length * 100}ms` : "0ms",
+            color: "var(--color-accent-primary)",
+            borderColor:
+              "color-mix(in srgb, var(--color-accent-primary) 45%, transparent)",
+            transform: isMobileMenuOpen ? "translateY(0)" : "translateY(20px)",
             opacity: isMobileMenuOpen ? 1 : 0,
             transition: "all 0.4s ease",
+            transitionDelay: isMobileMenuOpen
+              ? `${navLinks.length * 70}ms`
+              : "0ms",
           }}
         >
           Download CV
         </a>
       </div>
-    </header>
+    </>
   );
 }

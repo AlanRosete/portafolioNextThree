@@ -169,10 +169,6 @@ a {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
 /* ═══════════════════════════════════════════════════
    SCROLLBAR
    ═══════════════════════════════════════════════════ */
@@ -448,5 +444,77 @@ textarea.field-input {
 @media (min-width: 800px) {
   .responsive-hero-desktop {
     padding-left: 10%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   LOADER ORB
+   Anillo giratorio de la pantalla de carga.
+   Nombre propio con prefijo: ".container" chocaba con
+   utilidades y con cualquier otro div del proyecto.
+   Vive EN FLUJO (position: relative), así el flex del
+   overlay lo centra junto a la barra y el texto.
+   ═══════════════════════════════════════════════════ */
+
+.loader-orb {
+  position: relative;
+  /* Escala con el viewport sin pasarse en móvil ni en desktop. */
+  height: clamp(56px, 16vw, 96px);
+  width: clamp(56px, 16vw, 96px);
+  border-radius: 50%;
+  /* El extremo oscuro del degradado es lo que crea la "cometa"
+     al girar: acento → variante tonal → línea. Sin colores ajenos. */
+  background-image: linear-gradient(
+    var(--color-accent-primary),
+    var(--color-accent-tertiary),
+    var(--color-line-strong)
+  );
+  animation: loader-orb-spin 1.2s linear infinite;
+}
+
+/* Cada capa repite el degradado con más desenfoque: el apilado
+   es lo que produce el halo. `inherit` evita duplicar el gradiente. */
+.loader-orb__glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-image: inherit;
+}
+
+.loader-orb__glow:nth-of-type(1) {
+  filter: blur(4px);
+}
+
+.loader-orb__glow:nth-of-type(2) {
+  filter: blur(9px);
+}
+
+.loader-orb__glow:nth-of-type(3) {
+  filter: blur(18px);
+}
+
+.loader-orb__glow:nth-of-type(4) {
+  filter: blur(32px);
+}
+
+/* Disco central del color del fondo: convierte el orbe en anillo.
+   En % para que el grosor acompañe al tamaño responsive. */
+.loader-orb::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background-color: var(--color-bg-primary);
+}
+
+@keyframes loader-orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader-orb {
+    animation-duration: 3.6s;
   }
 }
