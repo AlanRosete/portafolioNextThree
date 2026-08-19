@@ -518,3 +518,39 @@ textarea.field-input {
     animation-duration: 3.6s;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════
+   HERO VEIL
+   Vela direccional sobre la escena 3D: opaca donde va el
+   texto y transparente donde están los cactus. Un radial
+   centrado no servía — apagaba justo la planta y dejaba
+   el texto sobre el punto más claro del canvas.
+   ═══════════════════════════════════════════════════ */
+
+.hero-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Móvil: texto arriba, jardinera al pie */
+  background: linear-gradient(
+    to bottom,
+    var(--color-bg-primary) 0%,
+    color-mix(in srgb, var(--color-bg-primary) 88%, transparent) 42%,
+    color-mix(in srgb, var(--color-bg-primary) 30%, transparent) 68%,
+    transparent 100%
+  );
+}
+
+@media (min-width: 768px) {
+  .hero-veil {
+    /* Escritorio: texto a la izquierda, jardinera a la derecha */
+    background: linear-gradient(
+      to right,
+      var(--color-bg-primary) 0%,
+      color-mix(in srgb, var(--color-bg-primary) 92%, transparent) 30%,
+      color-mix(in srgb, var(--color-bg-primary) 45%, transparent) 52%,
+      transparent 72%
+    );
+  }
+}

@@ -52,22 +52,21 @@ export default function HeroSection() {
     <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
       {/* 3D Background */}
       <div className="absolute inset-0 z-0">
-        <ThreeScene className="w-full h-full">
+        <ThreeScene
+          className="w-full h-full"
+          shadows
+          camera={{ position: [0, 0.6, 9], fov: 42 }}
+          dpr={[1, 1.75]}
+        >
           <HeroScene />
         </ThreeScene>
       </div>
 
-      {/* Gradient overlay — softer to let the galaxy show through */}
-      <div
-        className="absolute inset-0 z-1"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, transparent 40%, var(--color-bg-primary) 85%)",
-        }}
-      />
+      {/* Veil that keeps the copy readable over the 3D scene */}
+      <div className="hero-veil z-1" />
 
       {/* Content — centered on all viewports */}
-      <div ref={textRef} className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 w-full">
+      <div ref={textRef} className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 w-full pb-[34vh] md:pb-0">
         <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 lg:max-w-2xl responsive-hero-desktop">
           <p
             className="hero-subtitle text-text-muted text-xs md:text-sm font-medium tracking-[0.2em] uppercase mb-4 md:mb-6"

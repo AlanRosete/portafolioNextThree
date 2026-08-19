@@ -8,6 +8,11 @@ interface ThreeSceneProps {
   children: React.ReactNode;
   className?: string;
   interactive?: boolean;
+  /** Activa el shadow map. Las luces deciden luego quién proyecta. */
+  shadows?: boolean;
+  /** Cada escena tiene su encuadre: la galería y el hero no comparten cámara. */
+  camera?: { position: [number, number, number]; fov: number };
+  dpr?: [number, number];
 }
 
 function WebGLFallback() {
@@ -33,6 +38,9 @@ export default function ThreeScene({
   children,
   className = "",
   interactive = false,
+  shadows = false,
+  camera = { position: [0, 0, 10], fov: 55 },
+  dpr = [1, 2],
 }: ThreeSceneProps) {
   const [webglSupported, setWebglSupported] = useState(true);
 
@@ -55,9 +63,9 @@ export default function ThreeScene({
     <div className={`${className} ${interactive ? "interactive" : ""}`}>
       <Suspense fallback={<CanvasLoader />}>
         <Canvas
-          // Cámara más atrás para ver todas las cards del círculo
-          camera={{ position: [0, 0, 10], fov: 55, near: 0.1, far: 100 }}
-          dpr={[1, 2]}
+          camera={{ ...camera, near: 0.1, far: 100 }}
+          dpr={dpr}
+          shadows={shadows}
           gl={{
             antialias: true,
             alpha: true,
