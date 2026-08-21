@@ -37,8 +37,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    // suppressHydrationWarning: el script de abajo escribe data-theme en <html>
+    // antes de que React hidrate, así que el HTML del servidor y el del cliente
+    // difieren a propósito en ese atributo. Solo silencia este elemento.
+    <html lang="es" suppressHydrationWarning>
       <head>
+        {/*
+          Va PRIMERO y sin `defer`/`async` a propósito: un script inline en
+          <head> bloquea el parseo, así que corre antes del primer pintado.
+          Ese es justo el punto — si el tema se aplicara desde un useEffect,
+          la pantalla de "Cargando experiencia" alcanzaría a pintarse en
+          oscuro y saltaría a claro (el clásico flash de tema).
+
+          Sin dependencias del bundle: tiene que existir antes que React.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='dark'}})()`,
+          }}
+        />
         <link
           rel="preconnect"
           href="https://fonts.googleapis.com"

@@ -179,7 +179,7 @@ export default function Gallery() {
       />
       <pointLight
         position={[5, 0, 5]}
-        color="#e8175d"
+        color="#8fb996"
         intensity={1.2}
         distance={15}
       />

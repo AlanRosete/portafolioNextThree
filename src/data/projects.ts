@@ -33,7 +33,7 @@ export const projects: Project[] = [
       "Aplicación social completa con sistema de posts, stories ephemeral, chat en tiempo real con Socket.io, sistema de followers, notificaciones push y feed algorítmico personalizado.",
     tags: ["React Native", "Firebase", "Socket.io", "Redis"],
     image: "/projects/project-3.jpg",
-    color: "#e8175d",
+    color: "#8fb996",
   },
   {
     id: "project-4",
@@ -57,7 +57,7 @@ export const projects: Project[] = [
     image: "/imgPortfolio/ecommerceReact.png",
     liveUrl: "https://ecommerce-test-react.netlify.app",
     repoUrl: "https://github.com/AlanRosete",
-    color: "#cc527a",
+    color: "#6b7c70",
   },
 ];
 

@@ -13,20 +13,31 @@
   --color-bg-card: #232323;
   --color-bg-glass: #1a1a1a;
 
-  /* Acento único. secondary/tertiary son variantes tonales,
-     NO colores distintos: eso es lo que evita el look "gradiente IA". */
-  --color-accent-primary: #e8175d;
+  /* Acento único, verde salvia. secondary/tertiary son variantes tonales,
+     NO colores distintos: eso es lo que evita el look "gradiente IA".
+     Salvia apagada, no verde saturado: el verde neón sobre fondo casi negro
+     lee como terminal/cripto, que es justo el registro que no queremos. */
+  --color-accent-primary: #8fb996;
   --color-accent-secondary: #a8a7a8;
-  --color-accent-tertiary: #cc527a;
+  --color-accent-tertiary: #6b7c70;
 
-  /* El acento a tamaño de texto: #e8175d solo llega a 4.13:1 sobre el fondo,
-     por debajo del 4.5:1 que pide WCAG AA. Este tono aclarado da 5.21:1.
-     Usar accent-primary para rellenos e iconos, accent-text para tipografía. */
-  --color-accent-text: #ef4a7b;
+  /* Antes esto era un parche: el carmín #e8175d solo daba 4.13:1 sobre el
+     fondo y hacía falta un tono aclarado aparte para tipografía. La salvia
+     da 8.38:1 por sí sola, así que accent-text ya es el mismo color. Se
+     mantiene el token porque hay CSS y componentes que lo referencian. */
+  --color-accent-text: #8fb996;
+
+  /* El acento ya no puede señalar errores: un mensaje de validación en verde
+     se lee como éxito. Rosa apagado, semántico y sin competir con la marca. */
+  --color-danger: #d9737d;
 
   --color-text-primary: #f8f8f8;
   --color-text-secondary: #a8a7a8;
   --color-text-muted: #898989;
+
+  /* El hover del botón primario. Era un hex suelto; ahora es token porque
+     en claro tiene que ir en la dirección contraria (oscurecer, no aclarar). */
+  --color-accent-hover: #a3c8aa;
 
   --color-line: #2e2e2e;
   --color-line-strong: #474747;
@@ -34,6 +45,56 @@
   --font-family-heading: 'Inter', sans-serif;
   --font-family-body: 'Inter', sans-serif;
 }
+
+/* ═══════════════════════════════════════════════════
+   TEMAS
+   Los tokens de @theme (arriba) SON el tema oscuro: es el default y
+   el que se ve si JavaScript no corre. Aquí solo se redefine lo que
+   cambia en claro.
+
+   Esto funciona sin tocar un solo componente porque Tailwind v4 genera
+   las utilidades por referencia —`background-color: var(--color-bg-secondary)`,
+   no el hex— así que redefinir el token arrastra utilidades y `var()`
+   escritos a mano por igual.
+
+   `color-scheme` no es decorativo: le dice al navegador de qué color
+   pintar scrollbars, inputs nativos y el fondo durante la carga.
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Blanco cálido, no #fff puro: el blanco absoluto sobre pantalla
+     brillante cansa y delata plantilla. */
+  --color-bg-primary: #f7f7f5;
+  --color-bg-secondary: #eeeeea;
+  --color-bg-card: #ffffff;
+  --color-bg-glass: #f2f2ef;
+
+  /* El acento se invierte en luminancia: en oscuro es salvia CLARA sobre
+     fondo negro; en claro tiene que ser salvia OSCURA sobre fondo blanco.
+     Mismo matiz, misma familia. #456e51 da 5.43:1 como texto y 5.83:1
+     con texto claro encima, así que sirve para tipografía y para relleno. */
+  --color-accent-primary: #456e51;
+  --color-accent-secondary: #6e6e6e;
+  --color-accent-tertiary: #7d9584;
+  --color-accent-text: #456e51;
+  --color-accent-hover: #37583f;
+
+  --color-danger: #b23a46;
+
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #5c5c5c;
+  --color-text-muted: #6e6e6e;
+
+  --color-line: #e0e0da;
+  --color-line-strong: #c2c2ba;
+}
+
 
 /* ═══════════════════════════════════════════════════
    BASE STYLES
@@ -254,7 +315,9 @@ a {
   gap: 0.5rem;
   padding: 0.875rem 2rem;
   background: var(--color-accent-primary);
-  color: #ffffff;
+  /* Texto oscuro sobre el relleno claro: 8.38:1. El carmín obligaba a texto
+     blanco y se quedaba en 4.46:1, al filo del mínimo. */
+  color: var(--color-bg-primary);
   border: 1px solid var(--color-accent-primary);
   border-radius: 6px;
   font-family: var(--font-family-body);
@@ -266,8 +329,8 @@ a {
 }
 
 .btn-primary:hover {
-  background: #cc134f;
-  border-color: #cc134f;
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
 }
 
 .btn-secondary {
@@ -344,7 +407,7 @@ a {
 }
 
 .field-input[aria-invalid="true"] {
-  border-color: var(--color-accent-text);
+  border-color: var(--color-danger);
 }
 
 textarea.field-input {
@@ -355,7 +418,7 @@ textarea.field-input {
 .field-error {
   margin-top: 0.5rem;
   font-size: 0.8125rem;
-  color: var(--color-accent-text);
+  color: var(--color-danger);
 }
 
 
@@ -365,8 +428,78 @@ textarea.field-input {
 
 
 /* ═══════════════════════════════════════════════════
+   THEME TOGGLE
+   Qué icono se ve lo decide el CSS, no React: así el markup del
+   servidor y el del cliente son idénticos en ambos temas y no hay
+   hydration mismatch ni parpadeo del icono al hidratar.
+   ═══════════════════════════════════════════════════ */
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-text);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--color-accent-primary) 35%, transparent);
+}
+
+.theme-toggle svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+/* Oscuro (default): se ve el sol — el icono anuncia la acción, no el estado. */
+.theme-toggle__moon {
+  display: none;
+}
+
+:root[data-theme="light"] .theme-toggle__sun {
+  display: none;
+}
+
+:root[data-theme="light"] .theme-toggle__moon {
+  display: block;
+}
+
+/* En el menú móvil el botón va al tamaño del resto de los enlaces. */
+.theme-toggle--mobile {
+  width: 3rem;
+  height: 3rem;
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent-primary) 45%,
+    transparent
+  );
+  color: var(--color-accent-text);
+}
+
+.theme-toggle--mobile svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+
+/* ═══════════════════════════════════════════════════
    SKILLS — órbitas + tooltip
-   Hover: tinte carmín sutil (el acento único, nunca saturado).
+   Hover: tinte salvia sutil (el acento único, nunca saturado).
    ═══════════════════════════════════════════════════ */
 
 .skill-node {
@@ -394,7 +527,8 @@ textarea.field-input {
   transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.skill-node:hover .skill-orbit img {
+.skill-node:hover .skill-orbit img,
+.skill-node:focus-visible .skill-orbit img {
   transform: scale(1.06);
   filter: saturate(1.05);
 }

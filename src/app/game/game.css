@@ -253,17 +253,17 @@
   color: var(--color-text-secondary);
 }
 
-/* Tonos aclarados respecto al acento base: el código va a 0.8rem
-   y #e8175d solo daba 3.82:1 sobre el panel. */
+/* El acento salvia #8fb996 ya pasa contraste sobre el panel a 0.8rem,
+   así que la sintaxis usa el acento y una variante tonal, sin parches. */
 .syn-keyword {
-  color: #d97f9c;
+  color: #8fb996;
   font-weight: 600;
 }
 .syn-string {
   color: #a8a7a8;
 }
 .syn-tag {
-  color: #ef4a7b;
+  color: #a3c8aa;
 }
 .syn-brace {
   color: #898989;
@@ -410,7 +410,8 @@
   width: 100%;
   padding: 0.75rem 1.5rem;
   background: var(--color-accent-primary);
-  color: #ffffff;
+  /* Texto oscuro sobre relleno claro, igual que .btn-primary del sitio. */
+  color: var(--color-bg-primary);
   border: none;
   border-radius: 6px;
   font-family: var(--font-family-body);
@@ -424,7 +425,7 @@
 }
 
 .cv-download-btn:hover {
-  background: #cc134f;
+  background: var(--color-accent-hover);
 }
 
 .cv-icon {

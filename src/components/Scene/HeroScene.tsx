@@ -20,7 +20,7 @@ const POT = "#2f2f2f";
 const POT_RIM = "#3a3a3a";
 const SOIL = "#1f1f1f";
 const SPINE = "#8f8d86";
-const BLOOM = "#e8175d";     // el acento del sitio, una sola vez en toda la escena
+const BLOOM = "#8fb996";     // el acento del sitio, una sola vez en toda la escena
 
 /* ── Utilidades de geometría ─────────────────────── */
 
@@ -444,7 +444,7 @@ function Bloom({ castShadow }: { castShadow: boolean }) {
 
       <mesh position={[0, 0.02, 0]} scale={[0.045, 0.03, 0.045]}>
         <sphereGeometry args={[1, 10, 8]} />
-        <meshStandardMaterial color="#f6d9e2" roughness={0.6} />
+        <meshStandardMaterial color="#dbe8dd" roughness={0.6} />
       </mesh>
     </group>
   );

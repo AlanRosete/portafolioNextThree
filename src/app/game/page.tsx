@@ -108,15 +108,15 @@ function AtomScene() {
     <>
       <ambientLight intensity={0.3} />
       <pointLight position={[0, 0, 5]} color="#ffffff" intensity={2} />
-      <pointLight position={[3, 3, 3]} color="#e8175d" intensity={1} />
+      <pointLight position={[3, 3, 3]} color="#8fb996" intensity={1} />
 
       <group ref={groupRef}>
         {/* Núcleo: único punto con el acento */}
         <mesh>
           <sphereGeometry args={[0.2, 32, 32]} />
           <meshStandardMaterial
-            color="#e8175d"
-            emissive="#e8175d"
+            color="#8fb996"
+            emissive="#8fb996"
             emissiveIntensity={3}
             toneMapped={false}
           />
@@ -125,7 +125,7 @@ function AtomScene() {
         <mesh>
           <sphereGeometry args={[0.35, 32, 32]} />
           <meshBasicMaterial
-            color="#e8175d"
+            color="#8fb996"
             transparent
             opacity={0.08}
           />
@@ -159,7 +159,7 @@ function AtomScene() {
           rotationAngle={2.1}
           speed={2.1}
           color="#474747"
-          electronColor="#cc527a"
+          electronColor="#6b7c70"
         />
       </group>
     </>
@@ -242,7 +242,7 @@ const NEOFETCH_LINES = [
 // Rampa de grises + el acento al final, como una paleta de terminal sobria
 const NEOFETCH_COLORS = [
   "#141414", "#2e2e2e", "#474747", "#898989",
-  "#a8a7a8", "#f8f8f8", "#cc527a", "#e8175d",
+  "#a8a7a8", "#f8f8f8", "#6b7c70", "#8fb996",
 ];
 
 function NeofetchPanel() {
@@ -257,7 +257,7 @@ function NeofetchPanel() {
               <span className="neofetch-user">
                 <span style={{ color: "#f8f8f8" }}>alan</span>
                 <span style={{ color: "#898989" }}>@</span>
-                <span style={{ color: "#ef4a7b" }}>portfolio</span>
+                <span style={{ color: "#8fb996" }}>portfolio</span>
               </span>
             ) : i === 1 ? (
               <span className="neofetch-separator">{line}</span>
@@ -447,9 +447,9 @@ function CodeHighlight({ line }: { line: string }) {
 
   // Debe coincidir con las clases .syn-* de game.css
   const colorMap: Record<string, string> = {
-    keyword: "#d97f9c",
+    keyword: "#8fb996",
     string: "#a8a7a8",
-    tag: "#ef4a7b",
+    tag: "#8fb996",
     brace: "#898989",
     plain: "inherit",
   };

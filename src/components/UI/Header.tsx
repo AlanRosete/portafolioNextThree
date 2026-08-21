@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
 import { useStore } from "@/hooks/useStore";
 import { navLinks } from "@/data/projects";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
@@ -55,7 +56,10 @@ export default function Header() {
         }`}
         style={{ opacity: 0 }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div
+          className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+          style={{ paddingInline: "1.5rem" }}
+        >
           {/* Logo */}
           <a
             href="#hero"
@@ -63,11 +67,16 @@ export default function Header() {
               e.preventDefault();
               handleNavClick("#hero");
             }}
-            className="text-2xl font-bold tracking-tight"
-            style={{ fontFamily: "var(--font-family-heading)" }}
+            className="flex items-center"
+            aria-label="Alan — ir al inicio"
           >
-            <span className="text-text-primary">Alan</span>
-            <span className="text-text-muted">.dev</span>
+            <img
+              src="/world-svgrepo-com.svg"
+              alt=""
+              width={40}
+              height={40}
+              className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 transition-transform duration-300 hover:scale-105"
+            />
           </a>
 
           {/* Desktop Nav */}
@@ -92,6 +101,8 @@ export default function Header() {
             >
               Download CV
             </a>
+
+            <ThemeToggle />
           </nav>
 
           {/* Mobile Hamburger */}
@@ -187,6 +198,22 @@ export default function Header() {
         >
           Download CV
         </a>
+
+        <div
+          style={{
+            transform: isMobileMenuOpen ? "translateY(0)" : "translateY(20px)",
+            opacity: isMobileMenuOpen ? 1 : 0,
+            transition: "all 0.4s ease",
+            transitionDelay: isMobileMenuOpen
+              ? `${(navLinks.length + 1) * 70}ms`
+              : "0ms",
+          }}
+        >
+          <ThemeToggle
+            className="theme-toggle--mobile"
+            tabIndex={isMobileMenuOpen ? 0 : -1}
+          />
+        </div>
       </div>
     </>
   );
