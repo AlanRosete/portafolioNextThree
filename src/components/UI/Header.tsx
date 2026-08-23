@@ -57,7 +57,7 @@ export default function Header() {
         style={{ opacity: 0 }}
       >
         <div
-          className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+          className="mx-auto px-6 py-4 flex items-center justify-between"
           style={{ paddingInline: "1.5rem" }}
         >
           {/* Logo */}

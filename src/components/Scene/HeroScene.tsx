@@ -4,6 +4,7 @@ import React, { useMemo, useRef, useLayoutEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
+import { useTheme } from "@/hooks/useTheme";
 
 /* ═══════════════════════════════════════════════════
    JARDINERA DE CACTUS — hero procedural
@@ -14,13 +15,90 @@ import { gsap } from "@/lib/gsap";
    y el único color saturado de la escena es la flor.
    ═══════════════════════════════════════════════════ */
 
-const BODY = "#4a544d";      // verde grisáceo, apenas fuera del neutro
-const BODY_DARK = "#3b433e";
-const POT = "#2f2f2f";
-const POT_RIM = "#3a3a3a";
-const SOIL = "#1f1f1f";
-const SPINE = "#8f8d86";
-const BLOOM = "#8fb996";     // el acento del sitio, una sola vez en toda la escena
+interface ScenePalette {
+  body: string;
+  bodyDark: string;
+  pot: string;
+  potRim: string;
+  soil: string;
+  spine: string;
+  bloom: string;
+  petal: string;
+  /** Sombra de contacto del suelo. */
+  shadow: string;
+  shadowOpacity: number;
+  /** Sombra pintada de móvil, donde no hay shadow map. */
+  fakeShadow: string;
+  fakeShadowOpacity: number;
+  fill: string;
+  ambient: string;
+  ambientIntensity: number;
+  /** Contraluz: dibuja el borde contra el fondo. Casi no hace falta en claro. */
+  rimIntensity: number;
+}
+
+/**
+ * En oscuro los cuerpos son un verde tan desaturado que lee casi gris, y el
+ * único color saturado es la flor.
+ */
+const DARK_PALETTE: ScenePalette = {
+  body: "#4a544d",
+  bodyDark: "#3b433e",
+  pot: "#2f2f2f",
+  potRim: "#3a3a3a",
+  soil: "#1f1f1f",
+  spine: "#8f8d86",
+  bloom: "#8fb996",
+  petal: "#dbe8dd",
+  shadow: "#1b1b1b",
+  shadowOpacity: 1,
+  fakeShadow: "#0b0b0b",
+  fakeShadowOpacity: 0.85,
+  fill: "#9aa6ad",
+  ambient: "#c9cdd1",
+  ambientIntensity: 0.35,
+  rimIntensity: 2.2,
+};
+
+/**
+ * En claro no vale con aclarar el fondo: hay que invertir la jerarquía.
+ *
+ * 1. Los cuerpos suben de luminancia. En oscuro eran casi negros porque el
+ *    fondo era negro; sobre blanco eso los convertía en siluetas recortadas.
+ * 2. La flor se INVIERTE: pasa a ser el verde oscuro del acento en claro.
+ *    La regla del sitio es que la flor sea el punto focal, y sobre un cuerpo
+ *    claro eso solo se consigue siendo más oscura, no más clara.
+ * 3. La sombra deja de ser casi negra. Una sombra real sobre una superficie
+ *    hueso es un gris cálido desaturado, no un disco negro — ese disco era
+ *    invisible sobre fondo negro y dominaba la escena sobre fondo claro.
+ * 4. La ambiental sube: sobre una superficie clara los objetos reciben rebote,
+ *    y sin ese rebote la escena se veía sucia en vez de iluminada.
+ */
+const LIGHT_PALETTE: ScenePalette = {
+  body: "#93ae98",
+  bodyDark: "#7d9a83",
+  pot: "#a9a39a",
+  potRim: "#b6b0a7",
+  soil: "#6d655c",
+  spine: "#4f5f55",
+  bloom: "#456e51",
+  petal: "#e6ede7",
+  shadow: "#c0bcb4",
+  shadowOpacity: 0.2,
+  fakeShadow: "#bab5ad",
+  fakeShadowOpacity: 0.5,
+  fill: "#b9c2c8",
+  ambient: "#efece6",
+  ambientIntensity: 0.75,
+  rimIntensity: 0.7,
+};
+
+/**
+ * La paleta viaja por contexto y no por props: si no, cada color habría que
+ * enhebrarlo por seis niveles de <group> hasta llegar a cada material.
+ */
+const PaletteContext = React.createContext<ScenePalette>(DARK_PALETTE);
+const usePalette = () => React.useContext(PaletteContext);
 
 /* ── Utilidades de geometría ─────────────────────── */
 
@@ -104,6 +182,8 @@ function Spines({
   length?: number;
   bulge?: number;
 }) {
+  const p = usePalette();
+
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const count = rows * ribs;
 
@@ -144,7 +224,7 @@ function Spines({
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <coneGeometry args={[length * 0.32, length, 4]} />
-      <meshStandardMaterial color={SPINE} roughness={0.75} metalness={0} />
+      <meshStandardMaterial color={p.spine} roughness={0.75} metalness={0} />
     </instancedMesh>
   );
 }
@@ -160,12 +240,14 @@ function Pot({
   height: number;
   castShadow: boolean;
 }) {
+  const p = usePalette();
+
   return (
     <group>
       {/* Cuerpo troncocónico: más estrecho abajo que arriba */}
       <mesh position={[0, height / 2, 0]} castShadow={castShadow} receiveShadow>
         <cylinderGeometry args={[radius, radius * 0.78, height, 28]} />
-        <meshStandardMaterial color={POT} roughness={0.9} metalness={0} />
+        <meshStandardMaterial color={p.pot} roughness={0.9} metalness={0} />
       </mesh>
 
       {/* Reborde: el labio que separa la maceta del cuerpo del cactus */}
@@ -173,13 +255,13 @@ function Pot({
         <cylinderGeometry
           args={[radius * 1.07, radius * 1.07, height * 0.13, 28]}
         />
-        <meshStandardMaterial color={POT_RIM} roughness={0.85} metalness={0} />
+        <meshStandardMaterial color={p.potRim} roughness={0.85} metalness={0} />
       </mesh>
 
       {/* Tierra, ligeramente hundida bajo el reborde */}
       <mesh position={[0, height * 1.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[radius * 1.0, 28]} />
-        <meshStandardMaterial color={SOIL} roughness={1} metalness={0} />
+        <meshStandardMaterial color={p.soil} roughness={1} metalness={0} />
       </mesh>
     </group>
   );
@@ -206,11 +288,13 @@ function Arm({
   position: [number, number, number];
   castShadow: boolean;
 }) {
+  const p = usePalette();
+
   return (
     <group position={position}>
       <mesh rotation={[0, 0, -Math.PI / 2]} castShadow={castShadow}>
         <torusGeometry args={[elbowRadius, tube, 10, 20, Math.PI / 2]} />
-        <meshStandardMaterial color={BODY} roughness={0.68} metalness={0} />
+        <meshStandardMaterial color={p.body} roughness={0.68} metalness={0} />
       </mesh>
 
       <mesh
@@ -218,7 +302,7 @@ function Arm({
         castShadow={castShadow}
       >
         <capsuleGeometry args={[tube, height, 6, 18]} />
-        <meshStandardMaterial color={BODY} roughness={0.68} metalness={0} />
+        <meshStandardMaterial color={p.body} roughness={0.68} metalness={0} />
       </mesh>
     </group>
   );
@@ -231,6 +315,8 @@ function ColumnarCactus({
   castShadow: boolean;
   detail: boolean;
 }) {
+  const p = usePalette();
+
   const trunk = useMemo(
     () => applyRibs(new THREE.CapsuleGeometry(0.32, 1.95, 8, 40), 11, 0.055),
     []
@@ -245,7 +331,7 @@ function ColumnarCactus({
         position={[0, 1.55, 0]}
         castShadow={castShadow}
       >
-        <meshStandardMaterial color={BODY} roughness={0.68} metalness={0} />
+        <meshStandardMaterial color={p.body} roughness={0.68} metalness={0} />
       </mesh>
 
       {/* Brazo derecho, alto */}
@@ -295,6 +381,8 @@ function PadSpines({
   rows: number;
   cols: number;
 }) {
+  const p = usePalette();
+
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const [rx, ry, rz] = radii;
   const count = rows * cols * 2;
@@ -343,7 +431,7 @@ function PadSpines({
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <coneGeometry args={[0.011, 0.05, 4]} />
-      <meshStandardMaterial color={SPINE} roughness={0.75} metalness={0} />
+      <meshStandardMaterial color={p.spine} roughness={0.75} metalness={0} />
     </instancedMesh>
   );
 }
@@ -361,11 +449,13 @@ function Pad({
   castShadow: boolean;
   detail: boolean;
 }) {
+  const p = usePalette();
+
   return (
     <group position={position} rotation={rotation}>
       <mesh scale={radii} castShadow={castShadow}>
         <sphereGeometry args={[1, 24, 16]} />
-        <meshStandardMaterial color={BODY_DARK} roughness={0.72} metalness={0} />
+        <meshStandardMaterial color={p.bodyDark} roughness={0.72} metalness={0} />
       </mesh>
 
       <PadSpines radii={radii} rows={detail ? 6 : 4} cols={detail ? 4 : 3} />
@@ -417,6 +507,8 @@ function NopalCactus({
 /* ── Cactus 3: barril, con flor ──────────────────── */
 
 function Bloom({ castShadow }: { castShadow: boolean }) {
+  const p = usePalette();
+
   const petals = useMemo(
     () => Array.from({ length: 6 }, (_, i) => (i / 6) * Math.PI * 2),
     []
@@ -434,9 +526,9 @@ function Bloom({ castShadow }: { castShadow: boolean }) {
         >
           <sphereGeometry args={[1, 10, 8]} />
           <meshStandardMaterial
-            color={BLOOM}
+            color={p.bloom}
             roughness={0.5}
-            emissive={BLOOM}
+            emissive={p.bloom}
             emissiveIntensity={0.25}
           />
         </mesh>
@@ -444,7 +536,7 @@ function Bloom({ castShadow }: { castShadow: boolean }) {
 
       <mesh position={[0, 0.02, 0]} scale={[0.045, 0.03, 0.045]}>
         <sphereGeometry args={[1, 10, 8]} />
-        <meshStandardMaterial color="#dbe8dd" roughness={0.6} />
+        <meshStandardMaterial color={p.petal} roughness={0.6} />
       </mesh>
     </group>
   );
@@ -457,6 +549,8 @@ function BarrelCactus({
   castShadow: boolean;
   detail: boolean;
 }) {
+  const p = usePalette();
+
   const body = useMemo(
     () => applyRibs(new THREE.SphereGeometry(0.46, 40, 26), 13, 0.075),
     []
@@ -472,7 +566,7 @@ function BarrelCactus({
         scale={[1, 0.92, 1]}
         castShadow={castShadow}
       >
-        <meshStandardMaterial color={BODY} roughness={0.7} metalness={0} />
+        <meshStandardMaterial color={p.body} roughness={0.7} metalness={0} />
       </mesh>
 
       {detail && (
@@ -511,6 +605,8 @@ function Ground({
   texture: THREE.Texture;
   receiveShadow: boolean;
 }) {
+  const p = usePalette();
+
   return (
     <mesh
       rotation={[-Math.PI / 2, 0, 0]}
@@ -519,9 +615,10 @@ function Ground({
     >
       <circleGeometry args={[4.2, 48]} />
       <meshStandardMaterial
-        color="#1b1b1b"
+        color={p.shadow}
         alphaMap={texture}
         transparent
+        opacity={p.shadowOpacity}
         roughness={1}
         metalness={0}
         depthWrite={false}
@@ -540,6 +637,8 @@ function FakeShadow({
   position: [number, number, number];
   scale: number;
 }) {
+  const p = usePalette();
+
   return (
     <mesh
       rotation={[-Math.PI / 2, 0, 0]}
@@ -548,10 +647,10 @@ function FakeShadow({
     >
       <circleGeometry args={[1, 24]} />
       <meshBasicMaterial
-        color="#0b0b0b"
+        color={p.fakeShadow}
         alphaMap={texture}
         transparent
-        opacity={0.85}
+        opacity={p.fakeShadowOpacity}
         depthWrite={false}
       />
     </mesh>
@@ -566,12 +665,15 @@ const CACTI: {
   z: number;
   shadowScale: number;
 }[] = [
-  { key: "nopal", x: -1.42, z: 0.22, shadowScale: 0.5 },
+  { key: "nopal", x: -1.42, z: -0.8, shadowScale: 0.5 },
   { key: "columnar", x: 0.05, z: -0.12, shadowScale: 0.62 },
   { key: "barrel", x: 1.35, z: 0.4, shadowScale: 0.55 },
 ];
 
 export default function HeroScene() {
+  const theme = useTheme();
+  const p = theme === "light" ? LIGHT_PALETTE : DARK_PALETTE;
+
   const rootRef = useRef<THREE.Group>(null);
   const swayRefs = useRef<(THREE.Group | null)[]>([]);
 
@@ -675,77 +777,79 @@ export default function HeroScene() {
   });
 
   return (
-    <group
-      ref={rootRef}
-      position={layout.position}
-      scale={layout.scale}
-    >
-      <Ground texture={texture} receiveShadow={shadows} />
+    <PaletteContext.Provider value={p}>
+      <group
+        ref={rootRef}
+        position={layout.position}
+        scale={layout.scale}
+      >
+        <Ground texture={texture} receiveShadow={shadows} />
 
-      {CACTI.map((item, i) => (
-        <group key={item.key} position={[item.x, 0, item.z]}>
-          {!shadows && (
-            <FakeShadow
-              texture={texture}
-              position={[0.12, 0.012, 0.18]}
-              scale={item.shadowScale}
-            />
-          )}
+        {CACTI.map((item, i) => (
+          <group key={item.key} position={[item.x, 0, item.z]}>
+            {!shadows && (
+              <FakeShadow
+                texture={texture}
+                position={[0.12, 0.012, 0.18]}
+                scale={item.shadowScale}
+              />
+            )}
 
-          <group
-            ref={(el) => {
-              swayRefs.current[i] = el;
-            }}
-          >
-            {item.key === "columnar" && (
-              <ColumnarCactus castShadow={shadows} detail={detail} />
-            )}
-            {item.key === "nopal" && (
-              <NopalCactus castShadow={shadows} detail={detail} />
-            )}
-            {item.key === "barrel" && (
-              <BarrelCactus castShadow={shadows} detail={detail} />
-            )}
+            <group
+              ref={(el) => {
+                swayRefs.current[i] = el;
+              }}
+            >
+              {item.key === "columnar" && (
+                <ColumnarCactus castShadow={shadows} detail={detail} />
+              )}
+              {item.key === "nopal" && (
+                <NopalCactus castShadow={shadows} detail={detail} />
+              )}
+              {item.key === "barrel" && (
+                <BarrelCactus castShadow={shadows} detail={detail} />
+              )}
+            </group>
           </group>
-        </group>
-      ))}
+        ))}
 
-      {/* Luz principal: rasante y desde la derecha, para que la
-          sombra caiga hacia el texto y una las dos mitades del hero */}
-      <directionalLight
-        position={[3.4, 5.2, 3.2]}
-        intensity={2.1}
-        color="#ffffff"
-        castShadow={shadows}
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0012}
-        shadow-normalBias={0.02}
-        shadow-camera-left={-5}
-        shadow-camera-right={5}
-        shadow-camera-top={5}
-        shadow-camera-bottom={-5}
-        shadow-camera-near={0.5}
-        shadow-camera-far={16}
-      />
+        {/* Luz principal: rasante y desde la derecha, para que la
+            sombra caiga hacia el texto y una las dos mitades del hero */}
+        <directionalLight
+          position={[3.4, 5.2, 3.2]}
+          intensity={2.1}
+          color="#ffffff"
+          castShadow={shadows}
+          shadow-mapSize={[1024, 1024]}
+          shadow-bias={-0.0012}
+          shadow-normalBias={0.02}
+          shadow-camera-left={-5}
+          shadow-camera-right={5}
+          shadow-camera-top={5}
+          shadow-camera-bottom={-5}
+          shadow-camera-near={0.5}
+          shadow-camera-far={16}
+        />
 
-      {/* Relleno frío por el lado opuesto: sin esto las caras en
-          sombra quedan en negro puro y el cactus se ve recortado */}
-      <directionalLight
-        position={[-4, 2, -2]}
-        intensity={0.45}
-        color="#9aa6ad"
-      />
+        {/* Relleno frío por el lado opuesto: sin esto las caras en
+            sombra quedan en negro puro y el cactus se ve recortado */}
+        <directionalLight
+          position={[-4, 2, -2]}
+          intensity={0.45}
+          color={p.fill}
+        />
 
-      {/* Contraluz con el acento del sitio, muy bajo: sólo dibuja
-          el borde de la silueta contra el fondo oscuro */}
-      <pointLight
-        position={[-1.1, 3.1, -2.4]}
-        intensity={2.2}
-        distance={4.6}
-        color={BLOOM}
-      />
+        {/* Contraluz con el acento del sitio, muy bajo: sólo dibuja
+            el borde de la silueta contra el fondo oscuro */}
+        <pointLight
+          position={[-1.1, 3.1, -2.4]}
+          intensity={p.rimIntensity}
+          distance={4.6}
+          color={p.bloom}
+        />
 
-      <ambientLight intensity={0.35} color="#c9cdd1" />
-    </group>
+        <ambientLight intensity={p.ambientIntensity} color={p.ambient} />
+      </group>
+    </PaletteContext.Provider>
   );
 }

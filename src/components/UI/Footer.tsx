@@ -37,7 +37,7 @@ export default function Footer() {
 
   return (
     <footer className="relative z-10 border-t border-line">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="text-center md:text-left">
