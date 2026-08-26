@@ -2,10 +2,11 @@
 
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { MorphSVGPlugin } from "gsap/MorphSVGPlugin";
 
 // Register GSAP plugins
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, MorphSVGPlugin);
 }
 
-export { gsap, ScrollTrigger };
+export { gsap, ScrollTrigger, MorphSVGPlugin };

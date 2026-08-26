@@ -582,79 +582,6 @@ textarea.field-input {
 }
 
 /* ═══════════════════════════════════════════════════
-   LOADER ORB
-   Anillo giratorio de la pantalla de carga.
-   Nombre propio con prefijo: ".container" chocaba con
-   utilidades y con cualquier otro div del proyecto.
-   Vive EN FLUJO (position: relative), así el flex del
-   overlay lo centra junto a la barra y el texto.
-   ═══════════════════════════════════════════════════ */
-
-.loader-orb {
-  position: relative;
-  /* Escala con el viewport sin pasarse en móvil ni en desktop. */
-  height: clamp(56px, 16vw, 96px);
-  width: clamp(56px, 16vw, 96px);
-  border-radius: 50%;
-  /* El extremo oscuro del degradado es lo que crea la "cometa"
-     al girar: acento → variante tonal → línea. Sin colores ajenos. */
-  background-image: linear-gradient(
-    var(--color-accent-primary),
-    var(--color-accent-tertiary),
-    var(--color-line-strong)
-  );
-  animation: loader-orb-spin 1.2s linear infinite;
-}
-
-/* Cada capa repite el degradado con más desenfoque: el apilado
-   es lo que produce el halo. `inherit` evita duplicar el gradiente. */
-.loader-orb__glow {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background-image: inherit;
-}
-
-.loader-orb__glow:nth-of-type(1) {
-  filter: blur(4px);
-}
-
-.loader-orb__glow:nth-of-type(2) {
-  filter: blur(9px);
-}
-
-.loader-orb__glow:nth-of-type(3) {
-  filter: blur(18px);
-}
-
-.loader-orb__glow:nth-of-type(4) {
-  filter: blur(32px);
-}
-
-/* Disco central del color del fondo: convierte el orbe en anillo.
-   En % para que el grosor acompañe al tamaño responsive. */
-.loader-orb::after {
-  content: "";
-  position: absolute;
-  inset: 12%;
-  border-radius: 50%;
-  background-color: var(--color-bg-primary);
-}
-
-@keyframes loader-orb-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .loader-orb {
-    animation-duration: 3.6s;
-  }
-}
-
-
-/* ═══════════════════════════════════════════════════
    HERO VEIL
    Vela direccional sobre la escena 3D: opaca donde va el
    texto y transparente donde están los cactus. Un radial
@@ -687,4 +614,55 @@ textarea.field-input {
       transparent 72%
     );
   }
+}
+
+
+/* ═══════════════════════════════════════════════════
+   CAT CORNER
+   Gato derretido en la esquina superior derecha del formulario.
+
+   El truco del tema está en `color`: la silueta usa `currentColor`, así
+   que hereda `--color-text-primary` y se invierte sola con el toggle
+   (#f8f8f8 en oscuro, #1a1a1a en claro). No hay JavaScript de por medio.
+
+   La posición ahora se ancla a un PUNTO, no a un borde: en el viewBox la
+   esquina del formulario está en (150, 64) de 200×140, y hay que hacerla
+   coincidir con la esquina real. Con `top: 0; right: 0` el elemento queda
+   pegado por arriba y por la derecha, y de ahí se corrige en cada eje:
+
+     X: 1 − 150/200 = 25%      (empuja a la derecha lo que sobresale)
+     Y: −(64/140)  = −45.714%  (sube el cuerpo por encima del borde)
+
+   Los porcentajes de `translate` son relativos al propio elemento —no al
+   padre—, que es lo que hace que el punto siga clavado en la esquina a
+   cualquier ancho, sin recalcular nada por breakpoint.
+
+   El ancho manda sobre todo lo demás: de los 200 del viewBox, 150 son
+   cuerpo y 50 es lo que cuelga fuera del formulario. A 150px de ancho eso
+   son ~19px sobresaliendo, que caben en el padding lateral de `.section`
+   incluso en móvil (1.5rem = 24px).
+   ═══════════════════════════════════════════════════ */
+
+.cat-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  width: clamp(104px, 14vw, 150px);
+  transform: translate(25%, -45.714%);
+  color: var(--color-text-primary);
+  pointer-events: none;
+}
+
+.cat-corner svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* El ojo va "recortado" sobre la silueta: se pinta del color de lo que
+   hay detrás de la cabeza, que es el fondo de la página —la cabeza queda
+   por encima del borde del formulario, no sobre su superficie. */
+.cat-corner__eye {
+  stroke: var(--color-bg-primary);
 }

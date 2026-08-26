@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
+import CatCorner from "@/components/UI/CatCorner";
 
 /* Edita estos valores: son los únicos datos personales de la sección. */
 const CONTACT_EMAIL = "alanroset3@gmail.com";
@@ -160,7 +161,11 @@ export default function ContactSection() {
           </div>
 
           {/* ── Columna derecha: formulario ── */}
-          <div className="lg:col-span-7 w-full">
+          <div className="lg:col-span-7 w-full relative">
+            {/* El gato se apoya en el borde superior del formulario; vive
+                fuera de <form> para no formar parte de su flujo. */}
+            <CatCorner />
+
             <form
               onSubmit={handleSubmit}
               noValidate
