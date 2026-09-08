@@ -51,13 +51,13 @@ export default function Header() {
     <>
       <header
         ref={headerRef}
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 w-full z-50 p-[1%]! transition-all duration-500 ${
           scrolled && !isMobileMenuOpen ? "glass-strong" : ""
         }`}
         style={{ opacity: 0 }}
       >
         <div
-          className="mx-auto px-6 py-4 flex items-center justify-between"
+          className="mx-auto px-6 flex items-center justify-between"
           style={{ paddingInline: "1.5rem" }}
         >
           {/* Logo */}

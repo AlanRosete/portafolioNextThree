@@ -252,51 +252,83 @@ export default function ContactSection() {
               </div>
 
               <div
-                className="contact-field mt-8 pt-8 border-t border-line flex flex-col sm:flex-row sm:items-center"
+                className="contact-field mt-8 pt-8 border-t border-line"
                 style={{ opacity: 0 }}
               >
-                <button
-                  type="submit"
-                  disabled={status === "sending"}
-                  className="btn-primary justify-center w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {status === "sending" ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Sending…
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                        />
-                      </svg>
-                      Send message
-                    </>
-                  )}
-                </button>
-
-                {/* aria-live: el estado se anuncia sin mover el layout. */}
-                <p
-                  role="status"
-                  aria-live="polite"
-                  className={`text-sm ${
-                    status === "error" ? "text-accent-text" : "text-text-secondary"
-                  }`}
-                >
-                  {status === "sent" && "Thanks — I'll get back to you shortly."}
-                  {status === "error" &&
-                    `Couldn't send. Email me directly at ${CONTACT_EMAIL}.`}
+                {/* Región viva PERSISTENTE. Tiene que existir en el DOM antes
+                    de que cambie su contenido: un `aria-live` que se monta ya
+                    con texto dentro no lo anuncia en la mayoría de lectores.
+                    Por eso solo cambia su texto y nunca se desmonta. */}
+                <p role="status" aria-live="polite" className="sr-only">
+                  {status === "sent" &&
+                    "Message sent. I'll get back to you within a couple of days."}
+                  {status === "error" && "Couldn't send the message."}
                 </p>
+
+                <div className="form-status-slot">
+                  {status === "sent" ? (
+                    <div className="form-sent" aria-hidden="true">
+                      <span className="form-sent-title">Message sent</span>
+                      <span className="form-sent-note">
+                        I&apos;ll get back to you within a couple of days.
+                      </span>
+                    </div>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={status === "sending"}
+                      className="btn-primary justify-center w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {status === "sending" ? (
+                        <>
+                          {/* `border-current` y no `border-white`: el botón es
+                              salvia con texto oscuro, un aro blanco encima se
+                              perdía contra el relleno. */}
+                          <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                          Sending…
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                            />
+                          </svg>
+                          Send message
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {/* Sin `aria-hidden`: aquí dentro va un enlace enfocable, y
+                    esconderlo del árbol de accesibilidad lo dejaría alcanzable
+                    con tabulador pero invisible para el lector. */}
+                {status === "error" && (
+                  <div className="form-error-note">
+                    <p className="form-error-head">
+                      Couldn&apos;t send it — something broke on my end.
+                    </p>
+                    <p>
+                      Write to{" "}
+                      <a
+                        href={`mailto:${CONTACT_EMAIL}`}
+                        className="form-error-link"
+                      >
+                        {CONTACT_EMAIL}
+                      </a>{" "}
+                      and it reaches me just the same.
+                    </p>
+                  </div>
+                )}
               </div>
             </form>
           </div>

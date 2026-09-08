@@ -100,11 +100,14 @@
    BASE STYLES
    ═══════════════════════════════════════════════════ */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* NO REINTRODUCIR AQUI UN RESET `* { margin: 0; padding: 0 }`.
+   Lo no-encapado le gana a lo encapado en la cascada, y Tailwind v4 mete sus
+   utilidades en `@layer utilities`: un reset suelto mata `p-*`, `m-*`, `px-*`
+   y `mx-auto` en el sitio ENTERO, sin error ni aviso. El preflight de Tailwind
+   ya aplica exactamente lo mismo, pero dentro de `@layer base`, donde las
+   utilidades sí ganan. Esto ya rompio el hero tres veces (2026-08-19,
+   2026-09-07): el sintoma enganya porque parece "Tailwind no compilo mis
+   clases". Si una utilidad de espaciado no aplica, sospechar de aqui primero. */
 
 html {
   scroll-behavior: auto;
@@ -422,6 +425,126 @@ textarea.field-input {
 }
 
 
+/* ═══════════════════════════════════════════════════
+   ESTADO DE ENVÍO DEL FORMULARIO
+
+   La confirmación RELEVA al botón en el mismo hueco en vez de sentarse a
+   su lado. Dos razones, ninguna decorativa:
+
+   1. El <p> de estado compartía contenedor flex con un botón `w-full`, así
+      que se quedaba literalmente sin ancho y se ahogaba contra el borde.
+   2. Al enviarse, el formulario se vacía. Dejar ahí un "Send message"
+      pulsable invita a mandar un mensaje en blanco.
+
+   El error hace lo contrario: MANTIENE el botón —ahí sí hay que reintentar—
+   y añade una nota debajo.
+
+   El acento es una regla de 2px, no un relleno ni un icono: el verde salvia
+   se gana la atención por luminancia contra el gris, no por superficie.
+   ═══════════════════════════════════════════════════ */
+
+.form-status-slot {
+  /* La altura del botón (0.875rem×2 + 1.5rem de línea). Fijarla aquí es lo
+     que impide que el formulario pegue un salto al cambiar de estado. */
+  min-height: 3.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.form-sent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* `flex-start` deja que cada línea mida lo que mide su texto: la máscara
+     barre justo el ancho de las palabras y no un renglón vacío detrás. */
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding-left: 1rem;
+}
+
+/* La regla se dibuja de arriba abajo. No es `fade + translateY`: es el gesto
+   de marcar al margen, que es lo que el bloque significa. */
+.form-sent::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-accent-primary);
+  transform: scaleY(0);
+  transform-origin: top;
+  animation: form-rule-draw 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes form-rule-draw {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* El texto se descubre detrás de la regla con una máscara `clip-path`, no
+   apareciendo de la nada. `inset(0 100% 0 0)` recorta todo por la derecha. */
+.form-sent-title,
+.form-sent-note {
+  clip-path: inset(0 100% 0 0);
+  animation: form-text-wipe 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.form-sent-title {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  animation-delay: 0.1s;
+}
+
+.form-sent-note {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+  animation-delay: 0.2s;
+}
+
+@keyframes form-text-wipe {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.form-error-note {
+  margin-top: 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* Rosa, no salvia: un fallo anunciado en el color de marca se lee como que
+   todo fue bien. Es la razón por la que existe `--color-danger`. */
+.form-error-head {
+  color: var(--color-danger);
+}
+
+.form-error-link {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-line-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.form-error-link:hover {
+  text-decoration-color: var(--color-text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-sent::before,
+  .form-sent-title,
+  .form-sent-note {
+    animation: none;
+    transform: none;
+    clip-path: none;
+  }
+}
+
+
 .space-mt {
   padding-top: 10%;
 }
@@ -572,16 +695,6 @@ textarea.field-input {
 
 
 /* ═══════════════════════════════════════════════════
-   HERO SECTION STYLES DESKTOP
-   ═══════════════════════════════════════════════════ */
-
-@media (min-width: 800px) {
-  .responsive-hero-desktop {
-    padding-left: 10%;
-  }
-}
-
-/* ═══════════════════════════════════════════════════
    HERO VEIL
    Vela direccional sobre la escena 3D: opaca donde va el
    texto y transparente donde están los cactus. Un radial
@@ -665,4 +778,234 @@ textarea.field-input {
    por encima del borde del formulario, no sobre su superficie. */
 .cat-corner__eye {
   stroke: var(--color-bg-primary);
+}
+
+/* ═══════════════════════════════════════════════════
+   PROJECTS
+   Índice editorial + un solo plano 3D.
+
+   Sustituye a la galería en espiral. Aquello era un canvas WebGL
+   completo dibujando cinco rectángulos de color: sin HTML que indexar,
+   sin foco por teclado, ilegible en vertical, y con el scroll táctil
+   secuestrado por los OrbitControls. Aquí el contenido es HTML de
+   verdad y el 3D se reserva para la pieza que sí lo aprovecha —la
+   captura del proyecto activo.
+
+   La jerarquía la hacen el número, el tamaño y la regla de 1px. No hay
+   tarjetas, ni sombras, ni relleno de color: la fila ES el proyecto.
+   ═══════════════════════════════════════════════════ */
+
+.projects-head {
+  max-width: 42rem;
+  margin-bottom: 4rem;
+}
+
+.projects-head__title {
+  font-family: var(--font-family-heading);
+  font-size: clamp(2rem, 6vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+.projects-head__lead {
+  margin-top: 1rem;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.projects-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .projects-head {
+    margin-bottom: 5.5rem;
+  }
+
+  .projects-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.78fr);
+    gap: 4.5rem;
+  }
+}
+
+.projects-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.project-row {
+  position: relative;
+}
+
+/* La máscara del reveal vive aquí, no en el <li>: la regla de 1px se
+   anima aparte y no debe quedar recortada por el mismo clip-path. */
+.project-row__inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  padding: 2rem 0;
+  will-change: clip-path;
+}
+
+@media (min-width: 768px) {
+  .project-row__inner {
+    gap: 2.5rem;
+    padding: 2.5rem 0;
+  }
+}
+
+.project-row__index {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+  padding-top: 0.5rem;
+  transition: color 0.35s ease;
+}
+
+.project-row__heading {
+  font-size: clamp(1.5rem, 4.5vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+/* Reset de botón: el título es interactivo, pero tipográficamente
+   tiene que leerse como un titular, no como un control. */
+.project-row__open {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.35s ease;
+}
+
+/* El área de click es la fila entera. No se puede envolver la fila en un
+   <button> porque los enlaces Live/Code quedarían anidados dentro —HTML
+   inválido—, así que el botón del título estira un ::after sobre todo el
+   <li> y los enlaces se elevan por encima con z-index. */
+.project-row__open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.project-row__stack {
+  margin-top: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.project-row__desc {
+  margin-top: 0.875rem;
+  max-width: 34rem;
+  color: var(--color-text-secondary);
+  font-size: 0.925rem;
+  line-height: 1.65;
+}
+
+.project-row__thumb {
+  position: relative;
+  margin-top: 1.5rem;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+}
+
+.project-row__links {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-row__links a {
+  color: var(--color-text-secondary);
+  padding-bottom: 0.2rem;
+  /* El subrayado crece desde la izquierda en lugar de aparecer de golpe. */
+  background-image: linear-gradient(var(--color-accent-primary), var(--color-accent-primary));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: color 0.3s ease, background-size 0.35s ease;
+}
+
+.project-row__links a:hover,
+.project-row__links a:focus-visible {
+  color: var(--color-accent-text);
+  background-size: 100% 1px;
+}
+
+.project-row__rule {
+  display: block;
+  height: 1px;
+  background: var(--color-line);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+/* Solo con puntero fino: en táctil no hay fila "activa", así que atenuar
+   las demás dejaría el índice a medio encender sin que nadie lo pidiera. */
+@media (hover: hover) and (pointer: fine) {
+  .project-row__open {
+    color: var(--color-text-secondary);
+  }
+
+  .project-row.is-active .project-row__open {
+    color: var(--color-text-primary);
+  }
+
+  .project-row.is-active .project-row__index {
+    color: var(--color-accent-text);
+  }
+
+  .project-row__body {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .project-row.is-active .project-row__body {
+    transform: translateX(0.5rem);
+  }
+}
+
+/* ── La pieza 3D ──
+   Columna pegajosa con una sola captura. `pointer-events: none` aquí sí
+   es la solución correcta y no un parche: no hay nada que pulsar dentro,
+   así que el canvas no debe interceptar nada —ni el click de una fila que
+   pase por debajo, ni el gesto de scroll. */
+.projects-preview {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .projects-preview {
+    display: block;
+    position: sticky;
+    top: 8rem;
+    pointer-events: none;
+  }
+}
+
+.projects-preview__frame {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  background: var(--color-bg-secondary);
 }

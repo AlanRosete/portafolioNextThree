@@ -4,7 +4,7 @@ export const projects: Project[] = [
   {
     id: "project-1",
     title: "GeoWeather",
-    description: "App del clima con mapa interactivo y pronóstico global.",
+    description: "Weather app with an interactive map and a global forecast.",
     longDescription:
       "Aplicación del clima que consulta datos de cualquier punto del planeta. Búsqueda de ciudades con autocompletado de Google Places, geolocalización del navegador y selección directa sobre un mapa de Google Maps. Muestra el día actual y el pronóstico extendido con gráficas de temperatura en Chart.js, además de humedad, viento y su dirección en grados, sensación térmica, y horarios de amanecer y atardecer. Incluye conmutador de unidades °C/°F, estado global con Context API y useReducer, y carga diferida de los recursos de cada condición climática.",
     tags: ["React", "Vite", "TailwindCSS", "Google Maps API", "Chart.js"],
@@ -16,7 +16,7 @@ export const projects: Project[] = [
   {
     id: "project-2",
     title: "Minimalist Calendar",
-    description: "Calendario anual completo con estética minimalista y nevada animada.",
+    description: "Full-year calendar with a minimalist look and animated snowfall.",
     longDescription:
       "Calendario que despliega los doce meses del año en una sola vista, construido con JavaScript vanilla sobre la librería js-year-calendar. El diseño parte de una paleta suave en azul pálido y rosa, tipografía Quicksand para el cuerpo y Dancing Script para los títulos, tarjetas por mes con sombras difusas y realce de fines de semana. Incluye un efecto de nevada generado por completo en JavaScript, donde cada copo recibe posición, tamaño, opacidad y duración aleatorias, animado con keyframes de CSS y aislado de la interacción del usuario.",
     tags: ["JavaScript", "HTML5", "CSS3", "js-year-calendar", "CSS Animations"],
@@ -26,31 +26,9 @@ export const projects: Project[] = [
     color: "#a8a7a8",
   },
   {
-    id: "project-3",
-    title: "Social Media App",
-    description: "Red social con chat en tiempo real y stories.",
-    longDescription:
-      "Aplicación social completa con sistema de posts, stories ephemeral, chat en tiempo real con Socket.io, sistema de followers, notificaciones push y feed algorítmico personalizado.",
-    tags: ["React Native", "Firebase", "Socket.io", "Redis"],
-    image: "/projects/project-3.jpg",
-    color: "#8fb996",
-  },
-  {
-    id: "project-4",
-    title: "3D Product Configurator",
-    description: "Configurador 3D interactivo para productos custom.",
-    longDescription:
-      "Configurador de productos en 3D usando Three.js y React Three Fiber. Los usuarios pueden personalizar colores, materiales y componentes del producto en tiempo real con render fotorrealista y exportación a AR.",
-    tags: ["Three.js", "R3F", "WebGL", "AR", "GSAP"],
-    image: "/projects/project-4.jpg",
-    liveUrl: "https://example.com",
-    repoUrl: "https://github.com",
-    color: "#898989",
-  },
-  {
     id: "project-5",
     title: "Ecommerce Shoes",
-    description: "Tienda online con catálogo, filtros y carrito persistente.",
+    description: "Online store with catalog, filters and a persistent cart.",
     longDescription:
       "E-commerce de moda urbana con catálogo dividido en calzado, bolsos y sombreros. Incluye filtrado por categoría y rango de precio, ordenamiento por destacados, alfabético y precio, carga progresiva del catálogo con IntersectionObserver, y ficha de producto con selección de talla, descuentos y sugerencias relacionadas. El carrito maneja cantidades, eliminación de artículos y cálculo de totales, y persiste en localStorage entre sesiones. Navegación con React Router, estado global mediante Context API y useReducer, notificaciones con React Toastify, y un backend serverless en Netlify Functions que sirve el catálogo.",
     tags: ["React", "React Router", "TailwindCSS", "Netlify Functions", "Context API"],
