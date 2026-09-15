@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { skills } from "@/data/projects";
+import { useTranslation } from "@/hooks/useLang";
+import { RichText } from "@/i18n/RichText";
 import { gsap } from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 
@@ -128,6 +130,7 @@ function PlanetSkill({ name }: { name: string }) {
 
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -211,11 +214,10 @@ export default function AboutSection() {
 
   const categories = [...new Set(skills.map((s) => s.category))];
 
-  // Stats (puedes ajustar)
   const stats = [
-    { value: "3+", label: "Years exp." },
-    { value: "20+", label: "Projects" },
-    { value: "10+", label: "Technologies" },
+    { value: "3+", label: t.about.statYears },
+    { value: "20+", label: t.about.statProjects },
+    { value: "10+", label: t.about.statTech },
   ];
 
   return (
@@ -235,7 +237,7 @@ export default function AboutSection() {
           className="about-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 md:mb-14 text-center"
           style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
         >
-          <span className="text-text-primary">About Me</span>
+          <span className="text-text-primary">{t.about.title}</span>
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-center space-mt">
@@ -246,26 +248,15 @@ export default function AboutSection() {
                 className="text-2xl font-bold mb-4 text-text-primary"
                 style={{ fontFamily: "var(--font-family-heading)" }}
               >
-                Frontend Developer
+                {t.about.role}
               </h3>
               <br />
-              {/* Updated paragraph (your requested version) */}
               <p className="text-text-secondary leading-relaxed mb-4">
-                I’m <strong>Alan Rosete Mendoza</strong>, a frontend developer with
-                over 3 years of experience building modern and scalable web
-                applications. Throughout my career, I’ve worked on projects for
-                companies such as <em>Banco Azteca</em>, <em>Mexicode</em>, and
-                <em>Holding HSI</em>, where I designed and implemented dynamic
-                interfaces using <strong>React, TypeScript, JavaScript, Redux</strong>, and
-                component-based architecture patterns. I also have experience with API
-                integration, performance optimization, microfrontends, unit testing with
-                Jest, and deployments in Cloud environments.
+                <RichText text={t.about.bio1} />
               </p>
 
               <p className="text-text-secondary leading-relaxed mb-4">
-                I also build mobile apps with React Native (iOS / Android) and enjoy
-                exploring WebGL shaders and performance optimizations when not
-                coding.
+                <RichText text={t.about.bio2} />
               </p>
               <br />
               {/* Stats */}

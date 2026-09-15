@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/useLang";
 import React, { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { useStore } from "@/hooks/useStore";
@@ -69,6 +70,7 @@ const PLANT_STEM = `m474.671875 232.453125-66.554687-23.289063c-26.558594-9.2968
 export default function LoadingScreen() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { setLoading } = useStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // `type: "rotational"` interpola girando los puntos en vez de
@@ -123,7 +125,7 @@ export default function LoadingScreen() {
           reevalúan solos. Los verdes saturados del CodePen (#45B549,
           #4CAF50, #3d7606) se quedaron fuera a propósito — masa apagada y
           detalle claro, la misma jerarquía por luminancia que el hero. */}
-      <div className="loading-text mb-8!" role="status" aria-label="Cargando">
+      <div className="loading-text mb-8!" role="status" aria-label={t.loading.label}>
         {/* El disco es el `.circle` del CodePen, pero en tono de superficie
             del sitio en vez de rosa fijo: la maceta contra la que se lee la
             planta. `overflow: visible` porque los paths de la planta adulta
@@ -170,7 +172,7 @@ export default function LoadingScreen() {
 
       {/* Loading Text */}
       <p className="loading-text text-text-muted text-xs sm:text-sm mt-4! tracking-widest uppercase">
-        Cargando experiencia
+        {t.loading.text}
       </p>
     </div>
   );

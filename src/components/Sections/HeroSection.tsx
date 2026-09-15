@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { gsap } from "@/lib/gsap";
+import { useTranslation } from "@/hooks/useLang";
 
 const ThreeScene = dynamic(() => import("@/components/Scene/ThreeScene"), {
   ssr: false,
@@ -13,6 +14,7 @@ const HeroScene = dynamic(() => import("@/components/Scene/HeroScene"), {
 
 export default function HeroSection() {
   const textRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!textRef.current) return;
@@ -81,21 +83,23 @@ export default function HeroSection() {
            en px queda pegado al header en un iPhone SE y perdido en un Pro Max.
            22svh deja el bloque centrado sobre el ~38% del alto visible.
            De `md` en adelante vuelve a cero y manda `items-center`. */
-        className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-20 w-full pt-[22svh] md:pt-0 pb-12 md:pb-0"
+        className="relative z-10 mx-auto px-6 md:px-12 lg:px-20 w-full pt-[22svh] md:pt-0 pb-12 md:pb-0"
       >
         <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 lg:max-w-2xl responsive-hero-desktop">
           <p
             className="hero-subtitle text-text-muted text-xs md:text-sm font-medium tracking-[0.2em] uppercase mb-4 md:mb-6"
             style={{ opacity: 0 }}
           >
-            Frontend Developer & Mobile Engineer
+            {t.hero.role}
           </p>
 
           <h1
             className="hero-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[0.95] mb-5 md:mb-8"
             style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
           >
-            <span className="block text-text-secondary font-normal">Hi, I'm</span>
+            <span className="block text-text-secondary font-normal">
+              {t.hero.greeting}
+            </span>
             <span className="block text-text-primary">Alan Rosete</span>
           </h1>
 
@@ -103,10 +107,10 @@ export default function HeroSection() {
             className="hero-desc text-text-secondary text-base md:text-lg lg:text-xl leading-relaxed mb-8 md:mb-10 mx-auto md:mx-0"
             style={{ opacity: 0 }}
           >
-            I build immersive web experiences with{" "}
+            {t.hero.descPrefix}{" "}
             <span className="text-text-primary font-medium">React</span>,{" "}
             <span className="text-text-primary font-medium">Javascript</span>{" "}
-            and{" "}
+            {t.hero.descJoin}{" "}
             <span className="text-text-primary font-medium">
               React Native
             </span>
@@ -115,7 +119,7 @@ export default function HeroSection() {
 
           <div className="hero-cta flex flex-wrap gap-4 justify-center md:justify-start" style={{ opacity: 0 }}>
             <a href="#projects" className="btn-primary">
-              View projects
+              {t.hero.viewProjects}
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -131,7 +135,7 @@ export default function HeroSection() {
               </svg>
             </a>
             <a href="#contact" className="btn-secondary">
-              Contact me
+              {t.hero.contactMe}
             </a>
           </div>
         </div>

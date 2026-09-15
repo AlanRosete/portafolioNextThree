@@ -4,7 +4,11 @@ import React, { useRef, useMemo, useState, useCallback } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
-import { projects } from "@/data/projects";
+// Huérfano desde que #projects pasó a lista + plano 3D (ver ProjectPreview).
+// Se deja en disco a propósito; importa el dato ya resuelto a un idioma.
+import { localizeProjects } from "@/data/projects";
+
+const projects = localizeProjects("en");
 import { useStore } from "@/hooks/useStore";
 
 function ProjectCard3D({

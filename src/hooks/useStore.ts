@@ -34,16 +34,9 @@ interface PortfolioState {
   // Loading
   isLoading: boolean;
   setLoading: (loading: boolean) => void;
-
-  // Game
-  gameTokens: number;
-  maxTokens: number;
-  collectToken: () => void;
-  resetGame: () => void;
-  isGameComplete: boolean;
 }
 
-export const useStore = create<PortfolioState>((set, get) => ({
+export const useStore = create<PortfolioState>((set) => ({
   // Navigation
   activeSection: "hero",
   setActiveSection: (section) => set({ activeSection: section }),
@@ -64,20 +57,4 @@ export const useStore = create<PortfolioState>((set, get) => ({
   // Loading
   isLoading: true,
   setLoading: (loading) => set({ isLoading: loading }),
-
-  // Game
-  gameTokens: 0,
-  maxTokens: 5,
-  collectToken: () => {
-    const current = get().gameTokens;
-    const max = get().maxTokens;
-    if (current < max) {
-      set({
-        gameTokens: current + 1,
-        isGameComplete: current + 1 >= max,
-      });
-    }
-  },
-  resetGame: () => set({ gameTokens: 0, isGameComplete: false }),
-  isGameComplete: false,
 }));

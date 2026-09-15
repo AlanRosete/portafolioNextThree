@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
+import { useTranslation } from "@/hooks/useLang";
 import CatCorner from "@/components/UI/CatCorner";
 
 /* Edita estos valores: son los únicos datos personales de la sección. */
@@ -19,6 +20,7 @@ const EMPTY: FormState = { name: "", email: "", message: "" };
 
 export default function ContactSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const { t } = useTranslation();
   const [formState, setFormState] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<FormState>(EMPTY);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
@@ -62,11 +64,11 @@ export default function ContactSection() {
   const validate = () => {
     const next: FormState = { ...EMPTY };
 
-    if (!formState.name.trim()) next.name = "Please enter your name.";
+    if (!formState.name.trim()) next.name = t.contact.errorName;
     if (!/\S+@\S+\.\S+/.test(formState.email.trim()))
-      next.email = "Please enter a valid email address.";
+      next.email = t.contact.errorEmail;
     if (formState.message.trim().length < 10)
-      next.message = "Tell me a bit more — at least 10 characters.";
+      next.message = t.contact.errorMessage;
 
     setErrors(next);
     return !next.name && !next.email && !next.message;
@@ -122,20 +124,19 @@ export default function ContactSection() {
               className="text-4xl sm:text-5xl lg:text-6xl font-bold text-text-primary mb-6"
               style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
             >
-              Let&apos;s talk
+              {t.contact.title}
             </h2>
 
             <p
               className="text-text-secondary text-base sm:text-lg leading-relaxed max-w-md mb-10"
               style={{ opacity: 0 }}
             >
-              Have a project in mind, a role to fill, or just want to swap
-              notes on frontend? Drop me a line — I read every message.
+              {t.contact.intro}
             </p>
 
             <div className="border-t border-line pt-8" style={{ opacity: 0 }}>
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-text-muted mb-2">
-                Email
+                {t.contact.emailLabel}
               </p>
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
@@ -184,7 +185,7 @@ export default function ContactSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="contact-field" style={{ opacity: 0 }}>
                   <label htmlFor="name" className="field-label">
-                    Name
+                    {t.contact.fieldName}
                   </label>
                   <input
                     id="name"
@@ -207,7 +208,7 @@ export default function ContactSection() {
 
                 <div className="contact-field" style={{ opacity: 0 }}>
                   <label htmlFor="email" className="field-label">
-                    Email
+                    {t.contact.fieldEmail}
                   </label>
                   <input
                     id="email"
@@ -231,7 +232,7 @@ export default function ContactSection() {
 
               <div className="contact-field mt-5" style={{ opacity: 0 }}>
                 <label htmlFor="message" className="field-label">
-                  Message
+                  {t.contact.fieldMessage}
                 </label>
                 <textarea
                   id="message"
@@ -242,7 +243,7 @@ export default function ContactSection() {
                   aria-invalid={!!errors.message}
                   aria-describedby={errors.message ? "message-error" : undefined}
                   className="field-input"
-                  placeholder="Tell me about your project, timeline and budget."
+                  placeholder={t.contact.placeholderMessage}
                 />
                 {errors.message && (
                   <p id="message-error" className="field-error">
@@ -261,16 +262,16 @@ export default function ContactSection() {
                     Por eso solo cambia su texto y nunca se desmonta. */}
                 <p role="status" aria-live="polite" className="sr-only">
                   {status === "sent" &&
-                    "Message sent. I'll get back to you within a couple of days."}
-                  {status === "error" && "Couldn't send the message."}
+                    t.contact.sentBody}
+                  {status === "error" && t.contact.errorTitle}
                 </p>
 
                 <div className="form-status-slot">
                   {status === "sent" ? (
                     <div className="form-sent" aria-hidden="true">
-                      <span className="form-sent-title">Message sent</span>
+                      <span className="form-sent-title">{t.contact.sentTitle}</span>
                       <span className="form-sent-note">
-                        I&apos;ll get back to you within a couple of days.
+                        {t.contact.sentNote}
                       </span>
                     </div>
                   ) : (
@@ -285,7 +286,7 @@ export default function ContactSection() {
                               salvia con texto oscuro, un aro blanco encima se
                               perdía contra el relleno. */}
                           <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          Sending…
+                          {t.contact.sending}
                         </>
                       ) : (
                         <>
@@ -302,7 +303,7 @@ export default function ContactSection() {
                               d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                             />
                           </svg>
-                          Send message
+                          {t.contact.send}
                         </>
                       )}
                     </button>

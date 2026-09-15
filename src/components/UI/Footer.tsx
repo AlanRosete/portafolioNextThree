@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import { useTranslation } from "@/hooks/useLang";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { t } = useTranslation();
 
   const socialLinks = [
     {
@@ -49,7 +51,7 @@ export default function Footer() {
               <span className="text-text-muted">.dev</span>
             </h3>
             <p className="text-text-muted text-sm">
-              Construyendo experiencias digitales increíbles
+              {t.footer.tagline}
             </p>
           </div>
 
@@ -71,7 +73,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-text-muted text-sm">
-            © {currentYear} Alan Rosete. All rights reserved.
+            © {currentYear} Alan Rosete. {t.footer.rights}
           </p>
         </div>
       </div>

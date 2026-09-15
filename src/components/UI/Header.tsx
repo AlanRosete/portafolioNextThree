@@ -4,11 +4,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
 import { useStore } from "@/hooks/useStore";
 import { navLinks } from "@/data/projects";
+import { useTranslation } from "@/hooks/useLang";
 import ThemeToggle from "./ThemeToggle";
+import LangToggle from "./LangToggle";
+import DownloadCvButton from "./DownloadCvButton";
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
   const { isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } = useStore();
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -68,7 +72,7 @@ export default function Header() {
               handleNavClick("#hero");
             }}
             className="flex items-center"
-            aria-label="Alan — ir al inicio"
+            aria-label={t.nav.goHome}
           >
             <img
               src="/world-svgrepo-com.svg"
@@ -91,17 +95,13 @@ export default function Header() {
                 }}
                 className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors duration-300 relative group"
               >
-                {link.label}
+                {t.nav[link.key]}
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-accent-primary transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
-            <a
-              href="/game"
-              className="text-sm font-medium px-4 py-2 rounded-md border border-line-strong text-text-primary hover:border-accent-primary hover:text-accent-text transition-colors duration-200"
-            >
-              Download CV
-            </a>
+            <DownloadCvButton className="text-sm font-medium px-4 py-2 rounded-md border border-line-strong text-text-primary hover:border-accent-primary hover:text-accent-text transition-colors duration-200" />
 
+            <LangToggle />
             <ThemeToggle />
           </nav>
 
@@ -109,7 +109,7 @@ export default function Header() {
           <button
             onClick={toggleMobileMenu}
             className="md:hidden relative flex h-6 w-6 items-center justify-center"
-            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
+            aria-label={isMobileMenuOpen ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={isMobileMenuOpen}
           >
             <span
@@ -176,11 +176,10 @@ export default function Header() {
               transitionDelay: isMobileMenuOpen ? `${i * 70}ms` : "0ms",
             }}
           >
-            {link.label}
+            {t.nav[link.key]}
           </a>
         ))}
-        <a
-          href="/game"
+        <DownloadCvButton
           tabIndex={isMobileMenuOpen ? 0 : -1}
           onClick={closeMobileMenu}
           className="mt-2 rounded-md border px-6 py-3 text-lg font-medium"
@@ -195,9 +194,7 @@ export default function Header() {
               ? `${navLinks.length * 70}ms`
               : "0ms",
           }}
-        >
-          Download CV
-        </a>
+        />
 
         <div
           style={{
@@ -209,10 +206,16 @@ export default function Header() {
               : "0ms",
           }}
         >
-          <ThemeToggle
-            className="theme-toggle--mobile"
-            tabIndex={isMobileMenuOpen ? 0 : -1}
-          />
+          <div className="flex items-center gap-4">
+            <LangToggle
+              className="lang-toggle--mobile"
+              tabIndex={isMobileMenuOpen ? 0 : -1}
+            />
+            <ThemeToggle
+              className="theme-toggle--mobile"
+              tabIndex={isMobileMenuOpen ? 0 : -1}
+            />
+          </div>
         </div>
       </div>
     </>

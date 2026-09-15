@@ -2,141 +2,183 @@
 
 import React, { useMemo, useRef, useLayoutEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
+import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import { useTheme } from "@/hooks/useTheme";
 
 /* ═══════════════════════════════════════════════════
-   JARDINERA DE CACTUS — hero procedural
+   RINCÓN DE ESCRITORIO — hero procedural
 
-   Todo se genera en código: ni un solo .glb que descargar.
-   La paleta sigue la regla del sitio (neutros + un carmín):
-   los cuerpos son un verde tan desaturado que lee casi gris,
-   y el único color saturado de la escena es la flor.
+   Bosquejo: rincón con mesa, monitor, portátil, silla ergonómica
+   y lámpara de arco. Ni un .glb que descargar.
+
+   Presupuesto, porque el hero tiene que correr en gama baja:
+   · sin shadow maps (ni en escritorio) — el contacto son cuatro
+     quads con alphaMap de degradado radial;
+   · meshLambertMaterial en todo, nunca standard: a este tamaño
+     nadie ve el microfacetado y el shader es la mitad de largo;
+   · dos direccionales, una ambiental y la bombilla; ninguna proyecta;
+   · sin emissive, sin bloom, sin postprocesado;
+   · por frame sólo se toca una cosa: el paralaje del grupo raíz.
    ═══════════════════════════════════════════════════ */
 
+/* ── Medidas maestras ────────────────────────────── */
+
+/** Cara superior del tablero. Todo lo que va "sobre la mesa" cuelga de aquí. */
+const TOP = 0;
+const THICK = 0.09;
+/** Suelo. La altura de mesa sale de la diferencia con TOP. */
+const FLOOR = -0.75;
+
+/**
+ * El picado de tres cuartos se consigue rotando el RIG, nunca moviendo la
+ * cámara: la cámara del hero encuadra texto y 3D a la vez, y tocarla
+ * descuadraría el bloque de copy en cada breakpoint.
+ * TILT baja la vista sobre el tablero; TURN adelanta el canto izquierdo,
+ * y manda la lámpara al fondo.
+ */
+const BASE_TILT = 0.25;
+const BASE_TURN = 0.38;
+
+/* ── Paletas ─────────────────────────────────────── */
+
 interface ScenePalette {
-  body: string;
-  bodyDark: string;
-  pot: string;
-  potRim: string;
-  soil: string;
-  spine: string;
-  bloom: string;
-  petal: string;
-  /** Sombra de contacto del suelo. */
+  /** Tablero de suelo y las dos paredes del rincón. */
+  floorBoard: string;
+  wallBack: string;
+  wallSide: string;
   shadow: string;
   shadowOpacity: number;
-  /** Sombra pintada de móvil, donde no hay shadow map. */
-  fakeShadow: string;
-  fakeShadowOpacity: number;
+
+  deskTop: string;
+  deskBody: string;
+  deskPanel: string;
+
+  device: string;
+  deviceSoft: string;
+
+
+  mug: string;
+  lampMetal: string;
+  lampShade: string;
+  /** Luz de la bombilla: el único cálido de la escena. */
+  lampLight: string;
+  lampIntensity: number;
+  chair: string;
+  chairSoft: string;
+
+  key: number;
   fill: string;
+  fillIntensity: number;
   ambient: string;
   ambientIntensity: number;
-  /** Contraluz: dibuja el borde contra el fondo. Casi no hace falta en claro. */
-  rimIntensity: number;
 }
 
 /**
- * En oscuro los cuerpos son un verde tan desaturado que lee casi gris, y el
- * único color saturado es la flor.
+ * Dos cosas obligan a subir los hex del rincón mucho más de lo que parece
+ * razonable sobre un fondo de página casi negro:
+ *
+ * 1. El canvas sale con tone mapping ACES, que COMPRIME los valores bajos.
+ *    Un #2b2825 acaba por debajo del fondo de la página y el rincón se lee
+ *    como agujero negro en vez de como interior en penumbra.
+ * 2. La pared derecha sólo recibe el relleno y la ambiental —su normal -x le
+ *    da la espalda a la luz clave—, así que tiene que partir de un hex
+ *    BASTANTE más claro que la de fondo para acabar igual de visible. Por eso
+ *    `wallSide` es aquí el color más claro de los tres y no el más oscuro.
+ *
+ * La relación es la misma que en claro, donde las paredes también quedan por
+ * encima del tablero de la mesa.
  */
 const DARK_PALETTE: ScenePalette = {
-  body: "#4a544d",
-  bodyDark: "#3b433e",
-  pot: "#2f2f2f",
-  potRim: "#3a3a3a",
-  soil: "#1f1f1f",
-  spine: "#8f8d86",
-  bloom: "#8fb996",
-  petal: "#dbe8dd",
-  shadow: "#1b1b1b",
-  shadowOpacity: 1,
-  fakeShadow: "#0b0b0b",
-  fakeShadowOpacity: 0.85,
+  floorBoard: "#443d35",
+  wallBack: "#413b34",
+  wallSide: "#544d44",
+  shadow: "#0a0a0a",
+  shadowOpacity: 0.5,
+
+  deskTop: "#4f4843",
+  deskBody: "#332f2c",
+  deskPanel: "#3b3733",
+
+  device: "#2a2a2a",
+  deviceSoft: "#3a3a3a",
+
+
+  mug: "#6b7c70",
+  lampMetal: "#2a2a2a",
+  lampShade: "#3a3632",
+  lampLight: "#FFF6F5",
+  lampIntensity: 1.6,
+  /* Gris medio a propósito: en blanco competiría con el gato, que ya es
+     el punto claro de la escena y es mucho más pequeño */
+  chair: "#4a4845",
+  chairSoft: "#5c5955",
+
+  key: 2.1,
   fill: "#9aa6ad",
+  fillIntensity: 0.5,
   ambient: "#c9cdd1",
-  ambientIntensity: 0.35,
-  rimIntensity: 2.2,
+  ambientIntensity: 0.55,
 };
 
 /**
- * En claro no vale con aclarar el fondo: hay que invertir la jerarquía.
- *
- * 1. Los cuerpos suben de luminancia. En oscuro eran casi negros porque el
- *    fondo era negro; sobre blanco eso los convertía en siluetas recortadas.
- * 2. La flor se INVIERTE: pasa a ser el verde oscuro del acento en claro.
- *    La regla del sitio es que la flor sea el punto focal, y sobre un cuerpo
- *    claro eso solo se consigue siendo más oscura, no más clara.
- * 3. La sombra deja de ser casi negra. Una sombra real sobre una superficie
- *    hueso es un gris cálido desaturado, no un disco negro — ese disco era
- *    invisible sobre fondo negro y dominaba la escena sobre fondo claro.
- * 4. La ambiental sube: sobre una superficie clara los objetos reciben rebote,
- *    y sin ese rebote la escena se veía sucia en vez de iluminada.
+ * En claro no basta con aclarar: hay que invertir la jerarquía. Los cuerpos
+ * suben de luminancia (sobre hueso, un cuerpo oscuro se recorta como
+ * silueta), la sombra deja de ser negra — una sombra real
+ * sobre una superficie hueso es un gris cálido, no un disco negro.
  */
 const LIGHT_PALETTE: ScenePalette = {
-  body: "#93ae98",
-  bodyDark: "#7d9a83",
-  pot: "#a9a39a",
-  potRim: "#b6b0a7",
-  soil: "#6d655c",
-  spine: "#4f5f55",
-  bloom: "#456e51",
-  petal: "#e6ede7",
-  shadow: "#c0bcb4",
-  shadowOpacity: 0.2,
-  fakeShadow: "#bab5ad",
-  fakeShadowOpacity: 0.5,
+  floorBoard: "#d6cdbe",
+  wallBack: "#e9e5de",
+  wallSide: "#dcd7ce",
+  shadow: "#b5afa5",
+  shadowOpacity: 0.35,
+
+  deskTop: "#c5bbab",
+  deskBody: "#a79d90",
+  deskPanel: "#b3a99b",
+
+  device: "#d5d1cb",
+  deviceSoft: "#e4e1db",
+
+
+  mug: "#7d9584",
+  lampMetal: "#6b6760",
+  lampShade: "#e4ded4",
+  lampLight: "#ffe2bd",
+  lampIntensity: 0.8,
+  chair: "#948f87",
+  chairSoft: "#a8a29a",
+
+  key: 1.7,
   fill: "#b9c2c8",
+  fillIntensity: 0.4,
   ambient: "#efece6",
-  ambientIntensity: 0.75,
-  rimIntensity: 0.7,
+  ambientIntensity: 0.85,
 };
 
 /**
  * La paleta viaja por contexto y no por props: si no, cada color habría que
- * enhebrarlo por seis niveles de <group> hasta llegar a cada material.
+ * enhebrarlo por cinco niveles de <group> hasta llegar a cada material.
  */
 const PaletteContext = React.createContext<ScenePalette>(DARK_PALETTE);
 const usePalette = () => React.useContext(PaletteContext);
 
-/* ── Utilidades de geometría ─────────────────────── */
+/* ── Texturas de canvas ──────────────────────────── */
 
 /**
- * Desplaza los vértices radialmente con un coseno del ángulo:
- * es lo que convierte un cilindro liso en un cactus acanalado.
- * Se ejecuta una vez al construir la geometría, no por frame.
- */
-function applyRibs(
-  geometry: THREE.BufferGeometry,
-  ribs: number,
-  depth: number
-): THREE.BufferGeometry {
-  const position = geometry.attributes.position as THREE.BufferAttribute;
-  const v = new THREE.Vector3();
-
-  for (let i = 0; i < position.count; i++) {
-    v.fromBufferAttribute(position, i);
-    const radius = Math.hypot(v.x, v.z);
-    if (radius < 1e-4) continue;
-
-    const angle = Math.atan2(v.z, v.x);
-    const k = 1 + Math.cos(angle * ribs) * depth;
-    position.setXYZ(i, v.x * k, v.y, v.z * k);
-  }
-
-  position.needsUpdate = true;
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-/**
- * Degradado radial blanco → transparente dibujado en un canvas 2D.
- * Sirve para dos cosas: el charco de luz del suelo y las sombras
- * falsas de móvil. Una sola textura de 128px para ambas.
+ * Degradado radial blanco → transparente. Es el alphaMap del disco de suelo
+ * y de las cuatro sombras de contacto: una sola textura para las cinco.
+ *
+ * 256px y no 128: el disco se magnifica a ~700px en pantalla, así que cada
+ * téxel se estira a varios píxeles y el TRAMADO que Chrome mete en el
+ * degradado (para evitar bandas) se ve como moteado en el borde. El doble de
+ * resolución lo deja por debajo del píxel. Sigue siendo una textura de
+ * 256 KB generada una vez, no por frame.
  */
 function makeRadialTexture(): THREE.CanvasTexture {
-  const size = 128;
+  const size = 256;
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = size;
 
@@ -146,496 +188,164 @@ function makeRadialTexture(): THREE.CanvasTexture {
     size / 2, size / 2, size / 2
   );
   gradient.addColorStop(0, "rgba(255,255,255,0.85)");
-  gradient.addColorStop(0.2, "rgba(255,255,255,0.55)");
-  gradient.addColorStop(0.5, "rgba(255,255,255,0.18)");
-  gradient.addColorStop(0.8, "rgba(255,255,255,0.03)");
+  gradient.addColorStop(0.22, "rgba(255,255,255,0.48)");
+  gradient.addColorStop(0.5, "rgba(255,255,255,0.12)");
+  gradient.addColorStop(0.8, "rgba(255,255,255,0.015)");
   gradient.addColorStop(1, "rgba(255,255,255,0)");
 
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
 
+  return new THREE.CanvasTexture(canvas);
+}
+
+/**
+ * Editor de código a todo color: árbol de archivos, números de línea y
+ * tokens en varios tonos, pintado una vez en canvas.
+ *
+ * Antes era una máscara blanca teñida por el material y a tamaño real se
+ * leía como "rayas negras". Ahora el color va DENTRO de la textura, y como
+ * el editor es oscuro en los dos temas (igual que un VS Code real), no hay
+ * que regenerarla con el toggle.
+ *
+ * Los tokens salen de un generador con semilla fija: el mismo código en
+ * cada carga, sin Math.random que cambie la pantalla en cada render.
+ * El canvas se pide con el MISMO aspecto que el panel que lo muestra; si
+ * no, los renglones se estiran y el encuadre se ve mal.
+ */
+function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d")!;
+
+  let seed = 7;
+  const rand = () => {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
+
+  const u = height / 100; // unidad relativa: vale para cualquier tamaño
+  const rowH = 4.6 * u;
+  const barH = Math.max(2, 2 * u);
+
+  // Fondo del editor y barra lateral
+  ctx.fillStyle = "#1d2128";
+  ctx.fillRect(0, 0, width, height);
+  const sideW = width * 0.22;
+  ctx.fillStyle = "#171a20";
+  ctx.fillRect(0, 0, sideW, height);
+  ctx.fillStyle = "#0f1115";
+  ctx.fillRect(sideW, 0, Math.max(1, u * 0.6), height);
+
+  // Barra de título
+  ctx.fillStyle = "#14171c";
+  ctx.fillRect(0, 0, width, 6 * u);
+  ["#d9737d", "#d9b36b", "#8fb996"].forEach((c, i) => {
+    ctx.fillStyle = c;
+    ctx.beginPath();
+    ctx.arc(4 * u + i * 3.6 * u, 3 * u, 1.1 * u, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Árbol de archivos: icono + nombre, con sangrado por carpeta
+  const treeDepth = [0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 2, 3, 1, 0, 1, 1, 2, 0, 0, 1];
+  treeDepth.forEach((d, i) => {
+    const y = 10 * u + i * rowH;
+    if (y > height - rowH) return;
+    const x = 3 * u + d * 3 * u;
+    ctx.fillStyle = "#4b5563";
+    ctx.fillRect(x, y, 2 * u, barH);
+    ctx.fillStyle = "#5f6b7a";
+    ctx.fillRect(x + 3 * u, y, (6 + rand() * 9) * u, barH);
+  });
+
+  // Código: número de línea + tokens de colores
+  const tokens = ["#8fb996", "#d9a066", "#7fa7c4", "#c8ccd4", "#c8ccd4", "#c792ea"];
+  const codeX = sideW + 4 * u;
+  let indent = 0;
+  for (let i = 0; ; i++) {
+    const y = 10 * u + i * rowH;
+    if (y > height - rowH) break;
+
+    ctx.fillStyle = "#3b4250";
+    ctx.fillRect(codeX, y, 2.5 * u, barH);
+
+    // Bloques que abren y cierran: es la silueta en "flecha" del código real
+    const r = rand();
+    if (r < 0.28 && indent < 4) indent++;
+    else if (r < 0.5 && indent > 0) indent--;
+    if (i % 9 === 8) indent = 0;
+    if (rand() < 0.08) continue; // línea en blanco
+
+    let x = codeX + 6 * u + indent * 4 * u;
+    const count = 2 + Math.floor(rand() * 4);
+    for (let t = 0; t < count; t++) {
+      const w = (5 + rand() * 20) * u;
+      if (x + w > width - 3 * u) break;
+      ctx.fillStyle = tokens[Math.floor(rand() * tokens.length)];
+      ctx.fillRect(x, y, w, barH);
+      x += w + 1.5 * u;
+    }
+  }
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 4;
   return texture;
 }
 
-/* ── Espinas ─────────────────────────────────────── */
+/* ── Suelo y contacto ────────────────────────────── */
 
 /**
- * Conos diminutos colocados sobre las crestas de los canales,
- * en un InstancedMesh: 60 espinas cuestan un draw call.
+ * El rincón: tablero de suelo y dos paredes, la de fondo y la de la derecha.
+ *
+ * Van como CAJAS y no como planos: el canto visible del grueso es justo lo
+ * que da el aire de "cubo recortado" de la referencia isométrica, y un plano
+ * sin grueso se lee como telón pintado.
+ *
+ * La pared derecha NO llega al frente (su z se queda en 0.75 mientras el
+ * suelo sigue hasta 1.45): el rincón queda abierto por delante, y así la
+ * silla no aparece encajonada contra un muro.
+ *
+ * Las dos paredes son el mismo material con distinta orientación, así que
+ * el sombreado lambert las separa solo: la normal de la de fondo mira a la
+ * clave y la de la derecha le da la espalda. Aun así llevan tonos distintos
+ * —sin eso, en el tema claro las dos caras salían casi idénticas.
  */
-function Spines({
-  rows,
-  ribs,
-  radius,
-  from,
-  to,
-  length = 0.05,
-  bulge = 0,
-}: {
-  rows: number;
-  ribs: number;
-  radius: number;
-  from: number;
-  to: number;
-  length?: number;
-  bulge?: number;
-}) {
+function Room() {
   const p = usePalette();
-
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const count = rows * ribs;
-
-  useLayoutEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-
-    const dummy = new THREE.Object3D();
-    const up = new THREE.Vector3(0, 1, 0);
-    const outward = new THREE.Vector3();
-    let i = 0;
-
-    for (let row = 0; row < rows; row++) {
-      const t = rows === 1 ? 0.5 : row / (rows - 1);
-      const y = THREE.MathUtils.lerp(from, to, t);
-
-      // El radio se estrecha en los extremos si el cuerpo es abombado
-      const taper = 1 - bulge * Math.pow(t * 2 - 1, 2);
-      // Media cresta de desfase por fila: en línea recta parecen costuras
-      const offset = (row % 2) * (Math.PI / ribs);
-
-      for (let rib = 0; rib < ribs; rib++) {
-        const angle = (rib / ribs) * Math.PI * 2 + offset;
-        outward.set(Math.cos(angle), 0, Math.sin(angle));
-
-        dummy.position.copy(outward).multiplyScalar(radius * taper);
-        dummy.position.y = y;
-        dummy.quaternion.setFromUnitVectors(up, outward);
-        dummy.updateMatrix();
-
-        mesh.setMatrixAt(i++, dummy.matrix);
-      }
-    }
-
-    mesh.instanceMatrix.needsUpdate = true;
-  }, [rows, ribs, radius, from, to, bulge]);
-
-  return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      <coneGeometry args={[length * 0.32, length, 4]} />
-      <meshStandardMaterial color={p.spine} roughness={0.75} metalness={0} />
-    </instancedMesh>
-  );
-}
-
-/* ── Maceta ──────────────────────────────────────── */
-
-function Pot({
-  radius,
-  height,
-  castShadow,
-}: {
-  radius: number;
-  height: number;
-  castShadow: boolean;
-}) {
-  const p = usePalette();
+  const WALL_H = 2.1;
 
   return (
     <group>
-      {/* Cuerpo troncocónico: más estrecho abajo que arriba */}
-      <mesh position={[0, height / 2, 0]} castShadow={castShadow} receiveShadow>
-        <cylinderGeometry args={[radius, radius * 0.78, height, 28]} />
-        <meshStandardMaterial color={p.pot} roughness={0.9} metalness={0} />
+      <mesh position={[0.275, FLOOR - 0.045, 0.15]}>
+        <boxGeometry args={[3.65, 0.09, 2.1]} />
+        <meshLambertMaterial color={p.floorBoard} />
       </mesh>
 
-      {/* Reborde: el labio que separa la maceta del cuerpo del cactus */}
-      <mesh position={[0, height, 0]} castShadow={castShadow}>
-        <cylinderGeometry
-          args={[radius * 1.07, radius * 1.07, height * 0.13, 28]}
-        />
-        <meshStandardMaterial color={p.potRim} roughness={0.85} metalness={0} />
+      <mesh position={[0.275, FLOOR + WALL_H / 2, -0.9]}>
+        <boxGeometry args={[3.65, WALL_H, 0.1]} />
+        <meshLambertMaterial color={p.wallBack} />
       </mesh>
 
-      {/* Tierra, ligeramente hundida bajo el reborde */}
-      <mesh position={[0, height * 1.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[radius * 1.0, 28]} />
-        <meshStandardMaterial color={p.soil} roughness={1} metalness={0} />
+      <mesh position={[2.1, FLOOR + WALL_H / 2, -0.2]}>
+        <boxGeometry args={[0.1, WALL_H, 1.5]} />
+        <meshLambertMaterial color={p.wallSide} />
       </mesh>
     </group>
   );
 }
 
-/* ── Cactus 1: columnar (saguaro) ────────────────── */
-
-/**
- * Un brazo = codo de toro de un cuarto de vuelta + tramo recto.
- * El toro nace con su arco en el cuadrante +x+y; al girarlo -90°
- * en Z los extremos quedan donde los necesito: uno con la tangente
- * horizontal (pega al tronco) y otro vertical (sigue hacia arriba).
- */
-function Arm({
-  elbowRadius,
-  tube,
-  height,
-  position,
-  castShadow,
-}: {
-  elbowRadius: number;
-  tube: number;
-  height: number;
-  position: [number, number, number];
-  castShadow: boolean;
-}) {
-  const p = usePalette();
-
-  return (
-    <group position={position}>
-      <mesh rotation={[0, 0, -Math.PI / 2]} castShadow={castShadow}>
-        <torusGeometry args={[elbowRadius, tube, 10, 20, Math.PI / 2]} />
-        <meshStandardMaterial color={p.body} roughness={0.68} metalness={0} />
-      </mesh>
-
-      <mesh
-        position={[elbowRadius, height / 2, 0]}
-        castShadow={castShadow}
-      >
-        <capsuleGeometry args={[tube, height, 6, 18]} />
-        <meshStandardMaterial color={p.body} roughness={0.68} metalness={0} />
-      </mesh>
-    </group>
-  );
-}
-
-function ColumnarCactus({
-  castShadow,
-  detail,
-}: {
-  castShadow: boolean;
-  detail: boolean;
-}) {
-  const p = usePalette();
-
-  const trunk = useMemo(
-    () => applyRibs(new THREE.CapsuleGeometry(0.32, 1.95, 8, 40), 11, 0.055),
-    []
-  );
-
-  return (
-    <group>
-      <Pot radius={0.52} height={0.52} castShadow={castShadow} />
-
-      <mesh
-        geometry={trunk}
-        position={[0, 1.55, 0]}
-        castShadow={castShadow}
-      >
-        <meshStandardMaterial color={p.body} roughness={0.68} metalness={0} />
-      </mesh>
-
-      {/* Brazo derecho, alto */}
-      <Arm
-        elbowRadius={0.4}
-        tube={0.185}
-        height={0.72}
-        position={[0.1, 1.62, 0.02]}
-        castShadow={castShadow}
-      />
-
-      {/* Brazo izquierdo, más bajo y más corto: la asimetría es
-          lo que evita que parezca un candelabro */}
-      <group scale={[-1, 1, 1]}>
-        <Arm
-          elbowRadius={0.34}
-          tube={0.155}
-          height={0.44}
-          position={[0.1, 1.12, -0.06]}
-          castShadow={castShadow}
-        />
-      </group>
-
-      {detail && (
-        <group position={[0, 1.55, 0]}>
-          <Spines rows={9} ribs={11} radius={0.35} from={-0.95} to={0.95} />
-        </group>
-      )}
-    </group>
-  );
-}
-
-/* ── Cactus 2: nopal ─────────────────────────────── */
-
-/**
- * Areolas sobre las dos caras de una pala. Sin ellas el nopal se lee
- * como un huevo: son las espinas las que dicen "cactus".
- * Los puntos se muestrean en una malla que se recorta contra la
- * elipse, y cada uno se sube a la superficie del elipsoide.
- */
-function PadSpines({
-  radii,
-  rows,
-  cols,
-}: {
-  radii: [number, number, number];
-  rows: number;
-  cols: number;
-}) {
-  const p = usePalette();
-
-  const meshRef = useRef<THREE.InstancedMesh>(null);
-  const [rx, ry, rz] = radii;
-  const count = rows * cols * 2;
-
-  useLayoutEffect(() => {
-    const mesh = meshRef.current;
-    if (!mesh) return;
-
-    const dummy = new THREE.Object3D();
-    const up = new THREE.Vector3(0, 1, 0);
-    const normal = new THREE.Vector3();
-    let i = 0;
-
-    for (let row = 0; row < rows; row++) {
-      const v = -0.8 + 1.6 * ((row + 0.5) / rows);
-      // Filas alternas desplazadas: en cuadrícula recta parecen tornillos
-      const offset = (row % 2) * (0.5 / cols);
-
-      for (let col = 0; col < cols; col++) {
-        const u = -0.75 + 1.5 * ((col + 0.5) / cols + offset);
-        const rest = 1 - u * u - v * v;
-        if (rest <= 0.08) continue;
-
-        const z = Math.sqrt(rest);
-
-        for (const side of [1, -1]) {
-          dummy.position.set(u * rx, v * ry, side * z * rz);
-          // Gradiente del elipsoide: la espina sale perpendicular a la pala
-          normal
-            .set(u / rx, v / ry, (side * z) / rz)
-            .normalize();
-          dummy.quaternion.setFromUnitVectors(up, normal);
-          dummy.updateMatrix();
-          mesh.setMatrixAt(i++, dummy.matrix);
-        }
-      }
-    }
-
-    // Las instancias sobrantes (las recortadas) se colapsan a escala cero
-    const empty = new THREE.Matrix4().makeScale(0, 0, 0);
-    for (; i < count; i++) mesh.setMatrixAt(i, empty);
-
-    mesh.instanceMatrix.needsUpdate = true;
-  }, [rx, ry, rz, rows, cols, count]);
-
-  return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      <coneGeometry args={[0.011, 0.05, 4]} />
-      <meshStandardMaterial color={p.spine} roughness={0.75} metalness={0} />
-    </instancedMesh>
-  );
-}
-
-function Pad({
-  position,
-  rotation,
-  radii,
-  castShadow,
-  detail,
-}: {
-  position: [number, number, number];
-  rotation: [number, number, number];
-  radii: [number, number, number];
-  castShadow: boolean;
-  detail: boolean;
-}) {
-  const p = usePalette();
-
-  return (
-    <group position={position} rotation={rotation}>
-      <mesh scale={radii} castShadow={castShadow}>
-        <sphereGeometry args={[1, 24, 16]} />
-        <meshStandardMaterial color={p.bodyDark} roughness={0.72} metalness={0} />
-      </mesh>
-
-      <PadSpines radii={radii} rows={detail ? 6 : 4} cols={detail ? 4 : 3} />
-    </group>
-  );
-}
-
-function NopalCactus({
-  castShadow,
-  detail,
-}: {
-  castShadow: boolean;
-  detail: boolean;
-}) {
-  return (
-    <group>
-      <Pot radius={0.44} height={0.42} castShadow={castShadow} />
-
-      {/* Pala base */}
-      <Pad
-        position={[0, 1.0, 0]}
-        rotation={[0, 0.25, 0.06]}
-        radii={[0.42, 0.66, 0.13]}
-        castShadow={castShadow}
-        detail={detail}
-      />
-
-      {/* Pala superior izquierda, brotando del canto de la base */}
-      <Pad
-        position={[-0.42, 1.62, 0.04]}
-        rotation={[0, 0.4, 0.72]}
-        radii={[0.3, 0.44, 0.11]}
-        castShadow={castShadow}
-        detail={detail}
-      />
-
-      {/* Pala superior derecha, más pequeña y más abierta */}
-      <Pad
-        position={[0.38, 1.46, -0.06]}
-        rotation={[0, -0.25, -0.92]}
-        radii={[0.23, 0.36, 0.095]}
-        castShadow={castShadow}
-        detail={detail}
-      />
-    </group>
-  );
-}
-
-/* ── Cactus 3: barril, con flor ──────────────────── */
-
-function Bloom({ castShadow }: { castShadow: boolean }) {
-  const p = usePalette();
-
-  const petals = useMemo(
-    () => Array.from({ length: 6 }, (_, i) => (i / 6) * Math.PI * 2),
-    []
-  );
-
-  return (
-    <group>
-      {petals.map((angle, i) => (
-        <mesh
-          key={i}
-          position={[Math.cos(angle) * 0.07, 0, Math.sin(angle) * 0.07]}
-          rotation={[0, -angle, 0.55]}
-          scale={[0.075, 0.028, 0.045]}
-          castShadow={castShadow}
-        >
-          <sphereGeometry args={[1, 10, 8]} />
-          <meshStandardMaterial
-            color={p.bloom}
-            roughness={0.5}
-            emissive={p.bloom}
-            emissiveIntensity={0.25}
-          />
-        </mesh>
-      ))}
-
-      <mesh position={[0, 0.02, 0]} scale={[0.045, 0.03, 0.045]}>
-        <sphereGeometry args={[1, 10, 8]} />
-        <meshStandardMaterial color={p.petal} roughness={0.6} />
-      </mesh>
-    </group>
-  );
-}
-
-function BarrelCactus({
-  castShadow,
-  detail,
-}: {
-  castShadow: boolean;
-  detail: boolean;
-}) {
-  const p = usePalette();
-
-  const body = useMemo(
-    () => applyRibs(new THREE.SphereGeometry(0.46, 40, 26), 13, 0.075),
-    []
-  );
-
-  return (
-    <group>
-      <Pot radius={0.46} height={0.36} castShadow={castShadow} />
-
-      <mesh
-        geometry={body}
-        position={[0, 0.78, 0]}
-        scale={[1, 0.92, 1]}
-        castShadow={castShadow}
-      >
-        <meshStandardMaterial color={p.body} roughness={0.7} metalness={0} />
-      </mesh>
-
-      {detail && (
-        <group position={[0, 0.78, 0]}>
-          <Spines
-            rows={5}
-            ribs={13}
-            radius={0.5}
-            from={-0.26}
-            to={0.26}
-            length={0.055}
-            bulge={0.22}
-          />
-        </group>
-      )}
-
-      <group position={[0, 1.22, 0]}>
-        <Bloom castShadow={castShadow} />
-      </group>
-    </group>
-  );
-}
-
-/* ── Suelo ───────────────────────────────────────── */
-
-/**
- * No es un plano de suelo: es un charco de luz que se desvanece
- * antes de llegar al borde. Así no aparece una línea de horizonte
- * cortando el hero, y la sombra tiene algo más claro que el fondo
- * de la página sobre lo que dibujarse (si se iguala, desaparece).
- */
-function Ground({
-  texture,
-  receiveShadow,
-}: {
-  texture: THREE.Texture;
-  receiveShadow: boolean;
-}) {
-  const p = usePalette();
-
-  return (
-    <mesh
-      rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, 0, 0]}
-      receiveShadow={receiveShadow}
-    >
-      <circleGeometry args={[4.2, 48]} />
-      <meshStandardMaterial
-        color={p.shadow}
-        alphaMap={texture}
-        transparent
-        opacity={p.shadowOpacity}
-        roughness={1}
-        metalness={0}
-        depthWrite={false}
-      />
-    </mesh>
-  );
-}
-
-/** Sombra pintada para móvil, donde no hay shadow map. */
-function FakeShadow({
+/** Sombra de contacto pintada. Sustituye al shadow map entero. */
+function Contact({
   texture,
   position,
   scale,
 }: {
   texture: THREE.Texture;
   position: [number, number, number];
-  scale: number;
+  scale: [number, number];
 }) {
   const p = usePalette();
 
@@ -643,48 +353,372 @@ function FakeShadow({
     <mesh
       rotation={[-Math.PI / 2, 0, 0]}
       position={position}
-      scale={[scale * 1.5, scale, 1]}
+      scale={[scale[0], scale[1], 1]}
     >
-      <circleGeometry args={[1, 24]} />
+      <circleGeometry args={[1, 20]} />
       <meshBasicMaterial
-        color={p.fakeShadow}
+        color={p.shadow}
         alphaMap={texture}
         transparent
-        opacity={p.fakeShadowOpacity}
+        opacity={p.shadowOpacity}
         depthWrite={false}
       />
     </mesh>
   );
 }
 
-/* ── Escena ──────────────────────────────────────── */
+/* ── Mueble ──────────────────────────────────────── */
 
-const CACTI: {
-  key: string;
-  x: number;
-  z: number;
-  shadowScale: number;
-}[] = [
-  { key: "nopal", x: -1.42, z: -0.8, shadowScale: 0.5 },
-  { key: "columnar", x: 0.05, z: -0.12, shadowScale: 0.62 },
-  { key: "barrel", x: 1.35, z: 0.4, shadowScale: 0.55 },
-];
+/**
+ * Tablero + cajonera a la izquierda + panel macizo a la derecha. La
+ * asimetría es lo que evita que lea como mesa de catálogo, y el panel va
+ * macizo a propósito: un listón fino ahí se lee como pata rota.
+ */
+function Desk() {
+  const p = usePalette();
+  const legTop = TOP - THICK;
+  const legHeight = legTop - FLOOR;
+
+  return (
+    <group>
+      <RoundedBox
+        args={[2.6, THICK, 1.15]}
+        radius={0.02}
+        smoothness={2}
+        position={[0, TOP - THICK / 2, 0]}
+      >
+        <meshLambertMaterial color={p.deskTop} />
+      </RoundedBox>
+
+      {/* Cajonera */}
+      <RoundedBox
+        args={[0.52, legHeight, 0.88]}
+        radius={0.02}
+        smoothness={2}
+        position={[-0.92, FLOOR + legHeight / 2, -0.02]}
+      >
+        <meshLambertMaterial color={p.deskBody} />
+      </RoundedBox>
+
+      {/* Tiradores: dos rayas, suficiente para que se lean los cajones */}
+      {[0.16, -0.1].map((y) => (
+        <mesh key={y} position={[-0.66, legTop - 0.22 + y, -0.02]}>
+          <boxGeometry args={[0.012, 0.02, 0.26]} />
+          <meshLambertMaterial color={p.deskPanel} />
+        </mesh>
+      ))}
+
+      {/* Costado derecho */}
+      <RoundedBox
+        args={[0.07, legHeight, 0.98]}
+        radius={0.02}
+        smoothness={2}
+        position={[1.22, FLOOR + legHeight / 2, -0.02]}
+      >
+        <meshLambertMaterial color={p.deskPanel} />
+      </RoundedBox>
+    </group>
+  );
+}
+
+/* ── Monitor ─────────────────────────────────────── */
+
+function Monitor({ screen }: { screen: THREE.Texture }) {
+  const p = usePalette();
+
+  return (
+    <group position={[-0.05, TOP, -0.3]}>
+      <mesh position={[0, 0.012, 0.02]}>
+        <boxGeometry args={[0.44, 0.024, 0.2]} />
+        <meshLambertMaterial color={p.device} />
+      </mesh>
+
+      <mesh position={[0, 0.16, 0]}>
+        <boxGeometry args={[0.08, 0.28, 0.06]} />
+        <meshLambertMaterial color={p.device} />
+      </mesh>
+
+      {/* El panel se inclina hacia atrás: de frente parecería un cartel */}
+      <group position={[0, 0.66, 0]} rotation={[-0.07, 0, 0]}>
+        <RoundedBox args={[1.26, 0.74, 0.05]} radius={0.015} smoothness={2}>
+          <meshLambertMaterial color={p.device} />
+        </RoundedBox>
+
+        {/* Encendida: basic sin iluminar y SIN tone mapping — con ACES los
+            colores del código salían apagados. Cuesta cero y ahorra el
+            emissive, que en gama baja se paga cada frame */}
+        <mesh position={[0, 0.015, 0.027]}>
+          <planeGeometry args={[1.18, 0.64]} />
+          <meshBasicMaterial map={screen} toneMapped={false} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* ── Portátil ────────────────────────────────────── */
+
+/** Girado y adelantado para que su tapa muerda la esquina del monitor:
+ *  sin ese solape los objetos quedan en fila, como estante de tienda. */
+function Laptop({ screen }: { screen: THREE.Texture }) {
+  const p = usePalette();
+
+  return (
+    <group position={[0.6, TOP, 0.16]} rotation={[0, -0.42, 0]}>
+      <RoundedBox args={[0.62, 0.026, 0.42]} radius={0.008} smoothness={2}
+        position={[0, 0.013, 0]}>
+        <meshLambertMaterial color={p.deviceSoft} />
+      </RoundedBox>
+
+      <mesh position={[0, 0.027, 0.03]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.5, 0.26]} />
+        <meshLambertMaterial color={p.device} />
+      </mesh>
+
+      {/* Bisagra en el canto trasero: el grupo pivota ahí, no en el centro.
+          El ángulo es pequeño A PROPÓSITO — la tapa parte de vertical, así
+          que pasarse de -0.5 la tumba por debajo del tablero */}
+      <group position={[0, 0.026, -0.21]} rotation={[-0.3, 0, 0]}>
+        <RoundedBox args={[0.62, 0.4, 0.022]} radius={0.008} smoothness={2}
+          position={[0, 0.2, 0]}>
+          <meshLambertMaterial color={p.deviceSoft} />
+        </RoundedBox>
+
+        <mesh position={[0, 0.2, 0.013]}>
+          <planeGeometry args={[0.56, 0.34]} />
+          <meshBasicMaterial map={screen} toneMapped={false} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/* ── Trastos de mesa ─────────────────────────────── */
+
+function Keyboard() {
+  const p = usePalette();
+
+  return (
+    <group position={[-0.2, TOP, 0.3]} rotation={[0, 0.06, 0]}>
+      <mesh position={[0, 0.012, 0]}>
+        <boxGeometry args={[0.7, 0.024, 0.24]} />
+        <meshLambertMaterial color={p.deviceSoft} />
+      </mesh>
+      <mesh position={[0, 0.025, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.62, 0.17]} />
+        <meshLambertMaterial color={p.device} />
+      </mesh>
+    </group>
+  );
+}
+
+function Mug() {
+  const p = usePalette();
+
+  return (
+    <group position={[-0.72, TOP, 0.36]}>
+      <mesh position={[0, 0.055, 0]}>
+        <cylinderGeometry args={[0.058, 0.05, 0.11, 14]} />
+        <meshLambertMaterial color={p.mug} />
+      </mesh>
+      {/* El asa es lo que lo convierte en taza y no en vaso */}
+      <mesh position={[0.075, 0.06, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.033, 0.01, 5, 10]} />
+        <meshLambertMaterial color={p.mug} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ── Lámpara de pie ──────────────────────────────── */
+
+/**
+ * Lámpara de arco en el rincón derecho, donde antes iba el nopal: la
+ * pantalla cuelga sobre el canto de la mesa y la bombilla es la única luz
+ * cálida de la escena.
+ *
+ * Una sola pointLight de alcance corto (distance 2.4) y SIN sombras. Con
+ * Lambert cuesta una suma más por fragmento; lo que sale caro en gama baja
+ * es el shadow map de una point light (seis pasadas), y eso no está.
+ */
+function Lamp() {
+  const p = usePalette();
+  const POLE = 1.62;
+  const ARM = 0.5;
+
+  return (
+    <group position={[1.7, FLOOR, 0.05]}>
+      <mesh position={[0, 0.018, 0]}>
+        <cylinderGeometry args={[0.17, 0.19, 0.036, 20]} />
+        <meshLambertMaterial color={p.lampMetal} />
+      </mesh>
+
+      <mesh position={[0, POLE / 2, 0]}>
+        <cylinderGeometry args={[0.014, 0.014, POLE, 6]} />
+        <meshLambertMaterial color={p.lampMetal} />
+      </mesh>
+
+      {/* Codo: cuarto de toro que dobla el mástil hacia la mesa */}
+      <mesh position={[-0.12, POLE, 0]} rotation={[0, 0, 0]}>
+        <torusGeometry args={[0.12, 0.014, 5, 10, Math.PI / 2]} />
+        <meshLambertMaterial color={p.lampMetal} />
+      </mesh>
+
+      <mesh position={[-0.12 - ARM / 2, POLE + 0.12, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.014, 0.014, ARM, 6]} />
+        <meshLambertMaterial color={p.lampMetal} />
+      </mesh>
+
+      <group position={[-0.12 - ARM, POLE + 0.03, 0]}>
+        {/* Pantalla: cono abierto por abajo */}
+        <mesh>
+          <cylinderGeometry args={[0.06, 0.17, 0.2, 18, 1, true]} />
+          <meshLambertMaterial color={p.lampShade} side={THREE.DoubleSide} />
+        </mesh>
+
+        <mesh position={[0, -0.05, 0]}>
+          <sphereGeometry args={[0.05, 10, 8]} />
+          <meshBasicMaterial color={p.lampLight} toneMapped={false} />
+        </mesh>
+
+        <pointLight
+          position={[0, -0.12, 0]}
+          color={p.lampLight}
+          intensity={p.lampIntensity}
+          distance={2.4}
+          decay={1.6}
+        />
+      </group>
+    </group>
+  );
+}
+
+/* ── Silla ergonómica ────────────────────────────── */
+
+/**
+ * La estrella de cinco patas con sus ruedas: dos InstancedMesh, 2 draw calls
+ * para las diez piezas. Sueltas serían diez, y es la parte de la silla que
+ * menos se ve.
+ */
+function ChairStar() {
+  const p = usePalette();
+  const legsRef = useRef<THREE.InstancedMesh>(null);
+  const castersRef = useRef<THREE.InstancedMesh>(null);
+
+  useLayoutEffect(() => {
+    const legs = legsRef.current;
+    const casters = castersRef.current;
+    if (!legs || !casters) return;
+
+    const dummy = new THREE.Object3D();
+
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2;
+
+      // La pata nace en boxGeometry a lo largo de +x; girar -ángulo en Y
+      // la manda exactamente a ese radio
+      dummy.position.set(Math.cos(angle) * 0.15, 0.07, Math.sin(angle) * 0.15);
+      dummy.rotation.set(0, -angle, 0);
+      dummy.updateMatrix();
+      legs.setMatrixAt(i, dummy.matrix);
+
+      dummy.position.set(Math.cos(angle) * 0.29, 0.028, Math.sin(angle) * 0.29);
+      dummy.rotation.set(0, 0, 0);
+      dummy.updateMatrix();
+      casters.setMatrixAt(i, dummy.matrix);
+    }
+
+    legs.instanceMatrix.needsUpdate = true;
+    casters.instanceMatrix.needsUpdate = true;
+  }, []);
+
+  return (
+    <group>
+      <instancedMesh ref={legsRef} args={[undefined, undefined, 5]}>
+        <boxGeometry args={[0.3, 0.035, 0.05]} />
+        <meshLambertMaterial color={p.chair} />
+      </instancedMesh>
+
+      <instancedMesh ref={castersRef} args={[undefined, undefined, 5]}>
+        <cylinderGeometry args={[0.032, 0.032, 0.055, 6]} />
+        <meshLambertMaterial color={p.chair} />
+      </instancedMesh>
+    </group>
+  );
+}
+
+/**
+ * Delante de la mesa y de espaldas a cámara, girada un poco: de frente y a
+ * escuadra leería como silla de catálogo, y ese cuarto de giro es lo que
+ * hace que parezca que alguien acaba de levantarse.
+ *
+ * El respaldo pivota desde el canto TRASERO del asiento, no desde su centro:
+ * inclinado desde el centro se hunde dentro del cojín.
+ */
+function Chair() {
+  const p = usePalette();
+
+  return (
+    <group position={[-0.1, FLOOR, 0.92]} rotation={[0, 0.34, 0]}>
+      <ChairStar />
+
+      <mesh position={[0, 0.26, 0]}>
+        <cylinderGeometry args={[0.045, 0.056, 0.36, 10]} />
+        <meshLambertMaterial color={p.chair} />
+      </mesh>
+
+      <RoundedBox
+        args={[0.5, 0.08, 0.46]}
+        radius={0.025}
+        smoothness={2}
+        position={[0, 0.47, 0]}
+      >
+        <meshLambertMaterial color={p.chairSoft} />
+      </RoundedBox>
+
+      <group position={[0, 0.5, 0.2]} rotation={[0.2, 0, 0]}>
+        <RoundedBox
+          args={[0.42, 0.6, 0.06]}
+          radius={0.03}
+          smoothness={2}
+          position={[0, 0.3, 0]}
+        >
+          <meshLambertMaterial color={p.chairSoft} />
+        </RoundedBox>
+
+        {/* Cabecero: es la pieza que dice "ergonómica" y no "silla de cocina" */}
+        <RoundedBox
+          args={[0.26, 0.14, 0.05]}
+          radius={0.025}
+          smoothness={2}
+          position={[0, 0.69, 0.012]}
+        >
+          <meshLambertMaterial color={p.chair} />
+        </RoundedBox>
+      </group>
+    </group>
+  );
+}
+
+/* ── Escena ──────────────────────────────────────── */
 
 export default function HeroScene() {
   const theme = useTheme();
   const p = theme === "light" ? LIGHT_PALETTE : DARK_PALETTE;
 
-  const rootRef = useRef<THREE.Group>(null);
-  const swayRefs = useRef<(THREE.Group | null)[]>([]);
+  const parallaxRef = useRef<THREE.Group>(null);
+  const entryRef = useRef<THREE.Group>(null);
+  const propRefs = useRef<(THREE.Group | null)[]>([]);
 
   const viewport = useThree((state) => state.viewport);
   const width = useThree((state) => state.size.width);
-
-  const texture = useMemo(() => makeRadialTexture(), []);
-
   const isMobile = width < 768;
-  const shadows = !isMobile;
-  const detail = !isMobile;
+
+  const radial = useMemo(() => makeRadialTexture(), []);
+  // Dos texturas y no una: cada pantalla tiene su aspecto (1.84 el monitor,
+  // 1.65 el portátil) y compartir canvas estiraba el código en una de ellas
+  const monitorScreen = useMemo(() => makeCodeTexture(736, 400), []);
+  const laptopScreen = useMemo(() => makeCodeTexture(396, 240), []);
 
   const reducedMotion = useMemo(
     () =>
@@ -694,158 +728,145 @@ export default function HeroScene() {
   );
 
   /**
-   * Colocación derivada del viewport, no de breakpoints inventados.
-   * En escritorio el texto vive a la izquierda, así que la jardinera
-   * se va al tercio derecho; en móvil el texto está centrado y los
-   * cactus bajan al pie de la pantalla, más pequeños.
+   * Colocación derivada del viewport de r3f, no de breakpoints inventados.
+   * En escritorio el copy vive a la izquierda, así que el rincón se va al
+   * tercio derecho; en móvil el texto está anclado arriba y el rincón baja
+   * al pie, más pequeño.
    */
   const layout = useMemo(() => {
     if (isMobile) {
-      const scale = THREE.MathUtils.clamp(viewport.width / 6.4, 0.42, 0.72);
+      const scale = THREE.MathUtils.clamp(viewport.width / 5.7, 0.38, 0.66);
       return {
         scale,
-        position: [0, -viewport.height * 0.4, 0] as [number, number, number],
+        position: [0, -viewport.height * 0.26, 0] as [number, number, number],
       };
     }
-    const scale = THREE.MathUtils.clamp(viewport.width / 11.5, 0.78, 1.22);
+    const scale = THREE.MathUtils.clamp(viewport.width / 12.2, 0.68, 1.08);
     return {
       scale,
-      position: [
-        viewport.width * 0.24,
-        -viewport.height * 0.3,
-        0,
-      ] as [number, number, number],
+      position: [viewport.width * 0.26, -viewport.height * 0.06, 0] as
+        [number, number, number],
     };
   }, [isMobile, viewport.width, viewport.height]);
 
-  /* Entrada: los cactus crecen desde la maceta, escalonados.
-     Arranca con el mismo retraso que el texto del hero. */
+  /* Entrada: el rincón entra girando hasta su ángulo base mientras crece,
+     y luego brotan los objetos de encima. Arranca con el mismo retraso que
+     el texto del hero para que lleguen juntos. */
   useLayoutEffect(() => {
-    const groups = swayRefs.current.filter(Boolean) as THREE.Group[];
-    if (!groups.length) return;
+    const entry = entryRef.current;
+    const props = propRefs.current.filter(Boolean) as THREE.Group[];
+    if (!entry) return;
 
     if (reducedMotion) {
-      groups.forEach((g) => g.scale.setScalar(1));
+      entry.rotation.y = 0;
+      entry.scale.setScalar(1);
+      props.forEach((g) => g.scale.setScalar(1));
       return;
     }
 
-    groups.forEach((g) => g.scale.set(0.75, 0, 0.75));
+    entry.rotation.y = -0.5;
+    entry.scale.setScalar(0.9);
+    props.forEach((g) => g.scale.setScalar(0));
 
-    const tween = gsap.to(
-      groups.map((g) => g.scale),
-      {
-        x: 1,
-        y: 1,
-        z: 1,
-        duration: 1.1,
-        ease: "back.out(1.5)",
-        stagger: 0.14,
-        delay: 1.5,
-      }
-    );
+    const tl = gsap.timeline({ delay: 1.5 });
+
+    tl.to(entry.rotation, { y: 0, duration: 1.2, ease: "power3.out" })
+      .to(entry.scale, { x: 1, y: 1, z: 1, duration: 1.2, ease: "power3.out" }, 0)
+      .to(
+        props.map((g) => g.scale),
+        {
+          x: 1,
+          y: 1,
+          z: 1,
+          duration: 0.7,
+          ease: "back.out(1.6)",
+          stagger: 0.09,
+        },
+        0.35
+      );
 
     return () => {
-      tween.kill();
+      tl.kill();
     };
   }, [reducedMotion]);
 
-  /* Balanceo casi imperceptible + paralaje con el puntero.
-     La rotación se aplica al grupo raíz, nunca a la cámara:
-     mover la cámara descuadraría la composición responsive. */
+  /* Lo único que corre por frame: el paralaje, que se
+     amortigua con una exponencial del delta, no con un lerp fijo, para que
+     no dependa de los FPS del equipo. */
   useFrame((state, delta) => {
     if (reducedMotion) return;
 
-    const time = state.clock.getElapsedTime();
-
-    swayRefs.current.forEach((group, i) => {
-      if (!group) return;
-      group.rotation.z = Math.sin(time * 0.4 + i * 1.7) * 0.012;
-      group.rotation.x = Math.cos(time * 0.33 + i * 2.1) * 0.008;
-    });
-
-    if (rootRef.current && !isMobile) {
-      const targetY = state.pointer.x * 0.16;
-      const targetX = -state.pointer.y * 0.06;
-      const k = 1 - Math.pow(0.001, delta); // amortiguado, no lineal
-      rootRef.current.rotation.y = THREE.MathUtils.lerp(
-        rootRef.current.rotation.y, targetY, k
+    if (parallaxRef.current && !isMobile) {
+      const k = 1 - Math.pow(0.0015, delta);
+      parallaxRef.current.rotation.y = THREE.MathUtils.lerp(
+        parallaxRef.current.rotation.y,
+        BASE_TURN + state.pointer.x * 0.08,
+        k
       );
-      rootRef.current.rotation.x = THREE.MathUtils.lerp(
-        rootRef.current.rotation.x, targetX, k
+      parallaxRef.current.rotation.x = THREE.MathUtils.lerp(
+        parallaxRef.current.rotation.x,
+        BASE_TILT - state.pointer.y * 0.035,
+        k
       );
     }
   });
 
   return (
     <PaletteContext.Provider value={p}>
-      <group
-        ref={rootRef}
-        position={layout.position}
-        scale={layout.scale}
-      >
-        <Ground texture={texture} receiveShadow={shadows} />
+      <group position={layout.position} scale={layout.scale}>
+        <group ref={parallaxRef} rotation={[BASE_TILT, BASE_TURN, 0]}>
+          <group ref={entryRef}>
+            {/* El rig se centra sobre su propio origen. Con el rincón la
+                caja creció de 3.3 a 3.75 de ancho y de 1.85 a 2.2 de alto
+                (x -1.6 a 2.15, y -0.84 a 1.35), así que el empujón cambió:
+                sin él el paralaje giraría alrededor de un punto descentrado */}
+            <group position={[-0.28, -0.26, 0]}>
+              <Room />
 
-        {CACTI.map((item, i) => (
-          <group key={item.key} position={[item.x, 0, item.z]}>
-            {!shadows && (
-              <FakeShadow
-                texture={texture}
-                position={[0.12, 0.012, 0.18]}
-                scale={item.shadowScale}
-              />
-            )}
+              {/* Ceñidas a la huella real de cada pieza: un disco mayor que
+                  el mueble no lee como contacto, lee como mancha */}
+              <Contact texture={radial} position={[-0.92, FLOOR + 0.008, -0.02]} scale={[0.42, 0.6]} />
+              <Contact texture={radial} position={[1.22, FLOOR + 0.008, -0.02]} scale={[0.24, 0.62]} />
+              <Contact texture={radial} position={[1.7, FLOOR + 0.01, 0.05]} scale={[0.26, 0.26]} />
+              <Contact texture={radial} position={[-0.1, FLOOR + 0.009, 0.92]} scale={[0.42, 0.42]} />
+              {!isMobile && (
+                <Contact texture={radial} position={[0.2, FLOOR + 0.006, 0.05]} scale={[0.8, 0.42]} />
+              )}
 
-            <group
-              ref={(el) => {
-                swayRefs.current[i] = el;
-              }}
-            >
-              {item.key === "columnar" && (
-                <ColumnarCactus castShadow={shadows} detail={detail} />
-              )}
-              {item.key === "nopal" && (
-                <NopalCactus castShadow={shadows} detail={detail} />
-              )}
-              {item.key === "barrel" && (
-                <BarrelCactus castShadow={shadows} detail={detail} />
-              )}
+              <Desk />
+
+              <group ref={(el) => { propRefs.current[0] = el; }}>
+                <Monitor screen={monitorScreen} />
+              </group>
+              <group ref={(el) => { propRefs.current[1] = el; }}>
+                <Laptop screen={laptopScreen} />
+              </group>
+              <group ref={(el) => { propRefs.current[2] = el; }}>
+                <Keyboard />
+              </group>
+              <group ref={(el) => { propRefs.current[3] = el; }}>
+                <Mug />
+              </group>
+              <group ref={(el) => { propRefs.current[4] = el; }}>
+                <Lamp />
+              </group>
+              <group ref={(el) => { propRefs.current[5] = el; }}>
+                <Chair />
+              </group>
             </group>
           </group>
-        ))}
+        </group>
 
-        {/* Luz principal: rasante y desde la derecha, para que la
-            sombra caiga hacia el texto y una las dos mitades del hero */}
-        <directionalLight
-          position={[3.4, 5.2, 3.2]}
-          intensity={2.1}
-          color="#ffffff"
-          castShadow={shadows}
-          shadow-mapSize={[1024, 1024]}
-          shadow-bias={-0.0012}
-          shadow-normalBias={0.02}
-          shadow-camera-left={-5}
-          shadow-camera-right={5}
-          shadow-camera-top={5}
-          shadow-camera-bottom={-5}
-          shadow-camera-near={0.5}
-          shadow-camera-far={16}
-        />
+        {/* Clave alta y por delante-derecha: deja el canto izquierdo del
+            mueble en penumbra, que es lo que da el volumen de maqueta */}
+        <directionalLight position={[3.2, 5.4, 3.6]} intensity={p.key} />
 
-        {/* Relleno frío por el lado opuesto: sin esto las caras en
-            sombra quedan en negro puro y el cactus se ve recortado */}
+        {/* Relleno frío por el lado opuesto: sin él las caras en sombra
+            caen a negro puro y el mueble se recorta como silueta */}
         <directionalLight
-          position={[-4, 2, -2]}
-          intensity={0.45}
+          position={[-4, 1.8, -2.2]}
+          intensity={p.fillIntensity}
           color={p.fill}
-        />
-
-        {/* Contraluz con el acento del sitio, muy bajo: sólo dibuja
-            el borde de la silueta contra el fondo oscuro */}
-        <pointLight
-          position={[-1.1, 3.1, -2.4]}
-          intensity={p.rimIntensity}
-          distance={4.6}
-          color={p.bloom}
         />
 
         <ambientLight intensity={p.ambientIntensity} color={p.ambient} />

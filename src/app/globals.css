@@ -602,6 +602,54 @@ textarea.field-input {
   display: block;
 }
 
+/* ═══════════════════════════════════════════════════
+   INTERRUPTOR DE IDIOMA
+   Mismo tamaño y mismo borde que el de tema: van juntos en el header y
+   cualquier diferencia de caja se nota. La etiqueta va en mono porque son
+   dos letras en versalita — con la Inter del cuerpo bailaban de ancho al
+   pasar de "ES" a "EN".
+   ═══════════════════════════════════════════════════ */
+
+.lang-toggle {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.lang-toggle:hover,
+.lang-toggle:focus-visible {
+  color: var(--color-accent-text);
+  border-color: var(--color-accent-primary);
+}
+
+/* El borde va como ATAJO COMPLETO (`border: 1px solid ...`), no como
+   `border-color` suelto: el preflight de Tailwind pone `border-width: 0` a
+   todos los elementos, así que declarar sólo el color deja el borde invisible
+   —el botón salía como texto suelto junto al de tema—. Es la misma trampa de
+   capas documentada arriba, y por eso `.theme-toggle` ya usaba el atajo. */
+.lang-toggle--mobile {
+  width: 3rem;
+  height: 3rem;
+  font-size: 0.85rem;
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent-primary) 45%, transparent);
+  border-radius: 6px;
+  color: var(--color-accent-text);
+}
+
 /* En el menú móvil el botón va al tamaño del resto de los enlaces. */
 .theme-toggle--mobile {
   width: 3rem;
@@ -795,9 +843,15 @@ textarea.field-input {
    tarjetas, ni sombras, ni relleno de color: la fila ES el proyecto.
    ═══════════════════════════════════════════════════ */
 
+/* Centrada: `margin-inline: auto` sobre el ancho máximo, y el texto centrado
+   con él. El `max-width` en `ch` y no en `rem` ata la medida a la longitud de
+   la línea —unos 50 caracteres—, que es lo que mantiene el subtítulo en dos
+   renglones parejos en vez de uno largísimo en pantallas anchas. */
 .projects-head {
-  max-width: 42rem;
+  max-width: 50ch;
+  margin-inline: auto;
   margin-bottom: 4rem;
+  text-align: center;
 }
 
 .projects-head__title {
@@ -811,8 +865,11 @@ textarea.field-input {
 .projects-head__lead {
   margin-top: 1rem;
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
+  /* Crece un punto con el viewport: a 0.95rem fijo se quedaba diminuto bajo
+     un título que llega a 3.75rem. */
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
   line-height: 1.6;
+  text-wrap: balance;
 }
 
 .projects-layout {

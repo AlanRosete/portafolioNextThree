@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "@/hooks/useLang";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { projects } from "@/data/projects";
+import { localizeProjects } from "@/data/projects";
 import { useStore } from "@/hooks/useStore";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 
@@ -14,6 +15,9 @@ const ProjectPreview = dynamic(
 
 export default function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null);
+  const { lang, t } = useTranslation();
+  // Se rehace sólo al cambiar de idioma, no en cada render
+  const projects = useMemo(() => localizeProjects(lang), [lang]);
   const [active, setActive] = useState(0);
   const selectProject = useStore((s) => s.selectProject);
 
@@ -88,10 +92,8 @@ export default function ProjectsSection() {
   return (
     <section id="projects" ref={sectionRef} className="section projects">
       <header className="projects-head">
-        <h2 className="projects-head__title">My Projects</h2>
-        <p className="projects-head__lead">
-          Three shipped products. Pick one for the full write-up.
-        </p>
+        <h2 className="projects-head__title">{t.projects.headTitle}</h2>
+        <p className="projects-head__lead">{t.projects.headLead}</p>
       </header>
 
       <div className="projects-layout">
@@ -146,7 +148,7 @@ export default function ProjectsSection() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        Live <span aria-hidden="true">↗</span>
+                        {t.projects.live} <span aria-hidden="true">↗</span>
                       </a>
                     )}
                     {project.repoUrl && (
@@ -155,7 +157,7 @@ export default function ProjectsSection() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        Code <span aria-hidden="true">↗</span>
+                        {t.projects.code} <span aria-hidden="true">↗</span>
                       </a>
                     )}
                   </div>
