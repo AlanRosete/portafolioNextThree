@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { skills } from "@/data/projects";
+import { roles, skillGroups } from "@/data/projects";
 import { useTranslation } from "@/hooks/useLang";
 import { RichText } from "@/i18n/RichText";
 import { gsap } from "gsap";
@@ -9,128 +9,9 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/**
- * Helper: normaliza el nombre de la skill y genera candidatos de filenames
- * También contiene un map de excepciones conocidas (react, tailwind, c# etc.)
- */
-const ICON_EXCEPTIONS: Record<string, string> = {
-  react: "iconReact.svg.png",
-  tailwind: "iconTailwind.svg.png",
-  typescript: "iconTypeScript.svg",
-  "c#": "iconCsharp.png",
-  csharp: "iconCsharp.png",
-  "microsoft sql": "iconMicrosoftSql.svg",
-  "microsoftsql": "iconMicrosoftSql.svg",
-  javascript: "iconJavascript.png",
-  node: "iconNode.svg",
-  firebase: "iconFirebase.svg",
-  mongo: "iconMongo.svg",
-  django: "iconDjango.webp",
-  html: "iconHtml.png",
-  css: "iconCss.png",
-  bootstrap: "iconBootstrap.svg",
-  sass: "iconSass.png",
-  angular: "iconAngular.svg",
-  amazon: "iconAmazon.svg",
-  redux: "iconRedux.svg",
-  gsap: "iconGsap.svg",
-  threejs: "iconThreejs.png",
-  android: "iconAndroid.svg",
-  sqlserver: "iconMicrosoftSql.svg",
-  aws: "iconAmazon.svg",
-  swift: "iconSwift.svg",
-  nextjs: "iconNext.svg",
-};
-
-function normalizeName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/[\s+#.]/g, "")
-    .replace(/\+/g, "plus");
-}
-
-function buildCandidates(name: string) {
-  const n = name.toLowerCase().trim();
-
-  // Buscar match exacto primero
-  if (ICON_EXCEPTIONS[n]) {
-    return [`/icons/${ICON_EXCEPTIONS[n]}`];
-  }
-
-  // Buscar match parcial (ej: "Node.js" matchea key "node")
-  const partialKey = Object.keys(ICON_EXCEPTIONS).find(
-    (key) => n.includes(key) || key.includes(n.replace(/[.\s]/g, "").toLowerCase())
-  );
-
-  if (partialKey) {
-    return [`/icons/${ICON_EXCEPTIONS[partialKey]}`];
-  }
-
-  // fallback patterns
-  const base = normalizeName(name);
-  return [
-    `/icons/icon${base}.svg`,
-    `/icons/icon${base}.png`,
-    `/icons/icon${base}.webp`,
-    `/icons/icon${base}.svg.png`,
-    `/icons/${base}.svg`,
-    `/icons/${base}.png`,
-  ];
-}
-
-/** PlanetSkill: intenta cargar varias variantes de filename y hace fallback a iniciales */
-function PlanetSkill({ name }: { name: string }) {
-  const candidates = buildCandidates(name);
-  const [srcIndex, setSrcIndex] = useState(0);
-  const [errorCount, setErrorCount] = useState(0);
-
-  const onError = () => {
-    setErrorCount((c) => c + 1);
-    // intenta el siguiente candidato
-    setSrcIndex((i) => (i + 1 < candidates.length ? i + 1 : i));
-  };
-
-  // iniciales como fallback si todas fallan
-  const initials = name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
-  return (
-    <div className="skill-node" tabIndex={0} aria-label={name}>
-      <span className="skill-tooltip" role="tooltip">
-        {name}
-      </span>
-
-      <div
-        className="planet-skill w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center relative transform-gpu"
-        style={{ willChange: "transform" }}
-      >
-        {/* Superficie plana con hairline: mantiene la silueta de planeta sin el halo difuso */}
-        <div className="skill-orbit relative z-10 w-full h-full rounded-full flex items-center justify-center border border-line bg-bg-secondary">
-          {errorCount >= candidates.length ? (
-            <div className="text-xs font-semibold text-text-primary">{initials}</div>
-          ) : (
-            // no uso next/image aquí por simplicidad y porque assets están en public
-            <img
-              src={candidates[srcIndex]}
-              alt={name}
-              onError={onError}
-              className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
-              draggable={false}
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function AboutSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const { t } = useTranslation();
+  const { lang, t } = useTranslation();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -168,17 +49,18 @@ export default function AboutSection() {
         }
       );
 
-      // Planet items entrance
+      /* La rejilla de stack entra como el resto: una máscara, sin rebote
+         ni escala. Antes cada icono llevaba además DOS tweens infinitos
+         —flotación y rotación—, 44 en total, corriendo para siempre. */
       gsap.fromTo(
-        ".planet-skill",
-        { opacity: 0, y: 20, scale: 0.95 },
+        ".skill-group",
+        { opacity: 0, y: 16 },
         {
           opacity: 1,
           y: 0,
-          scale: 1,
-          duration: 0.7,
+          duration: 0.6,
           ease: "power3.out",
-          stagger: 0.06,
+          stagger: 0.08,
           scrollTrigger: {
             trigger: ".skills-grid",
             start: "top 85%",
@@ -186,39 +68,11 @@ export default function AboutSection() {
         }
       );
 
-      // Floating loop for planets (subtle)
-      const planets = gsap.utils.toArray<HTMLElement>(".planet-skill");
-      planets.forEach((el, i) => {
-        const dur = 3 + (i % 4); // variance duration
-        gsap.to(el, {
-          y: "+=" + (6 + (i % 4)),
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          duration: dur,
-          delay: (i % 3) * 0.15,
-        });
-        // tiny rotation
-        gsap.to(el, {
-          rotation: (i % 2 === 0 ? 2 : -2),
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-          duration: dur * 1.2,
-        });
-      });
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  const categories = [...new Set(skills.map((s) => s.category))];
-
-  const stats = [
-    { value: "3+", label: t.about.statYears },
-    { value: "20+", label: t.about.statProjects },
-    { value: "10+", label: t.about.statTech },
-  ];
 
   return (
     <section id="about" ref={sectionRef} className="section relative">
@@ -255,39 +109,58 @@ export default function AboutSection() {
                 <RichText text={t.about.bio1} />
               </p>
 
-              <p className="text-text-secondary leading-relaxed mb-4">
+              {/* <p className="text-text-secondary leading-relaxed mb-4">
                 <RichText text={t.about.bio2} />
-              </p>
-              <br />
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 lg:gap-6 mt-8 pt-6 border-t border-line">
-                {stats.map((s) => (
-                  <div key={s.label} className="text-center">
-                    <div className="text-2xl lg:text-3xl font-semibold text-text-primary">
-                      {s.value}
+              </p> */}
+              {/*
+                Trayectoria en lugar de los contadores `3+ / 20+ / 10+`.
+
+                Un contador no se puede comprobar y encima se contradecía con
+                el resto del sitio: "20+ proyectos" convivía con una lista de
+                tres, y "10+ tecnologías" con las 22 que hay al lado. Un
+                reclutador que detecta relleno en una cifra duda del resto,
+                incluido lo que sí es cierto — y aquí lo cierto (Banco Azteca,
+                microfrontends, SonarQube) vale mucho más que la cifra.
+
+                Sin caja ni tarjeta: año en mono a la izquierda y el puesto en
+                texto, que es el mismo lenguaje editorial de la lista de
+                proyectos. Ver [.role-row] en globals.css.
+              */}
+              <div className="role-list mt-10 pt-8 border-t border-line">
+                <h4 className="role-list__label">{t.about.experience}</h4>
+
+                {roles.map((role) => (
+                  <article key={role.company} className="role-row">
+                    <p className="role-row__when">
+                      {role.from} — {role.current ? t.about.present : role.to}
+                    </p>
+
+                    <div className="role-row__body">
+                      <h5 className="role-row__company">{role.company}</h5>
+                      <p className="role-row__title">{role.title[lang]}</p>
+                      <p className="role-row__impact">{role.impact[lang]}</p>
+                      <p className="role-row__stack">{role.stack.join(" · ")}</p>
                     </div>
-                    <div className="text-text-muted text-xs lg:text-sm mt-1">
-                      {s.label}
-                    </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Skills grid (planetitas) */}
-          <div className="skills-grid space-y-6">
-            {categories.map((category, ci) => (
-              <div key={category}>
-                <div className="flex flex-wrap gap-8 items-center justify-center" style={ci > 0 ? { paddingTop: "100px" } : undefined}>
-                  {skills
-                    .filter((s) => s.category === category)
-                    .map((skill) => (
-                      <div key={skill.name}>
-                        <PlanetSkill name={skill.name} />
-                      </div>
-                    ))}
-                </div>
+          {/*
+            Stack en texto, agrupado por uso. Mismo lenguaje que el stack de
+            los proyectos y el de la trayectoria: mono, puntos medios, sin
+            pills ni logos. Tres sitios del sitio, un solo vocabulario.
+          */}
+          <div className="skills-grid">
+            {skillGroups.map((group) => (
+              <div
+                key={group.label.en}
+                className="skill-group"
+                style={{ opacity: 0 }}
+              >
+                <h4 className="skill-group__label">{group.label[lang]}</h4>
+                <p className="skill-group__items">{group.items.join(" · ")}</p>
               </div>
             ))}
           </div>

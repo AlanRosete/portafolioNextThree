@@ -30,9 +30,9 @@ const projectSources: ProjectSource[] = [
       en: "Weather application that pulls data from anywhere on the planet. City search with Google Places autocomplete, browser geolocation and direct selection on a Google Maps view. It shows the current day and the extended forecast with temperature charts in Chart.js, plus humidity, wind and its direction in degrees, feels-like temperature, and sunrise and sunset times. Includes a °C/°F unit switch, global state with Context API and useReducer, and lazy loading of the assets for each weather condition.",
     },
     tags: ["React", "Vite", "TailwindCSS", "Google Maps API", "Chart.js"],
-    image: "/imgPortfolio/geoWeatherReact.png",
+    image: "/imgPortfolio/geoWeatherReact.webp",
     liveUrl: "https://geo-weatherv1.netlify.app",
-    repoUrl: "https://github.com/AlanRosete",
+    repoUrl: "https://github.com/AlanRosete/GeoWeather",
     color: "#f8f8f8",
   },
   {
@@ -47,9 +47,9 @@ const projectSources: ProjectSource[] = [
       en: "Calendar that lays out all twelve months of the year in a single view, built with vanilla JavaScript on top of the js-year-calendar library. The design starts from a soft palette of pale blue and pink, Quicksand for body text and Dancing Script for headings, per-month cards with diffuse shadows and highlighted weekends. It includes a snowfall effect generated entirely in JavaScript, where each flake gets a random position, size, opacity and duration, animated with CSS keyframes and isolated from user interaction.",
     },
     tags: ["JavaScript", "HTML5", "CSS3", "js-year-calendar", "CSS Animations"],
-    image: "/imgPortfolio/minimalistCalendarReact.png",
+    image: "/imgPortfolio/minimalistCalendarReact.webp",
     liveUrl: "https://minimalist-calendar.netlify.app",
-    repoUrl: "https://github.com/AlanRosete",
+    repoUrl: "https://github.com/AlanRosete/calendar_minimalist",
     color: "#a8a7a8",
   },
   {
@@ -64,9 +64,9 @@ const projectSources: ProjectSource[] = [
       en: "Urban fashion e-commerce with a catalog split into footwear, bags and hats. It includes filtering by category and price range, sorting by featured, alphabetical and price, progressive catalog loading with IntersectionObserver, and a product page with size selection, discounts and related suggestions. The cart handles quantities, item removal and total calculation, and persists in localStorage across sessions. Navigation with React Router, global state through Context API and useReducer, notifications with React Toastify, and a serverless backend on Netlify Functions serving the catalog.",
     },
     tags: ["React", "React Router", "TailwindCSS", "Netlify Functions", "Context API"],
-    image: "/imgPortfolio/ecommerceReact.png",
+    image: "/imgPortfolio/ecommerceReact.webp",
     liveUrl: "https://ecommerce-test-react.netlify.app",
-    repoUrl: "https://github.com/AlanRosete",
+    repoUrl: "https://github.com/AlanRosete/ecommerce_React_Dev",
     color: "#6b7c70",
   },
 ];
@@ -80,45 +80,137 @@ export function localizeProjects(lang: Lang): Project[] {
   }));
 }
 
-export interface Skill {
-  name: string;
-  icon: string;
-  color: string;
-  category: string;
+/**
+ * Trayectoria profesional. Sustituye a las métricas `3+ / 20+ / 10+` que
+ * había en el About: eran relleno, y una de ellas ("20+ proyectos") se
+ * contradecía con la lista de tres que vive dos pantallas más arriba.
+ *
+ * Los datos salen del LinkedIn de Alan, así que son verificables — que es
+ * justo lo que las métricas inventadas no eran. El `impact` es lo que un
+ * reclutador busca y un contador nunca dice: qué construyó y con qué medida.
+ *
+ * El orden es cronológico inverso: lo más reciente primero, como un CV.
+ */
+export interface Role {
+  company: string;
+  /** Rango corto; `current` decide si el final se traduce a "hoy"/"now". */
+  from: string;
+  to: string;
+  current?: boolean;
+  title: Record<"es" | "en", string>;
+  impact: Record<"es" | "en", string>;
+  stack: string[];
 }
 
-export const skills: Skill[] = [
-  // Frontend
-  { name: "React", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg", color: "#61DAFB", category: "Frontend" },
-  { name: "Next.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg", color: "#ffffff", category: "Frontend" },
-  { name: "TypeScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg", color: "#3178C6", category: "Frontend" },
-  { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg", color: "#F7DF1E", category: "Frontend" },
-  { name: "Angular", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/angular/angular-original.svg", color: "#DD0031", category: "Frontend" },
-  { name: "HTML5", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg", color: "#E34F26", category: "Frontend" },
-  { name: "CSS3", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg", color: "#1572B6", category: "Frontend" },
-  { name: "TailwindCSS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg", color: "#06B6D4", category: "Frontend" },
-  { name: "Sass", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/sass/sass-original.svg", color: "#CC6699", category: "Frontend" },
-  { name: "Redux", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redux/redux-original.svg", color: "#764ABC", category: "Frontend" },
-  // { name: "Three.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/threejs/threejs-original.svg", color: "#ffffff", category: "Frontend" },
-  // { name: "GSAP", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/greensock/greensock-original.svg", color: "#88CE02", category: "Frontend" },
-  // Backend
-  { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg", color: "#339933", category: "Backend" },
-  { name: "Firebase", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firebase/firebase-original.svg", color: "#FFCA28", category: "Backend" },
-  { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg", color: "#47A248", category: "Backend" },
-  { name: "SQL Server", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/microsoftsqlserver/microsoftsqlserver-original.svg", color: "#CC2927", category: "Backend" },
-  { name: "AWS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg", color: "#FF9900", category: "Backend" },
-  { name: "C#", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/csharp/csharp-original.svg", color: "#239120", category: "Backend" },
-  // Mobile
-  // { name: "React Native", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg", color: "#61DAFB", category: "Mobile" },
-  // { name: "Android", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/android/android-original.svg", color: "#3DDC84", category: "Mobile" },
-  // { name: "iOS / Swift", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/swift/swift-original.svg", color: "#F05138", category: "Mobile" },
+export const roles: Role[] = [
+  {
+    company: "Banco Azteca",
+    from: "2024",
+    to: "",
+    current: true,
+    title: {
+      es: "Desarrollador React",
+      en: "React Developer",
+    },
+    impact: {
+      es: "Microfrontends con Single-SPA para Captación, Inversiones y Nómina. Cobertura de pruebas del 80-100% bajo quality gates de SonarQube.",
+      en: "Single-SPA microfrontends for Deposits, Investments and Payroll. 80-100% test coverage under SonarQube quality gates.",
+    },
+    stack: ["React", "TypeScript", "Single-SPA", "Jest", "RTL"],
+  },
+  {
+    company: "Mexicode",
+    from: "2023",
+    to: "2024",
+    title: {
+      es: "Desarrollador Full Stack",
+      en: "Full Stack Web Developer",
+    },
+    impact: {
+      es: "Sistema de gestión de asistencias de punta a punta para clientes internacionales. Revisión de código y gestión de PRs.",
+      en: "End-to-end attendance management system for international clients. Code review and PR management.",
+    },
+    stack: ["React", "C#", ".NET", "MS SQL", "LINQ"],
+  },
+  {
+    company: "Holding SI",
+    from: "2023",
+    to: "2023",
+    title: {
+      es: "Desarrollador de Software",
+      en: "IT Software Developer",
+    },
+    impact: {
+      es: "Aplicaciones internas de core empresarial y gestión de garantías. Eficiencia operativa mejorada cerca de un 40%.",
+      en: "Internal core-business and warranty management apps. Operational efficiency improved by around 40%.",
+    },
+    stack: ["Django", "Python", "SQLite", "SQL"],
+  },
 ];
 
 /**
- * El enlace guarda una CLAVE del diccionario, no la etiqueta: si guardara el
- * texto, cambiar de idioma no lo tocaría. De paso muere la errata "Proyects",
- * que llevaba meses en el menú.
+ * Stack agrupado por USO, no por tipo.
+ *
+ * Antes eran 22 iconos flotando en bucle infinito —dos tweens por icono, 44
+ * en total— heredados de un portafolio de 2018. El problema no era la
+ * animación sino lo que la lista decía: una nube de logos afirma "conozco
+ * estos nombres" sin decir cuánto, para qué, ni desde cuándo, y ponía Angular
+ * del mismo tamaño que React.
+ *
+ * En texto se puede decir lo que un logo no puede. `explorando` es la pieza
+ * clave: permite nombrar Three.js o Swift sin fingir dominio, y de paso hace
+ * coherente el hero —que ES Three.js— en lugar de inflar una skill.
+ *
+ * Los cuatro primeros grupos son los del CV de Alan, deliberadamente: si un
+ * reclutador compara el sitio con el CV, tiene que leer lo mismo.
  */
+export interface SkillGroup {
+  label: Record<"es" | "en", string>;
+  items: string[];
+}
+
+export const skillGroups: SkillGroup[] = [
+  {
+    label: { es: "Frontend", en: "Frontend" },
+    items: [
+      "React",
+      "Next.js",
+      "JavaScript (ES6+)",
+      "TypeScript",
+      "HTML5",
+      "CSS3",
+      "Sass",
+      "Tailwind",
+    ],
+  },
+  {
+    label: { es: "Backend", en: "Backend" },
+    items: ["Node.js", "Django", ".NET", "C#"],
+  },
+  {
+    label: { es: "Testing y DevOps", en: "Testing & DevOps" },
+    items: [
+      "Jest",
+      "Testing Library",
+      "Enzyme",
+      "Docker",
+      "Rancher",
+      "Harbor",
+      "Postman",
+    ],
+  },
+  {
+    label: { es: "Datos y nube", en: "Data & Cloud" },
+    items: ["MS SQL", "PostgreSQL", "MongoDB", "Firebase", "AWS"],
+  },
+  {
+    /* Deliberadamente corto y separado: es lo que hace creíble a los otros
+       cuatro. Una lista donde todo se domina por igual no la cree nadie. */
+    label: { es: "Explorando", en: "Exploring" },
+    items: ["Three.js", "React Native", "RTK Query", "Swift"],
+  },
+];
+
 export const navLinks = [
   { key: "home", href: "#hero" },
   { key: "projects", href: "#projects" },

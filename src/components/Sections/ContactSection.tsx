@@ -8,9 +8,11 @@ import CatCorner from "@/components/UI/CatCorner";
 /* Edita estos valores: son los únicos datos personales de la sección. */
 const CONTACT_EMAIL = "alanroset3@gmail.com";
 const SOCIALS = [
-  { name: "GitHub", url: "https://github.com" },
-  { name: "LinkedIn", url: "https://linkedin.com" },
-  { name: "Twitter", url: "https://twitter.com" },
+  { name: "GitHub", url: "https://github.com/AlanRosete" },
+  {
+    name: "LinkedIn",
+    url: "https://www.linkedin.com/in/alan-rosete-mendoza-20ba03216",
+  },
 ];
 
 type FormState = { name: string; email: string; message: string };

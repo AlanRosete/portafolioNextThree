@@ -69,9 +69,9 @@ const dictionary = {
       es: "También desarrollo aplicaciones móviles con React Native (iOS / Android) y, cuando no estoy programando, me gusta explorar shaders de WebGL y optimización de rendimiento.",
       en: "I also build mobile apps with React Native (iOS / Android) and enjoy exploring WebGL shaders and performance optimizations when not coding.",
     },
-    statYears: { es: "Años exp.", en: "Years exp." },
-    statProjects: { es: "Proyectos", en: "Projects" },
-    statTech: { es: "Tecnologías", en: "Technologies" },
+    experience: { es: "Trayectoria", en: "Experience" },
+    /** Cierre del rango del puesto actual. */
+    present: { es: "hoy", en: "now" },
   },
 
   contact: {

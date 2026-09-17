@@ -603,6 +603,82 @@ textarea.field-input {
 }
 
 /* ═══════════════════════════════════════════════════
+   TRAYECTORIA (About)
+   Mismo lenguaje que la lista de proyectos: sin tarjeta, sin sombra, la
+   jerarquía la hacen el mono, el tamaño y una regla de 1px. El año va en
+   mono porque es un DATO —se escanea en vertical, como una tabla— y el
+   resto en la tipografía del cuerpo.
+   ═══════════════════════════════════════════════════ */
+
+.role-list__label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 1.75rem;
+}
+
+.role-row {
+  display: grid;
+  gap: 0.25rem 1.5rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--color-line);
+}
+
+/* La primera fila va pegada al rótulo: su regla la pone el contenedor */
+.role-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.role-row__when {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  padding-top: 0.15rem;
+}
+
+.role-row__company {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+.role-row__title {
+  font-size: 0.85rem;
+  color: var(--color-accent-text);
+  margin-top: 0.1rem;
+}
+
+.role-row__impact {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  margin-top: 0.5rem;
+}
+
+.role-row__stack {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+  /* El stack puede ser largo; que envuelva antes de desbordar la tarjeta */
+  overflow-wrap: anywhere;
+}
+
+/* Desde `sm` el año se va a su propia columna y el bloque se lee como una
+   tabla. Por debajo se apila: a 320px una columna de años deja al texto sin
+   sitio y las líneas se parten cada tres palabras. */
+@media (min-width: 640px) {
+  .role-row {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+  }
+}
+
+/* ═══════════════════════════════════════════════════
    INTERRUPTOR DE IDIOMA
    Mismo tamaño y mismo borde que el de tema: van juntos en el header y
    cualquier diferencia de caja se nota. La etiqueta va en mono porque son
@@ -669,76 +745,40 @@ textarea.field-input {
 
 
 /* ═══════════════════════════════════════════════════
-   SKILLS — órbitas + tooltip
-   Hover: tinte salvia sutil (el acento único, nunca saturado).
+   STACK — lista agrupada por uso
+   Sustituye a las "órbitas" de iconos flotantes (herencia de un portafolio
+   de 2018): 22 logos, 44 tweens infinitos y un tooltip por nodo.
+   Mismo vocabulario que el stack de los proyectos y el de la trayectoria:
+   rótulo en mono a versalita, tecnologías separadas por punto medio.
    ═══════════════════════════════════════════════════ */
 
-.skill-node {
-  position: relative;
-  outline: none;
+.skills-grid {
+  display: grid;
+  gap: 2.25rem;
 }
 
-.skill-node:focus-visible .skill-orbit {
-  border-color: var(--color-accent-primary);
+.skill-group__label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.6rem;
 }
 
-.skill-orbit {
-  transition: border-color 0.3s ease, background-color 0.3s ease,
-    box-shadow 0.3s ease;
+/* Interlínea holgada: son líneas largas de términos sueltos y, apretadas,
+   se leen como un muro. El punto medio ya separa; el aire hace el resto. */
+.skill-group__items {
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
 }
 
-.skill-node:hover .skill-orbit {
-  border-color: color-mix(in srgb, var(--color-accent-primary) 45%, transparent);
-  background: color-mix(in srgb, var(--color-accent-primary) 7%, var(--color-bg-secondary));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent-primary) 12%, transparent),
-    0 6px 22px -8px color-mix(in srgb, var(--color-accent-primary) 40%, transparent);
-}
-
-.skill-orbit img {
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.skill-node:hover .skill-orbit img,
-.skill-node:focus-visible .skill-orbit img {
-  transform: scale(1.06);
-  filter: saturate(1.05);
-}
-
-/* Tooltip: vive fuera del elemento animado por GSAP para no heredar la
-   rotación de flotación. */
-.skill-tooltip {
-  position: absolute;
-  bottom: calc(100% + 0.6rem);
-  left: 50%;
-  padding: 0.3rem 0.65rem;
-  border: 1px solid var(--color-line);
-  border-radius: 0.5rem;
-  background: var(--color-bg-secondary);
-  color: var(--color-text-primary);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  line-height: 1;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate(-50%, 4px);
-  transition: opacity 0.22s ease, transform 0.22s ease;
-  z-index: 30;
-}
-
-.skill-node:hover .skill-tooltip,
-.skill-node:focus-visible .skill-tooltip {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skill-tooltip,
-  .skill-orbit,
-  .skill-orbit img {
-    transition-duration: 0.01ms;
-  }
+/* El grupo que Alan reconoce como exploración se atenúa un punto: dice lo
+   mismo que su rótulo, pero sin leerlo. */
+.skills-grid .skill-group:last-child .skill-group__items {
+  color: var(--color-text-muted);
 }
 
 

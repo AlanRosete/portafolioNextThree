@@ -44,6 +44,32 @@ export default function ThreeScene({
 }: ThreeSceneProps) {
   const [webglSupported, setWebglSupported] = useState(true);
 
+  /**
+   * En móvil se renderiza más barato, y son dos ajustes distintos:
+   *
+   * · `antialias` crea un framebuffer multimuestra —memoria de GPU y trabajo
+   *   extra por frame—. A tamaño de móvil los cantos de la escena apenas se
+   *   benefician, así que el gasto no se recupera en nitidez.
+   * · El techo de DPR baja a 1.5: en un teléfono de 3x el canvas pasaba de
+   *   1.75 a 1.5, que es un 27% menos de píxeles que dibujar cada frame.
+   *
+   * No cambia nada en escritorio, donde se conservan ambos.
+   *
+   * Se decide con una media query y no con el ancho de `window`, porque
+   * `matchMedia` no fuerza reflow al leerse. Arranca en `false` a propósito:
+   * el servidor no conoce el dispositivo, así que el primer render tiene que
+   * ser idéntico en ambos lados o React descarta el árbol al hidratar.
+   */
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsMobile(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
   useEffect(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -64,10 +90,10 @@ export default function ThreeScene({
       <Suspense fallback={<CanvasLoader />}>
         <Canvas
           camera={{ ...camera, near: 0.1, far: 100 }}
-          dpr={dpr}
+          dpr={isMobile ? [1, Math.min(dpr[1], 1.5)] : dpr}
           shadows={shadows}
           gl={{
-            antialias: true,
+            antialias: !isMobile,
             alpha: true,
             powerPreference: "high-performance",
           }}
