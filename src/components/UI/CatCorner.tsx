@@ -2,26 +2,18 @@
 
 import React from "react";
 
-/**
- * Gato derretido en la esquina superior derecha del formulario: la panza
- * apoyada plana contra el borde de arriba y una pata estirada que se
- * escurre por el lateral derecho.
- *
- * El tema no se resuelve en JavaScript: la silueta va en `currentColor`
- * y el color lo pone `.cat-corner` desde `--color-text-primary`, que ya
- * se invierte con el toggle. En oscuro el token es #f8f8f8 (gato claro)
- * y en claro #1a1a1a (gato oscuro) — sin `useTheme`, sin re-render y sin
- * el parpadeo de un estado que llega tarde.
- *
- * El ojo es la excepción: al ir "recortado" sobre la silueta tiene que
- * pintarse del color de lo que hay detrás. La cabeza queda por encima del
- * borde del formulario, así que lo de detrás es el fondo de la página.
- *
- * Geometría: la esquina del formulario vive en (150, 64) del viewBox. El
- * tramo de cierre (150,64 → 18,64) ES la panza apoyada, y todo lo que hay
- * a la derecha de x=150 o por debajo de y=64 es lo que cuelga fuera. El
- * CSS alinea ese punto con la esquina real — ver `.cat-corner`.
- */
+// Gato en la esquina superior derecha del formulario.
+//
+// El tema no se resuelve en JavaScript: la silueta va en `currentColor` y
+// el color lo pone `.cat-corner` desde `--color-text-primary`, que ya se
+// invierte con el toggle. Sin `useTheme`, sin re-render, sin parpadeo.
+// El ojo es la excepción: va recortado sobre la silueta, así que se pinta
+// del color de lo que hay detrás, que es el fondo de la página.
+//
+// Geometría: la esquina del formulario vive en (150, 64) del viewBox; el
+// tramo de cierre (150,64 → 18,64) es la panza apoyada y lo que queda a la
+// derecha de x=150 o bajo y=64 cuelga fuera. El CSS alinea ese punto con la
+// esquina real — ver `.cat-corner`.
 export default function CatCorner() {
   return (
     <div className="cat-corner" aria-hidden="true">

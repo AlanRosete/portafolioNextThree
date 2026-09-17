@@ -5,7 +5,7 @@ import { gsap } from "@/lib/gsap";
 import { useTranslation } from "@/hooks/useLang";
 import CatCorner from "@/components/UI/CatCorner";
 
-/* Edita estos valores: son los únicos datos personales de la sección. */
+/* Los únicos datos personales de la sección. */
 const CONTACT_EMAIL = "alanroset3@gmail.com";
 const SOCIALS = [
   { name: "GitHub", url: "https://github.com/AlanRosete" },
@@ -33,8 +33,8 @@ export default function ContactSection() {
     if (typeof window === "undefined") return;
 
     const ctx = gsap.context(() => {
-      // Una sola timeline para toda la sección: la columna izquierda entra
-      // primero y el formulario la sigue, en vez de dos reveals compitiendo.
+      // Una sola timeline: la columna izquierda entra primero y el
+      // formulario la sigue, en vez de dos reveals compitiendo.
       const tl = gsap.timeline({
         scrollTrigger: { trigger: sectionRef.current, start: "top 70%" },
       });
@@ -59,7 +59,7 @@ export default function ContactSection() {
   ) => {
     const { value } = e.target;
     setFormState((s) => ({ ...s, [field]: value }));
-    // Limpia el error en cuanto el usuario corrige, no hasta el siguiente submit.
+    // Limpia el error al corregir, no en el siguiente submit.
     setErrors((prev) => (prev[field] ? { ...prev, [field]: "" } : prev));
   };
 

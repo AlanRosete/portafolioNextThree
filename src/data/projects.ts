@@ -1,15 +1,10 @@
 import { Project } from "@/hooks/useStore";
 import type { Lang } from "@/i18n/dictionary";
 
-/**
- * Los textos de cada proyecto viajan como par ES/EN dentro del propio dato,
- * no en el diccionario general: van pegados al proyecto que describen, así
- * que añadir uno nuevo es tocar UN sitio y no dos.
- *
- * `localizeProjects` los resuelve al idioma activo y devuelve el mismo
- * `Project` de siempre, de modo que ni las secciones ni el Modal saben que
- * esto es bilingüe.
- */
+// Los textos viajan como par ES/EN dentro del propio dato, no en el
+// diccionario general: añadir un proyecto es tocar un solo sitio.
+// `localizeProjects` los resuelve al idioma activo y devuelve el mismo
+// `Project`, así que las secciones no saben que esto es bilingüe.
 type Localized = Record<Lang, string>;
 
 interface ProjectSource extends Omit<Project, "description" | "longDescription"> {
@@ -71,7 +66,7 @@ const projectSources: ProjectSource[] = [
   },
 ];
 
-/** Resuelve los pares al idioma activo. Barato: tres objetos por cambio. */
+// Resuelve los pares al idioma activo: tres objetos por cambio.
 export function localizeProjects(lang: Lang): Project[] {
   return projectSources.map(({ description, longDescription, ...rest }) => ({
     ...rest,
@@ -80,20 +75,12 @@ export function localizeProjects(lang: Lang): Project[] {
   }));
 }
 
-/**
- * Trayectoria profesional. Sustituye a las métricas `3+ / 20+ / 10+` que
- * había en el About: eran relleno, y una de ellas ("20+ proyectos") se
- * contradecía con la lista de tres que vive dos pantallas más arriba.
- *
- * Los datos salen del LinkedIn de Alan, así que son verificables — que es
- * justo lo que las métricas inventadas no eran. El `impact` es lo que un
- * reclutador busca y un contador nunca dice: qué construyó y con qué medida.
- *
- * El orden es cronológico inverso: lo más reciente primero, como un CV.
- */
+// Trayectoria profesional, en cronológico inverso como un CV. El `impact`
+// dice qué se construyó y con qué medida, que es lo que un contador de
+// métricas no dice.
 export interface Role {
   company: string;
-  /** Rango corto; `current` decide si el final se traduce a "hoy"/"now". */
+  // Rango corto; `current` decide si el final se traduce a "hoy"/"now".
   from: string;
   to: string;
   current?: boolean;
@@ -148,22 +135,11 @@ export const roles: Role[] = [
   },
 ];
 
-/**
- * Stack agrupado por USO, no por tipo.
- *
- * Antes eran 22 iconos flotando en bucle infinito —dos tweens por icono, 44
- * en total— heredados de un portafolio de 2018. El problema no era la
- * animación sino lo que la lista decía: una nube de logos afirma "conozco
- * estos nombres" sin decir cuánto, para qué, ni desde cuándo, y ponía Angular
- * del mismo tamaño que React.
- *
- * En texto se puede decir lo que un logo no puede. `explorando` es la pieza
- * clave: permite nombrar Three.js o Swift sin fingir dominio, y de paso hace
- * coherente el hero —que ES Three.js— en lugar de inflar una skill.
- *
- * Los cuatro primeros grupos son los del CV de Alan, deliberadamente: si un
- * reclutador compara el sitio con el CV, tiene que leer lo mismo.
- */
+// Stack agrupado por uso, no por tipo: una nube de logos no dice cuánto ni
+// desde cuándo, y pone Angular del mismo tamaño que React. `explorando`
+// permite nombrar Three.js o Swift sin fingir dominio.
+// Los cuatro primeros grupos son los del CV: si alguien compara el sitio
+// con el CV, tiene que leer lo mismo.
 export interface SkillGroup {
   label: Record<"es" | "en", string>;
   items: string[];

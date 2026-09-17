@@ -8,26 +8,15 @@ import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import type { Project } from "@/hooks/useStore";
 
-/* ═══════════════════════════════════════════════════
-   PROJECT PREVIEW
+/* Un solo plano, sin luces ni OrbitControls: la escena solo muestra la
+   captura del proyecto activo y se deforma al cambiar de uno a otro.
+   No llevar controles es deliberado: los OrbitControls de three ponen
+   `touch-action: none` en su elemento y eso convierte el bloque en un muro
+   para el scroll táctil. */
 
-   Un solo plano. Sin luces, sin OrbitControls, sin órbita infinita:
-   la escena existe para UNA cosa, mostrar la captura del proyecto
-   activo y deformarse al cambiar de uno a otro.
-
-   Que no haya controles no es una omisión, es el punto: los
-   OrbitControls de three ponen `touch-action: none` en su elemento
-   (OrbitControls.js:508, "disable touch scroll"), y eso convertía el
-   bloque entero en un muro para el scroll táctil. Aquí ni siquiera
-   hacen falta.
-   ═══════════════════════════════════════════════════ */
-
-/* El pliegue es UNA gaussiana que cruza el plano de izquierda a derecha,
-   siempre hundiéndose (−z, lejos de la cámara). Dos motivos:
-   1. Hacia la cámara el plano se agranda por perspectiva y se saldría
-      del encuadre justo en mitad de la transición.
-   2. Una sola onda hundida lee como una presión suave. Una onda con
-      rebote —seno rectificado, tres lóbulos— lee como efecto de demo. */
+/* El pliegue es una gaussiana que cruza el plano hundiéndose (−z): hacia
+   la cámara el plano se agranda por perspectiva y se saldría del encuadre,
+   y una onda con rebote leería como efecto de demo. */
 const vertexShader = /* glsl */ `
   uniform float uProgress;
   uniform float uAmplitude;
@@ -38,15 +27,12 @@ const vertexShader = /* glsl */ `
 
     const float PI = 3.141592653589793;
 
-    // Campana: 0 en los extremos del recorrido. Garantiza que al empezar
-    // y al terminar el plano está perfectamente plano.
+    // Campana: 0 en los extremos, así el plano empieza y acaba plano.
     float bell = sin(uProgress * PI);
 
-    // Los cuatro bordes quedan clavados en z = 0. Sin esto el frente de
-    // onda hunde también las esquinas superior e inferior, el plano se
-    // encoge por perspectiva justo en esa columna y se ve un pellizco
-    // contra el marco. Con el pin, el plano se comporta como una membrana
-    // sujeta por el borde: se hunde por dentro y nunca se despega.
+    // Los cuatro bordes clavados en z = 0: sin esto la onda hunde también
+    // las esquinas, el plano se encoge por perspectiva en esa columna y se
+    // ve un pellizco contra el marco.
     float pin = sin(uv.x * PI) * sin(uv.y * PI);
 
     // Distancia al frente de onda, que viaja con uProgress.
@@ -60,8 +46,8 @@ const vertexShader = /* glsl */ `
   }
 `;
 
-/* El corte va ligeramente por delante del pliegue: la captura nueva
-   asoma por donde la onda acaba de pasar, no por el centro. */
+/* El corte va por delante del pliegue: la captura nueva asoma por donde la
+   onda acaba de pasar, no por el centro. */
 const fragmentShader = /* glsl */ `
   uniform sampler2D uFrom;
   uniform sampler2D uTo;
@@ -74,8 +60,8 @@ const fragmentShader = /* glsl */ `
 
     gl_FragColor = mix(texture2D(uTo, vUv), texture2D(uFrom, vUv), m);
 
-    // ShaderMaterial no aplica el espacio de color de salida por su cuenta.
-    // Las texturas sí se muestrean ya en lineal porque llevan SRGBColorSpace.
+    // ShaderMaterial no aplica el espacio de color de salida por su cuenta;
+    // las texturas sí se muestrean en lineal por su SRGBColorSpace.
     #include <colorspace_fragment>
   }
 `;
@@ -85,8 +71,8 @@ function Slide({ images, index }: { images: string[]; index: number }) {
   const { viewport, invalidate, gl } = useThree();
   const shown = useRef(index);
 
-  // Las uniforms se crean una sola vez: el material vive todo lo que vive
-  // la sección y las transiciones solo mutan sus valores.
+  // Las uniforms se crean una vez: el material vive lo que vive la sección
+  // y las transiciones solo mutan sus valores.
   const uniforms = useMemo(
     () => ({
       uFrom: { value: textures[index] },
@@ -104,8 +90,8 @@ function Slide({ images, index }: { images: string[]; index: number }) {
   );
 
   useEffect(() => {
-    // Las capturas son de ~1900px y se ven a menos de la mitad: los mipmaps
-    // por defecto se quedan, que si no el texto de la interfaz cintila.
+    // Capturas de ~1900px vistas a menos de la mitad: los mipmaps se quedan
+    // o el texto de la interfaz cintila.
     textures.forEach((t) => {
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = maxAnisotropy;
@@ -114,8 +100,8 @@ function Slide({ images, index }: { images: string[]; index: number }) {
     invalidate();
   }, [textures, invalidate, maxAnisotropy]);
 
-  // La amplitud se deriva del ancho visible, no de un número fijo: así el
-  // pliegue se ve igual de hondo en un portátil que en un monitor grande.
+  // La amplitud se deriva del ancho visible para que el pliegue se vea
+  // igual de hondo en un portátil y en un monitor grande.
   useEffect(() => {
     uniforms.uAmplitude.value = viewport.width * 0.06;
     invalidate();
@@ -165,10 +151,9 @@ export default function ProjectPreview({
   projects: Project[];
   index: number;
 }) {
-  /* Se resuelve en el inicializador, no en un efecto: este componente se
-     carga con `ssr: false` y solo se monta cuando ya se sabe que el
-     dispositivo tiene puntero fino, así que aquí siempre hay `document` y
-     no hay hidratación que desincronizar. */
+  /* En el inicializador y no en un efecto: el componente carga con
+     `ssr: false`, así que aquí siempre hay `document` y no hay hidratación
+     que desincronizar. */
   const [webglSupported] = useState(() => {
     try {
       const canvas = document.createElement("canvas");
@@ -181,7 +166,7 @@ export default function ProjectPreview({
   const images = useMemo(() => projects.map((p) => p.image), [projects]);
   const active = projects[index];
 
-  // Sin WebGL la sección no pierde nada esencial: la captura es la captura.
+  // Sin WebGL la sección no pierde nada: la captura es la captura.
   if (!webglSupported) {
     return (
       <Image

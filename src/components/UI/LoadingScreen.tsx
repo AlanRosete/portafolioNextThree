@@ -5,34 +5,20 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { useStore } from "@/hooks/useStore";
 
-/* ═══════════════════════════════════════════════════
-   PANTALLA DE CARGA — germinación
+/* Morph hoja → brote → planta, sobre las formas del CodePen de
+   recursiveElk. Crece una vez, en paralelo a la barra, sin loop, y
+   hoja→brote ocupa la primera mitad del timeline y brote→planta la segunda.
 
-   Morph hoja → brote → planta, sobre las formas del CodePen de
-   recursiveElk. Dos cosas se hacen distinto que en el original:
-
-   1. No hay loop. Allí el timeline era `repeat:-1, yoyo:true` y la
-      planta crecía y se rebobinaba sin decir nada. Aquí crece una vez,
-      en paralelo a la barra, y se va.
-
-   2. Las etapas ocurren de verdad. El original mandaba los siete tweens
-      a la misma etiqueta ("morphIt"), incluidos dos sobre el mismo tallo,
-      así que se pisaban y la hoja saltaba directo a planta. Aquí
-      hoja→brote ocupa la primera mitad y brote→planta la segunda.
-
-   Los estados destino son strings, no SVG ocultos: el CodePen apilaba
-   tres <svg> con `visibility:hidden` solo para que MorphSVG les leyera
-   el atributo `d`. MorphSVG acepta el path data en crudo, así que en el
-   DOM quedan únicamente los tres paths que se ven. La condición para
-   pasar strings es que ningún padre lleve transform —un selector se
+   Los estados destino son strings y no SVG ocultos: MorphSVG acepta el path
+   data en crudo, así que en el DOM quedan sólo los tres paths que se ven.
+   Para pasar strings ningún padre puede llevar transform —un selector se
    reencuadra, un string se interpreta tal cual—, y aquí ninguno lo lleva.
 
-   Los `zm0 0` del final de los paths de la planta sí se quitaron:
-   cerraban el contorno y abrían un subpath vacío detrás, y MorphSVG
-   empareja subpath con subpath.
-   ═══════════════════════════════════════════════════ */
+   Los `zm0 0` del final de los paths de la planta se quitaron: cerraban el
+   contorno y abrían un subpath vacío detrás, y MorphSVG empareja subpath
+   con subpath. */
 
-/* Estado 1 — una hoja. Los dos "leaf" arrancan con la MISMA forma y
+/* Estado 1 — una hoja. Los dos "leaf" arrancan con la misma forma y
    superpuestos: por eso al principio se ve una sola. Se separan al crecer. */
 const LEAF = `M201.38,88.422c113.12-12.44,149.88-84,150-84c1.856-3.567,6.252-4.953,9.819-3.097
 c1.799,0.936,3.126,2.581,3.661,4.537c37.6,127.52,17.08,215.44-26.08,267.6c-16.709,20.331-38.11,36.296-62.36,46.52
@@ -74,8 +60,8 @@ export default function LoadingScreen() {
 
   useEffect(() => {
     // `type: "rotational"` interpola girando los puntos en vez de
-    // arrastrarlos en línea recta: en formas orgánicas es la diferencia
-    // entre una hoja que se abre y una mancha que se retuerce.
+    // arrastrarlos en recta: en formas orgánicas es la diferencia entre una
+    // hoja que se abre y una mancha que se retuerce.
     const morphTo = (shape: string) => ({
       morphSVG: { shape, type: "rotational" as const },
     });

@@ -3,22 +3,18 @@
  *
  *   node scripts/build-favicon.mjs public/favicon/palette-mono.svg
  *
- * Escribe src/app/favicon.ico y src/app/apple-icon.png, que es el convenio
- * de archivos de Next: él mismo emite los <link> con un hash de contenido,
- * así que el cache-busting sale gratis y no hay que tocar layout.tsx.
+ * Escribe src/app/favicon.ico y src/app/apple-icon.png: es el convenio de
+ * Next, que emite los <link> con hash de contenido sin tocar layout.tsx.
  *
- * Requiere Chromium de Playwright una sola vez:
- *   npx playwright install chromium
- *
- * Se usa Playwright y no una librería de conversión porque rasteriza con el
- * mismo motor que un navegador: lo que ves en el PNG es lo que verá la gente.
+ * Requiere Chromium de Playwright una vez: npx playwright install chromium
+ * Playwright y no una librería de conversión porque rasteriza con el mismo
+ * motor que un navegador.
  */
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 // Playwright no es dependencia del proyecto: solo hace falta para regenerar
-// iconos, cosa que pasa una vez cada muerte de obispo. Se pide bajo demanda
-// en vez de cargarle 100 MB al repo.
+// iconos, así que se pide bajo demanda en vez de sumar 100 MB al repo.
 let chromium;
 try {
   ({ chromium } = await import('playwright'));
@@ -47,7 +43,7 @@ const svg = readFileSync(resolve(SRC), 'utf8')
 const browser = await chromium.launch();
 const page = await browser.newPage();
 
-/** Rasteriza el SVG a RGBA crudo en el tamaño pedido. */
+// Rasteriza el SVG a RGBA crudo en el tamaño pedido.
 async function rgba(size) {
   return page.evaluate(async ({ svg, size }) => {
     const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
@@ -60,11 +56,9 @@ async function rgba(size) {
   }, { svg, size });
 }
 
-/**
- * Una entrada ICO en BMP clásico: BITMAPINFOHEADER + BGRA de abajo a arriba
- * + máscara AND. Se usa BMP y no PNG incrustado porque los decodificadores
- * conservadores solo entienden esta variante.
- */
+// Entrada ICO en BMP clásico: BITMAPINFOHEADER + BGRA de abajo a arriba +
+// máscara AND. BMP y no PNG incrustado porque los decodificadores
+// conservadores solo entienden esta variante.
 function bmpEntry(px, size) {
   const head = Buffer.alloc(40);
   head.writeUInt32LE(40, 0);

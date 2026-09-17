@@ -5,21 +5,17 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { construirCorreo } from "@/lib/contactEmail";
 
 /**
- * Envío del formulario de contacto.
+ * Envío del formulario de contacto. El mensaje se guarda en DynamoDB.
  *
- * El mensaje se guarda en DynamoDB. Configura en .env.local (y en las
- * variables de entorno de Vercel):
- *   CONTACT_AWS_REGION=us-east-1
- *   CONTACT_TABLE_NAME=portafolio-contacto
- *   CONTACT_AWS_ACCESS_KEY_ID=AKIA…
- *   CONTACT_AWS_SECRET_ACCESS_KEY=…
+ * Variables en .env.local y en Vercel:
+ *   CONTACT_AWS_REGION, CONTACT_TABLE_NAME,
+ *   CONTACT_AWS_ACCESS_KEY_ID, CONTACT_AWS_SECRET_ACCESS_KEY
  *
- * Las credenciales son de un usuario IAM con un solo permiso:
- * dynamodb:PutItem sobre esa tabla. No pueden leer ni borrar nada.
+ * Las credenciales son de un IAM con un solo permiso: dynamodb:PutItem
+ * sobre esa tabla. No pueden leer ni borrar.
  *
- * Opcionalmente, si además defines RESEND_API_KEY y CONTACT_TO_EMAIL,
- * te llega un correo con el mensaje. El correo es notificación, no
- * almacenamiento: si Resend falla, el mensaje ya quedó guardado.
+ * Con RESEND_API_KEY y CONTACT_TO_EMAIL además llega un correo. El correo
+ * es notificación, no almacenamiento: si Resend falla, el mensaje ya quedó.
  */
 
 type Payload = { name?: string; email?: string; message?: string };

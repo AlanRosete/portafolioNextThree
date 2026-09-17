@@ -8,9 +8,9 @@ interface ThreeSceneProps {
   children: React.ReactNode;
   className?: string;
   interactive?: boolean;
-  /** Activa el shadow map. Las luces deciden luego quién proyecta. */
+  // Activa el shadow map. Las luces deciden luego quién proyecta.
   shadows?: boolean;
-  /** Cada escena tiene su encuadre: la galería y el hero no comparten cámara. */
+  // Cada escena tiene su encuadre: galería y hero no comparten cámara.
   camera?: { position: [number, number, number]; fov: number };
   dpr?: [number, number];
 }
@@ -44,22 +44,12 @@ export default function ThreeScene({
 }: ThreeSceneProps) {
   const [webglSupported, setWebglSupported] = useState(true);
 
-  /**
-   * En móvil se renderiza más barato, y son dos ajustes distintos:
-   *
-   * · `antialias` crea un framebuffer multimuestra —memoria de GPU y trabajo
-   *   extra por frame—. A tamaño de móvil los cantos de la escena apenas se
-   *   benefician, así que el gasto no se recupera en nitidez.
-   * · El techo de DPR baja a 1.5: en un teléfono de 3x el canvas pasaba de
-   *   1.75 a 1.5, que es un 27% menos de píxeles que dibujar cada frame.
-   *
-   * No cambia nada en escritorio, donde se conservan ambos.
-   *
-   * Se decide con una media query y no con el ancho de `window`, porque
-   * `matchMedia` no fuerza reflow al leerse. Arranca en `false` a propósito:
-   * el servidor no conoce el dispositivo, así que el primer render tiene que
-   * ser idéntico en ambos lados o React descarta el árbol al hidratar.
-   */
+  // En móvil se renderiza más barato: sin `antialias` (el framebuffer
+  // multimuestra no se recupera en nitidez a ese tamaño) y con techo de DPR
+  // en 1.5, que en un teléfono 3x son un 27% menos de píxeles por frame.
+  // Se decide con media query y no con el ancho de `window` porque
+  // `matchMedia` no fuerza reflow. Arranca en `false` a propósito: el
+  // servidor no conoce el dispositivo y el primer render debe coincidir.
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -104,11 +94,11 @@ export default function ThreeScene({
           {/* Controles de órbita para que el usuario pueda rotar con el cursor */}
           {interactive && (
             <OrbitControls
-              enableZoom={false}         // sin zoom para no interferir con scroll
-              enablePan={false}          // sin paneo
-              autoRotate={false}         // la galería ya tiene su propia rotación
-              minPolarAngle={Math.PI / 4}  // limita rotación vertical (arriba)
-              maxPolarAngle={(Math.PI * 3) / 4} // limita rotación vertical (abajo)
+              enableZoom={false}
+              enablePan={false}
+              autoRotate={false}
+              minPolarAngle={Math.PI / 4}
+              maxPolarAngle={(Math.PI * 3) / 4}
               rotateSpeed={0.5}
               dampingFactor={0.08}
               enableDamping

@@ -1,11 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
-/* ═══════════════════════════════════════════════════
-   DESIGN TOKENS
-   Paleta neutra + un único acento (carmín).
-   Grises: #F8F8F8 / #A8A7A8 / #898989 / #474747 / #363636
-   ═══════════════════════════════════════════════════ */
+/* Paleta neutra + un único acento salvia.
+   Grises: #F8F8F8 / #A8A7A8 / #898989 / #474747 / #363636 */
 
 @theme {
   --color-bg-primary: #141414;
@@ -13,30 +10,28 @@
   --color-bg-card: #232323;
   --color-bg-glass: #1a1a1a;
 
-  /* Acento único, verde salvia. secondary/tertiary son variantes tonales,
-     NO colores distintos: eso es lo que evita el look "gradiente IA".
-     Salvia apagada, no verde saturado: el verde neón sobre fondo casi negro
-     lee como terminal/cripto, que es justo el registro que no queremos. */
+  /* secondary/tertiary son variantes tonales del acento, no colores
+     distintos. Salvia apagada: el verde saturado sobre fondo casi negro
+     lee como terminal. */
   --color-accent-primary: #8fb996;
   --color-accent-secondary: #a8a7a8;
   --color-accent-tertiary: #6b7c70;
 
-  /* Antes esto era un parche: el carmín #e8175d solo daba 4.13:1 sobre el
-     fondo y hacía falta un tono aclarado aparte para tipografía. La salvia
-     da 8.38:1 por sí sola, así que accent-text ya es el mismo color. Se
-     mantiene el token porque hay CSS y componentes que lo referencian. */
+  /* La salvia da 8.38:1 sobre el fondo, así que accent-text es el mismo
+     color que el acento. El token se mantiene porque hay CSS y componentes
+     que lo referencian. */
   --color-accent-text: #8fb996;
 
-  /* El acento ya no puede señalar errores: un mensaje de validación en verde
-     se lee como éxito. Rosa apagado, semántico y sin competir con la marca. */
+  /* El acento no puede señalar errores: validación en verde lee como
+     éxito. */
   --color-danger: #d9737d;
 
   --color-text-primary: #f8f8f8;
   --color-text-secondary: #a8a7a8;
   --color-text-muted: #898989;
 
-  /* El hover del botón primario. Era un hex suelto; ahora es token porque
-     en claro tiene que ir en la dirección contraria (oscurecer, no aclarar). */
+  /* Token y no hex suelto: en claro va en la dirección contraria
+     (oscurecer, no aclarar). */
   --color-accent-hover: #a3c8aa;
 
   --color-line: #2e2e2e;
@@ -46,20 +41,12 @@
   --font-family-body: 'Inter', sans-serif;
 }
 
-/* ═══════════════════════════════════════════════════
-   TEMAS
-   Los tokens de @theme (arriba) SON el tema oscuro: es el default y
-   el que se ve si JavaScript no corre. Aquí solo se redefine lo que
-   cambia en claro.
-
-   Esto funciona sin tocar un solo componente porque Tailwind v4 genera
-   las utilidades por referencia —`background-color: var(--color-bg-secondary)`,
-   no el hex— así que redefinir el token arrastra utilidades y `var()`
-   escritos a mano por igual.
-
-   `color-scheme` no es decorativo: le dice al navegador de qué color
-   pintar scrollbars, inputs nativos y el fondo durante la carga.
-   ═══════════════════════════════════════════════════ */
+/* Los tokens de @theme son el tema oscuro: es el default y el que se ve si
+   JavaScript no corre. Aquí solo se redefine lo que cambia en claro, y
+   funciona sin tocar componentes porque Tailwind v4 genera las utilidades
+   por referencia al token, no al hex.
+   `color-scheme` le dice al navegador de qué color pintar scrollbars,
+   inputs nativos y el fondo durante la carga. */
 
 :root {
   color-scheme: dark;
@@ -95,23 +82,16 @@
   --color-line-strong: #c2c2ba;
 }
 
-
-/* ═══════════════════════════════════════════════════
-   BASE STYLES
-   ═══════════════════════════════════════════════════ */
-
-/* NO REINTRODUCIR AQUI UN RESET `* { margin: 0; padding: 0 }`.
-   Lo no-encapado le gana a lo encapado en la cascada, y Tailwind v4 mete sus
-   utilidades en `@layer utilities`: un reset suelto mata `p-*`, `m-*`, `px-*`
-   y `mx-auto` en el sitio ENTERO, sin error ni aviso. El preflight de Tailwind
-   ya aplica exactamente lo mismo, pero dentro de `@layer base`, donde las
-   utilidades sí ganan. Esto ya rompio el hero tres veces (2026-08-19,
-   2026-09-07): el sintoma enganya porque parece "Tailwind no compilo mis
-   clases". Si una utilidad de espaciado no aplica, sospechar de aqui primero. */
+/* NO reintroducir aquí un reset `* { margin: 0; padding: 0 }`.
+   Lo no-encapado gana a lo encapado, y Tailwind v4 mete sus utilidades en
+   `@layer utilities`: un reset suelto mata `p-*`, `m-*`, `px-*` y `mx-auto`
+   en todo el sitio, sin error ni aviso. El preflight de Tailwind hace lo
+   mismo dentro de `@layer base`, donde las utilidades sí ganan. Si una
+   utilidad de espaciado no aplica, sospechar de aquí primero. */
 
 html {
   scroll-behavior: auto;
-  /* Lenis handles smooth scroll */
+  /* Lenis se encarga del scroll suave */
 }
 
 html.lenis,
@@ -152,11 +132,9 @@ a {
   text-decoration: none;
 }
 
-/* ═══════════════════════════════════════════════════
-   SURFACES
+/* SURFACES
    Superficies planas con hairline. Sin backdrop-filter:
-   el blur translúcido es el rasgo que más "delata" la plantilla.
-   ═══════════════════════════════════════════════════ */
+   el blur translúcido es el rasgo que más "delata" la plantilla. */
 
 .glass {
   background: var(--color-bg-glass);
@@ -168,18 +146,14 @@ a {
   border-bottom: 1px solid var(--color-line);
 }
 
-/* ═══════════════════════════════════════════════════
-   TEXT EMPHASIS
-   Sin degradados ni glow: peso, color y tracking hacen el trabajo.
-   ═══════════════════════════════════════════════════ */
+/* TEXT EMPHASIS
+   Sin degradados ni glow: peso, color y tracking hacen el trabajo. */
 
 .accent-text {
   color: var(--color-accent-primary);
 }
 
-/* ═══════════════════════════════════════════════════
-   ANIMATIONS
-   ═══════════════════════════════════════════════════ */
+/* ANIMATIONS */
 
 @keyframes fadeInUp {
   from {
@@ -233,9 +207,7 @@ a {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* ═══════════════════════════════════════════════════
-   SCROLLBAR
-   ═══════════════════════════════════════════════════ */
+/* SCROLLBAR */
 
 ::-webkit-scrollbar {
   width: 6px;
@@ -254,9 +226,7 @@ a {
   background: var(--color-text-muted);
 }
 
-/* ═══════════════════════════════════════════════════
-   THREE.JS CANVAS
-   ═══════════════════════════════════════════════════ */
+/* THREE.JS CANVAS */
 
 .three-canvas-container {
   position: fixed;
@@ -272,9 +242,7 @@ a {
   pointer-events: auto;
 }
 
-/* ═══════════════════════════════════════════════════
-   SECTION STYLES
-   ═══════════════════════════════════════════════════ */
+/* SECTION STYLES */
 
 .section {
   position: relative;
@@ -308,9 +276,7 @@ a {
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   BUTTON STYLES
-   ═══════════════════════════════════════════════════ */
+/* BUTTON STYLES */
 
 .btn-primary {
   display: inline-flex;
@@ -318,8 +284,7 @@ a {
   gap: 0.5rem;
   padding: 0.875rem 2rem;
   background: var(--color-accent-primary);
-  /* Texto oscuro sobre el relleno claro: 8.38:1. El carmín obligaba a texto
-     blanco y se quedaba en 4.46:1, al filo del mínimo. */
+  /* Texto oscuro sobre el relleno claro: 8.38:1. */
   color: var(--color-bg-primary);
   border: 1px solid var(--color-accent-primary);
   border-radius: 6px;
@@ -358,19 +323,15 @@ a {
   background: var(--color-bg-secondary);
 }
 
-/* ═══════════════════════════════════════════════════
-   BUTTON REMOVE DEFAULT STYLES
-   ═══════════════════════════════════════════════════ */
+/* BUTTON REMOVE DEFAULT STYLES */
 
 .clean-styles {
   gap: 0px !important;
 }
 
-/* ═══════════════════════════════════════════════════
-   FORM FIELDS
+/* FORM FIELDS
    Un solo lugar donde vive la métrica del formulario:
-   misma altura, mismo radio y mismo foco en input y textarea.
-   ═══════════════════════════════════════════════════ */
+   misma altura, mismo radio y mismo foco en input y textarea. */
 
 .field-label {
   display: block;
@@ -424,24 +385,17 @@ textarea.field-input {
   color: var(--color-danger);
 }
 
-
-/* ═══════════════════════════════════════════════════
-   ESTADO DE ENVÍO DEL FORMULARIO
-
+/* ESTADO DE ENVÍO DEL FORMULARIO
    La confirmación RELEVA al botón en el mismo hueco en vez de sentarse a
    su lado. Dos razones, ninguna decorativa:
-
    1. El <p> de estado compartía contenedor flex con un botón `w-full`, así
-      que se quedaba literalmente sin ancho y se ahogaba contra el borde.
+   que se quedaba literalmente sin ancho y se ahogaba contra el borde.
    2. Al enviarse, el formulario se vacía. Dejar ahí un "Send message"
-      pulsable invita a mandar un mensaje en blanco.
-
+   pulsable invita a mandar un mensaje en blanco.
    El error hace lo contrario: MANTIENE el botón —ahí sí hay que reintentar—
    y añade una nota debajo.
-
    El acento es una regla de 2px, no un relleno ni un icono: el verde salvia
-   se gana la atención por luminancia contra el gris, no por superficie.
-   ═══════════════════════════════════════════════════ */
+   se gana la atención por luminancia contra el gris, no por superficie. */
 
 .form-status-slot {
   /* La altura del botón (0.875rem×2 + 1.5rem de línea). Fijarla aquí es lo
@@ -544,18 +498,14 @@ textarea.field-input {
   }
 }
 
-
 .space-mt {
   padding-top: 10%;
 }
 
-
-/* ═══════════════════════════════════════════════════
-   THEME TOGGLE
+/* THEME TOGGLE
    Qué icono se ve lo decide el CSS, no React: así el markup del
    servidor y el del cliente son idénticos en ambos temas y no hay
-   hydration mismatch ni parpadeo del icono al hidratar.
-   ═══════════════════════════════════════════════════ */
+   hydration mismatch ni parpadeo del icono al hidratar. */
 
 .theme-toggle {
   display: inline-flex;
@@ -602,13 +552,11 @@ textarea.field-input {
   display: block;
 }
 
-/* ═══════════════════════════════════════════════════
-   TRAYECTORIA (About)
+/* TRAYECTORIA (About)
    Mismo lenguaje que la lista de proyectos: sin tarjeta, sin sombra, la
    jerarquía la hacen el mono, el tamaño y una regla de 1px. El año va en
    mono porque es un DATO —se escanea en vertical, como una tabla— y el
-   resto en la tipografía del cuerpo.
-   ═══════════════════════════════════════════════════ */
+   resto en la tipografía del cuerpo. */
 
 .role-list__label {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -678,13 +626,11 @@ textarea.field-input {
   }
 }
 
-/* ═══════════════════════════════════════════════════
-   INTERRUPTOR DE IDIOMA
+/* INTERRUPTOR DE IDIOMA
    Mismo tamaño y mismo borde que el de tema: van juntos en el header y
    cualquier diferencia de caja se nota. La etiqueta va en mono porque son
    dos letras en versalita — con la Inter del cuerpo bailaban de ancho al
-   pasar de "ES" a "EN".
-   ═══════════════════════════════════════════════════ */
+   pasar de "ES" a "EN". */
 
 .lang-toggle {
   width: 2.25rem;
@@ -743,14 +689,11 @@ textarea.field-input {
   height: 1.4rem;
 }
 
-
-/* ═══════════════════════════════════════════════════
-   STACK — lista agrupada por uso
+/* STACK — lista agrupada por uso
    Sustituye a las "órbitas" de iconos flotantes (herencia de un portafolio
    de 2018): 22 logos, 44 tweens infinitos y un tooltip por nodo.
    Mismo vocabulario que el stack de los proyectos y el de la trayectoria:
-   rótulo en mono a versalita, tecnologías separadas por punto medio.
-   ═══════════════════════════════════════════════════ */
+   rótulo en mono a versalita, tecnologías separadas por punto medio. */
 
 .skills-grid {
   display: grid;
@@ -781,14 +724,11 @@ textarea.field-input {
   color: var(--color-text-muted);
 }
 
-
-/* ═══════════════════════════════════════════════════
-   HERO VEIL
+/* HERO VEIL
    Vela direccional sobre la escena 3D: opaca donde va el
    texto y transparente donde están los cactus. Un radial
    centrado no servía — apagaba justo la planta y dejaba
-   el texto sobre el punto más claro del canvas.
-   ═══════════════════════════════════════════════════ */
+   el texto sobre el punto más claro del canvas. */
 
 .hero-veil {
   position: absolute;
@@ -817,32 +757,24 @@ textarea.field-input {
   }
 }
 
-
-/* ═══════════════════════════════════════════════════
-   CAT CORNER
+/* CAT CORNER
    Gato derretido en la esquina superior derecha del formulario.
-
    El truco del tema está en `color`: la silueta usa `currentColor`, así
    que hereda `--color-text-primary` y se invierte sola con el toggle
    (#f8f8f8 en oscuro, #1a1a1a en claro). No hay JavaScript de por medio.
-
    La posición ahora se ancla a un PUNTO, no a un borde: en el viewBox la
    esquina del formulario está en (150, 64) de 200×140, y hay que hacerla
    coincidir con la esquina real. Con `top: 0; right: 0` el elemento queda
    pegado por arriba y por la derecha, y de ahí se corrige en cada eje:
-
-     X: 1 − 150/200 = 25%      (empuja a la derecha lo que sobresale)
-     Y: −(64/140)  = −45.714%  (sube el cuerpo por encima del borde)
-
+   X: 1 − 150/200 = 25%      (empuja a la derecha lo que sobresale)
+   Y: −(64/140)  = −45.714%  (sube el cuerpo por encima del borde)
    Los porcentajes de `translate` son relativos al propio elemento —no al
    padre—, que es lo que hace que el punto siga clavado en la esquina a
    cualquier ancho, sin recalcular nada por breakpoint.
-
    El ancho manda sobre todo lo demás: de los 200 del viewBox, 150 son
    cuerpo y 50 es lo que cuelga fuera del formulario. A 150px de ancho eso
    son ~19px sobresaliendo, que caben en el padding lateral de `.section`
-   incluso en móvil (1.5rem = 24px).
-   ═══════════════════════════════════════════════════ */
+   incluso en móvil (1.5rem = 24px). */
 
 .cat-corner {
   position: absolute;
@@ -868,20 +800,16 @@ textarea.field-input {
   stroke: var(--color-bg-primary);
 }
 
-/* ═══════════════════════════════════════════════════
-   PROJECTS
+/* PROJECTS
    Índice editorial + un solo plano 3D.
-
    Sustituye a la galería en espiral. Aquello era un canvas WebGL
    completo dibujando cinco rectángulos de color: sin HTML que indexar,
    sin foco por teclado, ilegible en vertical, y con el scroll táctil
    secuestrado por los OrbitControls. Aquí el contenido es HTML de
    verdad y el 3D se reserva para la pieza que sí lo aprovecha —la
    captura del proyecto activo.
-
    La jerarquía la hacen el número, el tamaño y la regla de 1px. No hay
-   tarjetas, ni sombras, ni relleno de color: la fila ES el proyecto.
-   ═══════════════════════════════════════════════════ */
+   tarjetas, ni sombras, ni relleno de color: la fila ES el proyecto. */
 
 /* Centrada: `margin-inline: auto` sobre el ancho máximo, y el texto centrado
    con él. El `max-width` en `ch` y no en `rem` ata la medida a la longitud de

@@ -3,21 +3,12 @@
 import React from "react";
 import { useLang } from "@/hooks/useLang";
 
-/**
- * Interruptor de idioma. Hermano de `ThemeToggle`: misma caja, mismo borde,
- * mismo hover.
- *
- * A diferencia del de tema, este SÍ lee el idioma con un hook, porque la
- * etiqueta del botón es texto ("ES" / "EN") y no un icono que el CSS pueda
- * intercambiar. El markup del servidor sale siempre en "ES" —igual que el
- * `lang="es"` del <html>— y el script inline ya ha corregido el atributo
- * antes de que React hidrate, así que el ajuste ocurre en el mismo tick que
- * la hidratación y no se ve un salto.
- *
- * Muestra el idioma ACTIVO, no al que lleva: es lo que hace todo el mundo
- * (Wikipedia, Airbnb) y evita la duda de "¿esto dice en qué estoy o a dónde
- * voy?". La dirección va en el `aria-label`, que sí la necesita explícita.
- */
+// A diferencia del de tema, este lee el idioma con un hook, porque la
+// etiqueta es texto ("ES"/"EN") y no un icono que el CSS pueda intercambiar.
+// El markup del servidor sale siempre en "ES" y el script inline ya corrigió
+// el atributo antes de hidratar, así que el ajuste va en el mismo tick.
+// Muestra el idioma activo, no al que lleva; la dirección va en el
+// `aria-label`, que sí la necesita explícita.
 export default function LangToggle({
   className = "",
   tabIndex,
@@ -34,8 +25,8 @@ export default function LangToggle({
     try {
       localStorage.setItem("lang", next);
     } catch {
-      // Safari en navegación privada lanza al escribir. El idioma igual
-      // cambia en esta sesión; solo se pierde la persistencia.
+      // Safari en navegación privada lanza al escribir: el idioma cambia en
+      // esta sesión, solo se pierde la persistencia.
     }
   };
 

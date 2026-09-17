@@ -17,7 +17,6 @@ export default function AboutSection() {
     if (typeof window === "undefined") return;
 
     const ctx = gsap.context(() => {
-      // Title animation
       gsap.fromTo(
         ".about-title",
         { opacity: 0, y: 40 },
@@ -33,7 +32,6 @@ export default function AboutSection() {
         }
       );
 
-      // Bio animation
       gsap.fromTo(
         ".about-bio",
         { opacity: 0, y: 30 },
@@ -48,10 +46,6 @@ export default function AboutSection() {
           },
         }
       );
-
-      /* La rejilla de stack entra como el resto: una máscara, sin rebote
-         ni escala. Antes cada icono llevaba además DOS tweens infinitos
-         —flotación y rotación—, 44 en total, corriendo para siempre. */
       gsap.fromTo(
         ".skill-group",
         { opacity: 0, y: 16 },
@@ -73,10 +67,8 @@ export default function AboutSection() {
     return () => ctx.revert();
   }, []);
 
-
   return (
     <section id="about" ref={sectionRef} className="section relative">
-      {/* Halo neutro muy tenue: da profundidad sin teñir la sección */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -86,7 +78,6 @@ export default function AboutSection() {
       />
 
       <div className="mx-auto relative z-10 px-4">
-        {/* Title */}
         <h2
           className="about-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 md:mb-14 text-center"
           style={{ fontFamily: "var(--font-family-heading)", opacity: 0 }}
@@ -108,24 +99,6 @@ export default function AboutSection() {
               <p className="text-text-secondary leading-relaxed mb-4">
                 <RichText text={t.about.bio1} />
               </p>
-
-              {/* <p className="text-text-secondary leading-relaxed mb-4">
-                <RichText text={t.about.bio2} />
-              </p> */}
-              {/*
-                Trayectoria en lugar de los contadores `3+ / 20+ / 10+`.
-
-                Un contador no se puede comprobar y encima se contradecía con
-                el resto del sitio: "20+ proyectos" convivía con una lista de
-                tres, y "10+ tecnologías" con las 22 que hay al lado. Un
-                reclutador que detecta relleno en una cifra duda del resto,
-                incluido lo que sí es cierto — y aquí lo cierto (Banco Azteca,
-                microfrontends, SonarQube) vale mucho más que la cifra.
-
-                Sin caja ni tarjeta: año en mono a la izquierda y el puesto en
-                texto, que es el mismo lenguaje editorial de la lista de
-                proyectos. Ver [.role-row] en globals.css.
-              */}
               <div className="role-list mt-10 pt-8 border-t border-line">
                 <h4 className="role-list__label">{t.about.experience}</h4>
 
@@ -147,11 +120,6 @@ export default function AboutSection() {
             </div>
           </div>
 
-          {/*
-            Stack en texto, agrupado por uso. Mismo lenguaje que el stack de
-            los proyectos y el de la trayectoria: mono, puntos medios, sin
-            pills ni logos. Tres sitios del sitio, un solo vocabulario.
-          */}
           <div className="skills-grid">
             {skillGroups.map((group) => (
               <div

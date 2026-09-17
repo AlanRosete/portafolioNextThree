@@ -4,8 +4,7 @@ import React, { useRef, useMemo, useState, useCallback } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
-// Huérfano desde que #projects pasó a lista + plano 3D (ver ProjectPreview).
-// Se deja en disco a propósito; importa el dato ya resuelto a un idioma.
+// Sin uso desde que #projects pasó a lista + plano 3D (ver ProjectPreview).
 import { localizeProjects } from "@/data/projects";
 
 const projects = localizeProjects("en");
@@ -28,7 +27,6 @@ function ProjectCard3D({
 
   const color = useMemo(() => new THREE.Color(project.color), [project.color]);
 
-  // Posición base en arreglo circular
   const basePosition = useMemo((): [number, number, number] => {
     const angle = (index / totalProjects) * Math.PI * 2;
     const radius = 3.2;
@@ -39,7 +37,6 @@ function ProjectCard3D({
     ];
   }, [index, totalProjects]);
 
-  // Rotación para que cada card mire hacia el centro
   const rotation = useMemo((): [number, number, number] => {
     const angle = (index / totalProjects) * Math.PI * 2;
     return [0, -angle, 0];
@@ -49,21 +46,18 @@ function ProjectCard3D({
     if (!meshRef.current || !groupRef.current) return;
     const time = state.clock.getElapsedTime();
 
-    // Float suave: solo modifica Y localmente dentro del grupo
     groupRef.current.position.set(
       basePosition[0],
       basePosition[1] + Math.sin(time * 0.5 + index * 1.1) * 0.12,
       basePosition[2]
     );
 
-    // Scale interpolado en hover
     const targetScale = hovered ? 1.12 : 1;
     meshRef.current.scale.lerp(
       new THREE.Vector3(targetScale, targetScale, targetScale),
       0.08
     );
 
-    // Emissive interpolado
     const mat = meshRef.current.material as THREE.MeshStandardMaterial;
     mat.emissiveIntensity = THREE.MathUtils.lerp(
       mat.emissiveIntensity,
@@ -72,7 +66,6 @@ function ProjectCard3D({
     );
     mat.opacity = THREE.MathUtils.lerp(mat.opacity, hovered ? 0.95 : 0.78, 0.1);
 
-    // Glow
     if (glowRef.current) {
       const glowMat = glowRef.current.material as THREE.MeshBasicMaterial;
       glowMat.opacity = THREE.MathUtils.lerp(
@@ -92,7 +85,6 @@ function ProjectCard3D({
   );
 
   return (
-    // Este group se encarga del float y la posición base
     <group ref={groupRef} rotation={rotation}>
       {/* Glow de fondo — siempre montado, opacity animada */}
       <mesh ref={glowRef} position={[0, 0, -0.02]}>
@@ -141,7 +133,7 @@ function ProjectCard3D({
         anchorX="center"
         anchorY="top"
         maxWidth={2}
-        font={undefined} // usa tu fuente o elimina esta línea
+        font={undefined}
       >
         {project.title}
       </Text>
@@ -157,7 +149,6 @@ export default function Gallery() {
     if (!groupRef.current) return;
     const time = state.clock.getElapsedTime();
 
-    // Rotación automática suave
     targetRotY.current = time * 0.04;
     groupRef.current.rotation.y = THREE.MathUtils.lerp(
       groupRef.current.rotation.y,

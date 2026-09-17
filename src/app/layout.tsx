@@ -47,22 +47,16 @@ export default function RootLayout({
 }>) {
   return (
     // suppressHydrationWarning: el script de abajo escribe data-theme y lang
-    // en <html> antes de que React hidrate, así que el HTML del servidor y el
-    // del cliente difieren a propósito en esos atributos. Solo silencia este
-    // elemento.
+    // en <html> antes de hidratar, así que servidor y cliente difieren a
+    // propósito en esos atributos. `lang="es"` es el valor del servidor.
     //
-    // `lang="es"` es el valor del SERVIDOR y el que ven los buscadores; el
-    // script de abajo lo corrige a "en" si el visitante lo eligió antes.
-    //
-    // OJO con `lang`: no se comporta como `data-theme`. Al hidratar, React
-    // RESTAURA los atributos que él mismo renderiza, así que el `lang="en"`
-    // que escribía el script inline se revertía a "es" en cuanto arrancaba el
-    // bundle — el interruptor funcionaba, pero el idioma no sobrevivía a una
-    // recarga. `suppressHydrationWarning` solo calla el aviso; no evita la
-    // restauración. Por eso el idioma se re-aplica desde `LangSync`, ya
-    // dentro del árbol de React, y el script inline sigue existiendo para
-    // cubrir el hueco ANTES de la hidratación (que es lo que evita el
-    // parpadeo). Los dos hacen falta: uno para pintar, otro para mandar.
+    // `lang` no se comporta como `data-theme`: al hidratar React restaura los
+    // atributos que él mismo renderiza, así que el `lang="en"` del script
+    // inline se revierte en cuanto arranca el bundle y el idioma no sobrevive
+    // a una recarga. `suppressHydrationWarning` calla el aviso pero no evita
+    // la restauración. Por eso el idioma se re-aplica desde `LangSync`, ya
+    // dentro del árbol de React, mientras el script inline cubre el hueco
+    // antes de la hidratación. Hacen falta los dos.
     <html lang="es" suppressHydrationWarning>
       <head>
         {/*

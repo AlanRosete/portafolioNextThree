@@ -9,19 +9,13 @@ function readTheme(): Theme {
   return document.documentElement.dataset.theme === "light" ? "light" : "dark";
 }
 
-/**
- * Lee el tema activo desde `data-theme` del <html> y se resuscribe a sus
- * cambios. La fuente de verdad sigue siendo el DOM —lo escribe el script
- * inline de `layout.tsx` antes del primer pintado—, no un estado de React.
- *
- * El observer es lo que conecta el toggle con Three.js: el toggle no sabe
- * que la escena existe, solo cambia el atributo, y quien necesite el valor
- * lo observa. Sin esto, cambiar de tema no repintaría los materiales.
- *
- * El estado inicial se lee de forma síncrona. Es seguro porque los únicos
- * consumidores son componentes `ssr: false`, que nunca hidratan: no hay
- * HTML de servidor con el que discrepar.
- */
+// Lee el tema desde `data-theme` del <html>. La fuente de verdad es el DOM
+// —lo escribe el script inline de `layout.tsx` antes del primer pintado—,
+// no un estado de React.
+// El observer conecta el toggle con Three.js sin que el toggle sepa que la
+// escena existe. Sin esto, cambiar de tema no repinta los materiales.
+// El estado inicial se lee síncrono: los consumidores son `ssr: false` y
+// nunca hidratan, así que no hay HTML de servidor con el que discrepar.
 export function useTheme(): Theme {
   const [theme, setTheme] = useState<Theme>(readTheme);
 

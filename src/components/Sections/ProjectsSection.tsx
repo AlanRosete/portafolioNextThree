@@ -16,7 +16,7 @@ const ProjectPreview = dynamic(
 export default function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const { lang, t } = useTranslation();
-  // Se rehace sólo al cambiar de idioma, no en cada render
+  // Se rehace sólo al cambiar de idioma
   const projects = useMemo(() => localizeProjects(lang), [lang]);
   const [active, setActive] = useState(0);
   const selectProject = useStore((s) => s.selectProject);
@@ -36,7 +36,7 @@ export default function ProjectsSection() {
 
   useEffect(() => {
     // Los ScrollTrigger se crean cuando `canHover` ya decidió qué se monta:
-    // antes medirían una altura de fila que aún va a cambiar.
+    // antes medirían una altura de fila que todavía va a cambiar.
     if (canHover === null || !sectionRef.current) return;
 
     const ctx = gsap.context(() => {

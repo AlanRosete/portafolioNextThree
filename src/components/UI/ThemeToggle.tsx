@@ -2,24 +2,18 @@
 
 import React from "react";
 
-/**
- * Interruptor de tema.
- *
- * No tiene estado de React a propósito. La fuente de verdad es el atributo
- * `data-theme` del <html>, que el script inline de `layout.tsx` ya escribió
- * antes del primer pintado. Qué icono se ve lo decide el CSS, no JavaScript.
- *
- * Eso evita el problema clásico de este componente: si el icono dependiera de
- * un `useState`, el servidor renderizaría siempre el del tema por defecto y el
- * cliente lo corregiría tras hidratar — hydration mismatch y un parpadeo del
- * icono. Aquí el markup es idéntico en servidor y cliente en ambos temas.
- */
+// Sin estado de React a propósito: la fuente de verdad es `data-theme` del
+// <html>, que el script inline de `layout.tsx` escribe antes del primer
+// pintado, y qué icono se ve lo decide el CSS.
+// Con `useState` el servidor renderizaría el icono del tema por defecto y el
+// cliente lo corregiría tras hidratar: mismatch y parpadeo. Así el markup es
+// idéntico en servidor y cliente en ambos temas.
 export default function ThemeToggle({
   className = "",
   tabIndex,
 }: {
   className?: string;
-  /** El menú móvil lo saca del orden de tabulación mientras está cerrado. */
+  // El menú móvil lo saca del orden de tabulación mientras está cerrado.
   tabIndex?: number;
 }) {
   const toggle = () => {
@@ -29,8 +23,8 @@ export default function ThemeToggle({
     try {
       localStorage.setItem("theme", next);
     } catch {
-      // Safari en navegación privada lanza al escribir. El tema igual cambia
-      // en esta sesión; solo se pierde la persistencia.
+      // Safari en navegación privada lanza al escribir: el tema cambia en
+      // esta sesión, solo se pierde la persistencia.
     }
   };
 
@@ -40,8 +34,8 @@ export default function ThemeToggle({
       onClick={toggle}
       tabIndex={tabIndex}
       className={`theme-toggle ${className}`}
-      // Etiqueta estática: es correcta en ambos temas y no depende de estado,
-      // que es lo que mantiene servidor y cliente idénticos.
+      // Etiqueta estática: correcta en ambos temas y sin estado, que es lo
+      // que mantiene servidor y cliente idénticos.
       aria-label="Cambiar tema"
       title="Cambiar tema"
     >

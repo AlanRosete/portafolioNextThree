@@ -3,11 +3,8 @@
 import React from "react";
 import { useTranslation } from "@/hooks/useLang";
 
-/**
- * El correo se repite aquí y en `ContactSection` a propósito: son los dos
- * únicos sitios del sitio donde aparece y no compensa un módulo para una
- * constante. Si sale un tercero, extraerlo.
- */
+// El correo se repite aquí y en `ContactSection`: son los dos únicos sitios
+// donde aparece. Si sale un tercero, extraerlo.
 const CONTACT_EMAIL = "alanroset3@gmail.com";
 
 export default function Footer() {
@@ -34,7 +31,7 @@ export default function Footer() {
       ),
     },
     {
-      /* Sustituye al de Twitter: no hay cuenta profesional activa y un icono
+      /* No hay cuenta de Twitter profesional activa y un icono
          que lleva a un perfil muerto resta más de lo que suma. El correo, en
          cambio, es la vía por la que un reclutador realmente escribe. */
       name: "Email",

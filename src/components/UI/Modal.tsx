@@ -20,7 +20,6 @@ export default function Modal() {
       document.addEventListener("keydown", handleEsc);
       document.body.style.overflow = "hidden";
 
-      // Animate in
       if (overlayRef.current && contentRef.current) {
         gsap.fromTo(
           overlayRef.current,
