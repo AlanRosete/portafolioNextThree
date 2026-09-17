@@ -1,37 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
-/* Paleta neutra + un único acento salvia.
-   Grises: #F8F8F8 / #A8A7A8 / #898989 / #474747 / #363636 */
-
 @theme {
   --color-bg-primary: #141414;
   --color-bg-secondary: #1c1c1c;
   --color-bg-card: #232323;
   --color-bg-glass: #1a1a1a;
 
-  /* secondary/tertiary son variantes tonales del acento, no colores
-     distintos. Salvia apagada: el verde saturado sobre fondo casi negro
-     lee como terminal. */
   --color-accent-primary: #8fb996;
   --color-accent-secondary: #a8a7a8;
   --color-accent-tertiary: #6b7c70;
 
-  /* La salvia da 8.38:1 sobre el fondo, así que accent-text es el mismo
-     color que el acento. El token se mantiene porque hay CSS y componentes
-     que lo referencian. */
   --color-accent-text: #8fb996;
 
-  /* El acento no puede señalar errores: validación en verde lee como
-     éxito. */
   --color-danger: #d9737d;
 
   --color-text-primary: #f8f8f8;
   --color-text-secondary: #a8a7a8;
   --color-text-muted: #898989;
 
-  /* Token y no hex suelto: en claro va en la dirección contraria
-     (oscurecer, no aclarar). */
   --color-accent-hover: #a3c8aa;
 
   --color-line: #2e2e2e;
@@ -41,13 +28,6 @@
   --font-family-body: 'Inter', sans-serif;
 }
 
-/* Los tokens de @theme son el tema oscuro: es el default y el que se ve si
-   JavaScript no corre. Aquí solo se redefine lo que cambia en claro, y
-   funciona sin tocar componentes porque Tailwind v4 genera las utilidades
-   por referencia al token, no al hex.
-   `color-scheme` le dice al navegador de qué color pintar scrollbars,
-   inputs nativos y el fondo durante la carga. */
-
 :root {
   color-scheme: dark;
 }
@@ -55,17 +35,11 @@
 :root[data-theme="light"] {
   color-scheme: light;
 
-  /* Blanco cálido, no #fff puro: el blanco absoluto sobre pantalla
-     brillante cansa y delata plantilla. */
   --color-bg-primary: #f7f7f5;
   --color-bg-secondary: #eeeeea;
   --color-bg-card: #ffffff;
   --color-bg-glass: #f2f2ef;
 
-  /* El acento se invierte en luminancia: en oscuro es salvia CLARA sobre
-     fondo negro; en claro tiene que ser salvia OSCURA sobre fondo blanco.
-     Mismo matiz, misma familia. #456e51 da 5.43:1 como texto y 5.83:1
-     con texto claro encima, así que sirve para tipografía y para relleno. */
   --color-accent-primary: #456e51;
   --color-accent-secondary: #6e6e6e;
   --color-accent-tertiary: #7d9584;
@@ -82,16 +56,8 @@
   --color-line-strong: #c2c2ba;
 }
 
-/* NO reintroducir aquí un reset `* { margin: 0; padding: 0 }`.
-   Lo no-encapado gana a lo encapado, y Tailwind v4 mete sus utilidades en
-   `@layer utilities`: un reset suelto mata `p-*`, `m-*`, `px-*` y `mx-auto`
-   en todo el sitio, sin error ni aviso. El preflight de Tailwind hace lo
-   mismo dentro de `@layer base`, donde las utilidades sí ganan. Si una
-   utilidad de espaciado no aplica, sospechar de aquí primero. */
-
 html {
   scroll-behavior: auto;
-  /* Lenis se encarga del scroll suave */
 }
 
 html.lenis,
@@ -124,17 +90,12 @@ h5,
 h6 {
   font-family: var(--font-family-heading);
   letter-spacing: -0.025em;
-  /* tracking cerrado: da la densidad editorial de las referencias */
 }
 
 a {
   color: inherit;
   text-decoration: none;
 }
-
-/* SURFACES
-   Superficies planas con hairline. Sin backdrop-filter:
-   el blur translúcido es el rasgo que más "delata" la plantilla. */
 
 .glass {
   background: var(--color-bg-glass);
@@ -146,14 +107,9 @@ a {
   border-bottom: 1px solid var(--color-line);
 }
 
-/* TEXT EMPHASIS
-   Sin degradados ni glow: peso, color y tracking hacen el trabajo. */
-
 .accent-text {
   color: var(--color-accent-primary);
 }
-
-/* ANIMATIONS */
 
 @keyframes fadeInUp {
   from {
@@ -178,7 +134,6 @@ a {
 }
 
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -207,8 +162,6 @@ a {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* SCROLLBAR */
-
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -226,8 +179,6 @@ a {
   background: var(--color-text-muted);
 }
 
-/* THREE.JS CANVAS */
-
 .three-canvas-container {
   position: fixed;
   top: 0;
@@ -241,8 +192,6 @@ a {
 .three-canvas-container.interactive {
   pointer-events: auto;
 }
-
-/* SECTION STYLES */
 
 .section {
   position: relative;
@@ -272,11 +221,8 @@ a {
 @media (min-width: 1280px) {
   .section {
     min-height: min(100vh, 760px);
-    /* menos vertical space en pantallas muy grandes */
   }
 }
-
-/* BUTTON STYLES */
 
 .btn-primary {
   display: inline-flex;
@@ -284,7 +230,7 @@ a {
   gap: 0.5rem;
   padding: 0.875rem 2rem;
   background: var(--color-accent-primary);
-  /* Texto oscuro sobre el relleno claro: 8.38:1. */
+
   color: var(--color-bg-primary);
   border: 1px solid var(--color-accent-primary);
   border-radius: 6px;
@@ -323,15 +269,9 @@ a {
   background: var(--color-bg-secondary);
 }
 
-/* BUTTON REMOVE DEFAULT STYLES */
-
 .clean-styles {
   gap: 0px !important;
 }
-
-/* FORM FIELDS
-   Un solo lugar donde vive la métrica del formulario:
-   misma altura, mismo radio y mismo foco en input y textarea. */
 
 .field-label {
   display: block;
@@ -385,21 +325,7 @@ textarea.field-input {
   color: var(--color-danger);
 }
 
-/* ESTADO DE ENVÍO DEL FORMULARIO
-   La confirmación RELEVA al botón en el mismo hueco en vez de sentarse a
-   su lado. Dos razones, ninguna decorativa:
-   1. El <p> de estado compartía contenedor flex con un botón `w-full`, así
-   que se quedaba literalmente sin ancho y se ahogaba contra el borde.
-   2. Al enviarse, el formulario se vacía. Dejar ahí un "Send message"
-   pulsable invita a mandar un mensaje en blanco.
-   El error hace lo contrario: MANTIENE el botón —ahí sí hay que reintentar—
-   y añade una nota debajo.
-   El acento es una regla de 2px, no un relleno ni un icono: el verde salvia
-   se gana la atención por luminancia contra el gris, no por superficie. */
-
 .form-status-slot {
-  /* La altura del botón (0.875rem×2 + 1.5rem de línea). Fijarla aquí es lo
-     que impide que el formulario pegue un salto al cambiar de estado. */
   min-height: 3.25rem;
   display: flex;
   align-items: center;
@@ -409,15 +335,12 @@ textarea.field-input {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* `flex-start` deja que cada línea mida lo que mide su texto: la máscara
-     barre justo el ancho de las palabras y no un renglón vacío detrás. */
+
   align-items: flex-start;
   gap: 0.25rem;
   padding-left: 1rem;
 }
 
-/* La regla se dibuja de arriba abajo. No es `fade + translateY`: es el gesto
-   de marcar al margen, que es lo que el bloque significa. */
 .form-sent::before {
   content: "";
   position: absolute;
@@ -437,8 +360,6 @@ textarea.field-input {
   }
 }
 
-/* El texto se descubre detrás de la regla con una máscara `clip-path`, no
-   apareciendo de la nada. `inset(0 100% 0 0)` recorta todo por la derecha. */
 .form-sent-title,
 .form-sent-note {
   clip-path: inset(0 100% 0 0);
@@ -470,8 +391,6 @@ textarea.field-input {
   color: var(--color-text-secondary);
 }
 
-/* Rosa, no salvia: un fallo anunciado en el color de marca se lee como que
-   todo fue bien. Es la razón por la que existe `--color-danger`. */
 .form-error-head {
   color: var(--color-danger);
 }
@@ -501,11 +420,6 @@ textarea.field-input {
 .space-mt {
   padding-top: 10%;
 }
-
-/* THEME TOGGLE
-   Qué icono se ve lo decide el CSS, no React: así el markup del
-   servidor y el del cliente son idénticos en ambos temas y no hay
-   hydration mismatch ni parpadeo del icono al hidratar. */
 
 .theme-toggle {
   display: inline-flex;
@@ -539,7 +453,6 @@ textarea.field-input {
   height: 1.05rem;
 }
 
-/* Oscuro (default): se ve el sol — el icono anuncia la acción, no el estado. */
 .theme-toggle__moon {
   display: none;
 }
@@ -551,12 +464,6 @@ textarea.field-input {
 :root[data-theme="light"] .theme-toggle__moon {
   display: block;
 }
-
-/* TRAYECTORIA (About)
-   Mismo lenguaje que la lista de proyectos: sin tarjeta, sin sombra, la
-   jerarquía la hacen el mono, el tamaño y una regla de 1px. El año va en
-   mono porque es un DATO —se escanea en vertical, como una tabla— y el
-   resto en la tipografía del cuerpo. */
 
 .role-list__label {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -574,7 +481,6 @@ textarea.field-input {
   border-top: 1px solid var(--color-line);
 }
 
-/* La primera fila va pegada al rótulo: su regla la pone el contenedor */
 .role-row:first-of-type {
   border-top: 0;
   padding-top: 0;
@@ -613,24 +519,15 @@ textarea.field-input {
   font-size: 0.68rem;
   color: var(--color-text-muted);
   margin-top: 0.5rem;
-  /* El stack puede ser largo; que envuelva antes de desbordar la tarjeta */
+
   overflow-wrap: anywhere;
 }
 
-/* Desde `sm` el año se va a su propia columna y el bloque se lee como una
-   tabla. Por debajo se apila: a 320px una columna de años deja al texto sin
-   sitio y las líneas se parten cada tres palabras. */
 @media (min-width: 640px) {
   .role-row {
     grid-template-columns: 5.5rem minmax(0, 1fr);
   }
 }
-
-/* INTERRUPTOR DE IDIOMA
-   Mismo tamaño y mismo borde que el de tema: van juntos en el header y
-   cualquier diferencia de caja se nota. La etiqueta va en mono porque son
-   dos letras en versalita — con la Inter del cuerpo bailaban de ancho al
-   pasar de "ES" a "EN". */
 
 .lang-toggle {
   width: 2.25rem;
@@ -657,11 +554,6 @@ textarea.field-input {
   border-color: var(--color-accent-primary);
 }
 
-/* El borde va como ATAJO COMPLETO (`border: 1px solid ...`), no como
-   `border-color` suelto: el preflight de Tailwind pone `border-width: 0` a
-   todos los elementos, así que declarar sólo el color deja el borde invisible
-   —el botón salía como texto suelto junto al de tema—. Es la misma trampa de
-   capas documentada arriba, y por eso `.theme-toggle` ya usaba el atajo. */
 .lang-toggle--mobile {
   width: 3rem;
   height: 3rem;
@@ -672,7 +564,6 @@ textarea.field-input {
   color: var(--color-accent-text);
 }
 
-/* En el menú móvil el botón va al tamaño del resto de los enlaces. */
 .theme-toggle--mobile {
   width: 3rem;
   height: 3rem;
@@ -689,12 +580,6 @@ textarea.field-input {
   height: 1.4rem;
 }
 
-/* STACK — lista agrupada por uso
-   Sustituye a las "órbitas" de iconos flotantes (herencia de un portafolio
-   de 2018): 22 logos, 44 tweens infinitos y un tooltip por nodo.
-   Mismo vocabulario que el stack de los proyectos y el de la trayectoria:
-   rótulo en mono a versalita, tecnologías separadas por punto medio. */
-
 .skills-grid {
   display: grid;
   gap: 2.25rem;
@@ -709,8 +594,6 @@ textarea.field-input {
   margin-bottom: 0.6rem;
 }
 
-/* Interlínea holgada: son líneas largas de términos sueltos y, apretadas,
-   se leen como un muro. El punto medio ya separa; el aire hace el resto. */
 .skill-group__items {
   font-size: 0.95rem;
   line-height: 1.85;
@@ -718,23 +601,15 @@ textarea.field-input {
   overflow-wrap: anywhere;
 }
 
-/* El grupo que Alan reconoce como exploración se atenúa un punto: dice lo
-   mismo que su rótulo, pero sin leerlo. */
 .skills-grid .skill-group:last-child .skill-group__items {
   color: var(--color-text-muted);
 }
-
-/* HERO VEIL
-   Vela direccional sobre la escena 3D: opaca donde va el
-   texto y transparente donde están los cactus. Un radial
-   centrado no servía — apagaba justo la planta y dejaba
-   el texto sobre el punto más claro del canvas. */
 
 .hero-veil {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Móvil: texto arriba, jardinera al pie */
+
   background: linear-gradient(
     to bottom,
     var(--color-bg-primary) 0%,
@@ -746,7 +621,6 @@ textarea.field-input {
 
 @media (min-width: 768px) {
   .hero-veil {
-    /* Escritorio: texto a la izquierda, jardinera a la derecha */
     background: linear-gradient(
       to right,
       var(--color-bg-primary) 0%,
@@ -756,25 +630,6 @@ textarea.field-input {
     );
   }
 }
-
-/* CAT CORNER
-   Gato derretido en la esquina superior derecha del formulario.
-   El truco del tema está en `color`: la silueta usa `currentColor`, así
-   que hereda `--color-text-primary` y se invierte sola con el toggle
-   (#f8f8f8 en oscuro, #1a1a1a en claro). No hay JavaScript de por medio.
-   La posición ahora se ancla a un PUNTO, no a un borde: en el viewBox la
-   esquina del formulario está en (150, 64) de 200×140, y hay que hacerla
-   coincidir con la esquina real. Con `top: 0; right: 0` el elemento queda
-   pegado por arriba y por la derecha, y de ahí se corrige en cada eje:
-   X: 1 − 150/200 = 25%      (empuja a la derecha lo que sobresale)
-   Y: −(64/140)  = −45.714%  (sube el cuerpo por encima del borde)
-   Los porcentajes de `translate` son relativos al propio elemento —no al
-   padre—, que es lo que hace que el punto siga clavado en la esquina a
-   cualquier ancho, sin recalcular nada por breakpoint.
-   El ancho manda sobre todo lo demás: de los 200 del viewBox, 150 son
-   cuerpo y 50 es lo que cuelga fuera del formulario. A 150px de ancho eso
-   son ~19px sobresaliendo, que caben en el padding lateral de `.section`
-   incluso en móvil (1.5rem = 24px). */
 
 .cat-corner {
   position: absolute;
@@ -793,28 +648,10 @@ textarea.field-input {
   height: auto;
 }
 
-/* El ojo va "recortado" sobre la silueta: se pinta del color de lo que
-   hay detrás de la cabeza, que es el fondo de la página —la cabeza queda
-   por encima del borde del formulario, no sobre su superficie. */
 .cat-corner__eye {
   stroke: var(--color-bg-primary);
 }
 
-/* PROJECTS
-   Índice editorial + un solo plano 3D.
-   Sustituye a la galería en espiral. Aquello era un canvas WebGL
-   completo dibujando cinco rectángulos de color: sin HTML que indexar,
-   sin foco por teclado, ilegible en vertical, y con el scroll táctil
-   secuestrado por los OrbitControls. Aquí el contenido es HTML de
-   verdad y el 3D se reserva para la pieza que sí lo aprovecha —la
-   captura del proyecto activo.
-   La jerarquía la hacen el número, el tamaño y la regla de 1px. No hay
-   tarjetas, ni sombras, ni relleno de color: la fila ES el proyecto. */
-
-/* Centrada: `margin-inline: auto` sobre el ancho máximo, y el texto centrado
-   con él. El `max-width` en `ch` y no en `rem` ata la medida a la longitud de
-   la línea —unos 50 caracteres—, que es lo que mantiene el subtítulo en dos
-   renglones parejos en vez de uno largísimo en pantallas anchas. */
 .projects-head {
   max-width: 50ch;
   margin-inline: auto;
@@ -833,8 +670,7 @@ textarea.field-input {
 .projects-head__lead {
   margin-top: 1rem;
   color: var(--color-text-secondary);
-  /* Crece un punto con el viewport: a 0.95rem fijo se quedaba diminuto bajo
-     un título que llega a 3.75rem. */
+
   font-size: clamp(0.9rem, 1.6vw, 1.05rem);
   line-height: 1.6;
   text-wrap: balance;
@@ -868,8 +704,6 @@ textarea.field-input {
   position: relative;
 }
 
-/* La máscara del reveal vive aquí, no en el <li>: la regla de 1px se
-   anima aparte y no debe quedar recortada por el mismo clip-path. */
 .project-row__inner {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -900,8 +734,6 @@ textarea.field-input {
   line-height: 1.05;
 }
 
-/* Reset de botón: el título es interactivo, pero tipográficamente
-   tiene que leerse como un titular, no como un control. */
 .project-row__open {
   background: none;
   border: 0;
@@ -914,10 +746,6 @@ textarea.field-input {
   transition: color 0.35s ease;
 }
 
-/* El área de click es la fila entera. No se puede envolver la fila en un
-   <button> porque los enlaces Live/Code quedarían anidados dentro —HTML
-   inválido—, así que el botón del título estira un ::after sobre todo el
-   <li> y los enlaces se elevan por encima con z-index. */
 .project-row__open::after {
   content: "";
   position: absolute;
@@ -963,7 +791,7 @@ textarea.field-input {
 .project-row__links a {
   color: var(--color-text-secondary);
   padding-bottom: 0.2rem;
-  /* El subrayado crece desde la izquierda en lugar de aparecer de golpe. */
+
   background-image: linear-gradient(var(--color-accent-primary), var(--color-accent-primary));
   background-repeat: no-repeat;
   background-position: 0 100%;
@@ -985,8 +813,6 @@ textarea.field-input {
   will-change: transform;
 }
 
-/* Solo con puntero fino: en táctil no hay fila "activa", así que atenuar
-   las demás dejaría el índice a medio encender sin que nadie lo pidiera. */
 @media (hover: hover) and (pointer: fine) {
   .project-row__open {
     color: var(--color-text-secondary);
@@ -1009,11 +835,6 @@ textarea.field-input {
   }
 }
 
-/* ── La pieza 3D ──
-   Columna pegajosa con una sola captura. `pointer-events: none` aquí sí
-   es la solución correcta y no un parche: no hay nada que pulsar dentro,
-   así que el canvas no debe interceptar nada —ni el click de una fila que
-   pase por debajo, ni el gesto de scroll. */
 .projects-preview {
   display: none;
 }

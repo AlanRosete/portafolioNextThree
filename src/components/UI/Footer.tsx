@@ -3,8 +3,6 @@
 import React from "react";
 import { useTranslation } from "@/hooks/useLang";
 
-// El correo se repite aquí y en `ContactSection`: son los dos únicos sitios
-// donde aparece. Si sale un tercero, extraerlo.
 const CONTACT_EMAIL = "alanroset3@gmail.com";
 
 export default function Footer() {
@@ -31,9 +29,6 @@ export default function Footer() {
       ),
     },
     {
-      /* No hay cuenta de Twitter profesional activa y un icono
-         que lleva a un perfil muerto resta más de lo que suma. El correo, en
-         cambio, es la vía por la que un reclutador realmente escribe. */
       name: "Email",
       url: `mailto:${CONTACT_EMAIL}`,
       icon: (
@@ -59,7 +54,7 @@ export default function Footer() {
     <footer className="relative z-10 border-t border-line">
       <div className="mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Logo */}
+          {}
           <div className="text-center md:text-left">
             <h3
               className="text-xl font-bold mb-1"
@@ -73,15 +68,13 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Social Links */}
+          {}
           <div className="flex items-center gap-4">
             {socialLinks.map((social) => (
               <a
                 key={social.name}
                 href={social.url}
-                /* `mailto:` se queda en la misma pestaña: abrirlo con
-                   target="_blank" lanza el cliente de correo y deja detrás
-                   una pestaña en blanco que el visitante tiene que cerrar. */
+
                 target={social.url.startsWith("mailto:") ? undefined : "_blank"}
                 rel={
                   social.url.startsWith("mailto:")
@@ -96,7 +89,7 @@ export default function Footer() {
             ))}
           </div>
 
-          {/* Copyright */}
+          {}
           <p className="text-text-muted text-sm">
             © {currentYear} Alan Rosete. {t.footer.rights}
           </p>

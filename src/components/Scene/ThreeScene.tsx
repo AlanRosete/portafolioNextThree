@@ -8,9 +8,9 @@ interface ThreeSceneProps {
   children: React.ReactNode;
   className?: string;
   interactive?: boolean;
-  // Activa el shadow map. Las luces deciden luego quién proyecta.
+
   shadows?: boolean;
-  // Cada escena tiene su encuadre: galería y hero no comparten cámara.
+
   camera?: { position: [number, number, number]; fov: number };
   dpr?: [number, number];
 }
@@ -44,12 +44,6 @@ export default function ThreeScene({
 }: ThreeSceneProps) {
   const [webglSupported, setWebglSupported] = useState(true);
 
-  // En móvil se renderiza más barato: sin `antialias` (el framebuffer
-  // multimuestra no se recupera en nitidez a ese tamaño) y con techo de DPR
-  // en 1.5, que en un teléfono 3x son un 27% menos de píxeles por frame.
-  // Se decide con media query y no con el ancho de `window` porque
-  // `matchMedia` no fuerza reflow. Arranca en `false` a propósito: el
-  // servidor no conoce el dispositivo y el primer render debe coincidir.
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -91,7 +85,7 @@ export default function ThreeScene({
         >
           {children}
 
-          {/* Controles de órbita para que el usuario pueda rotar con el cursor */}
+          {}
           {interactive && (
             <OrbitControls
               enableZoom={false}

@@ -1,10 +1,6 @@
 import { Project } from "@/hooks/useStore";
 import type { Lang } from "@/i18n/dictionary";
 
-// Los textos viajan como par ES/EN dentro del propio dato, no en el
-// diccionario general: añadir un proyecto es tocar un solo sitio.
-// `localizeProjects` los resuelve al idioma activo y devuelve el mismo
-// `Project`, así que las secciones no saben que esto es bilingüe.
 type Localized = Record<Lang, string>;
 
 interface ProjectSource extends Omit<Project, "description" | "longDescription"> {
@@ -66,7 +62,6 @@ const projectSources: ProjectSource[] = [
   },
 ];
 
-// Resuelve los pares al idioma activo: tres objetos por cambio.
 export function localizeProjects(lang: Lang): Project[] {
   return projectSources.map(({ description, longDescription, ...rest }) => ({
     ...rest,
@@ -75,12 +70,9 @@ export function localizeProjects(lang: Lang): Project[] {
   }));
 }
 
-// Trayectoria profesional, en cronológico inverso como un CV. El `impact`
-// dice qué se construyó y con qué medida, que es lo que un contador de
-// métricas no dice.
 export interface Role {
   company: string;
-  // Rango corto; `current` decide si el final se traduce a "hoy"/"now".
+
   from: string;
   to: string;
   current?: boolean;
@@ -135,11 +127,6 @@ export const roles: Role[] = [
   },
 ];
 
-// Stack agrupado por uso, no por tipo: una nube de logos no dice cuánto ni
-// desde cuándo, y pone Angular del mismo tamaño que React. `explorando`
-// permite nombrar Three.js o Swift sin fingir dominio.
-// Los cuatro primeros grupos son los del CV: si alguien compara el sitio
-// con el CV, tiene que leer lo mismo.
 export interface SkillGroup {
   label: Record<"es" | "en", string>;
   items: string[];
@@ -180,8 +167,6 @@ export const skillGroups: SkillGroup[] = [
     items: ["MS SQL", "PostgreSQL", "MongoDB", "Firebase", "AWS"],
   },
   {
-    /* Deliberadamente corto y separado: es lo que hace creíble a los otros
-       cuatro. Una lista donde todo se domina por igual no la cree nadie. */
     label: { es: "Explorando", en: "Exploring" },
     items: ["Three.js", "React Native", "RTK Query", "Swift"],
   },

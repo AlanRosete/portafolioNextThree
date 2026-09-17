@@ -3,12 +3,6 @@
 import React from "react";
 import { useLang } from "@/hooks/useLang";
 
-// A diferencia del de tema, este lee el idioma con un hook, porque la
-// etiqueta es texto ("ES"/"EN") y no un icono que el CSS pueda intercambiar.
-// El markup del servidor sale siempre en "ES" y el script inline ya corrigió
-// el atributo antes de hidratar, así que el ajuste va en el mismo tick.
-// Muestra el idioma activo, no al que lleva; la dirección va en el
-// `aria-label`, que sí la necesita explícita.
 export default function LangToggle({
   className = "",
   tabIndex,
@@ -25,8 +19,6 @@ export default function LangToggle({
     try {
       localStorage.setItem("lang", next);
     } catch {
-      // Safari en navegación privada lanza al escribir: el idioma cambia en
-      // esta sesión, solo se pierde la persistencia.
     }
   };
 

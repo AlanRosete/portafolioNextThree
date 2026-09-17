@@ -1,11 +1,7 @@
-// Un solo objeto y no un archivo por idioma: las dos versiones viven en la
-// misma línea y el tipo `Dict` obliga a que estén ambas.
-// Claves agrupadas por sección y en plano, para que el objeto se lea como
-// un inventario del texto visible del sitio.
+
 
 export type Lang = "es" | "en";
 
-// Cada entrada es la misma frase en los dos idiomas, nunca una sola.
 type Entry = Record<Lang, string>;
 
 const dictionary = {
@@ -38,7 +34,6 @@ const dictionary = {
   },
 
   projects: {
-    // El del menú, corto. El de la sección es `headTitle`.
     title: { es: "Proyectos", en: "Projects" },
     headTitle: { es: "Mis proyectos", en: "My Projects" },
     headLead: {
@@ -62,7 +57,7 @@ const dictionary = {
       en: "I also build mobile apps with React Native (iOS / Android) and enjoy exploring WebGL shaders and performance optimizations when not coding.",
     },
     experience: { es: "Trayectoria", en: "Experience" },
-    // Cierre del rango del puesto actual.
+
     present: { es: "hoy", en: "now" },
   },
 
@@ -109,15 +104,12 @@ const dictionary = {
   },
 
   langToggle: {
-    // El botón anuncia a qué idioma lleva, no en cuál está.
     label: { es: "Switch to English", en: "Cambiar a español" },
   },
 } satisfies Record<string, Record<string, Entry>>;
 
 export type Dict = typeof dictionary;
 
-// Aplana el diccionario al idioma pedido. Se memoiza en el hook, así que
-// corre una vez por cambio de idioma y no en cada render.
 export type Translated = {
   [S in keyof Dict]: { [K in keyof Dict[S]]: string };
 };
@@ -134,13 +126,11 @@ export function translate(lang: Lang): Translated {
   return out as Translated;
 }
 
-// Ruta del CV por idioma: basta con sustituir el PDF.
 export const CV_PATH: Record<Lang, string> = {
   es: "/cv/alan-rosete-cv-es.pdf",
   en: "/cv/alan-rosete-cv-en.pdf",
 };
 
-// Nombre con el que se guarda la descarga, para no exponer el path interno.
 export const CV_FILENAME: Record<Lang, string> = {
   es: "Alan-Rosete-CV-ES.pdf",
   en: "Alan-Rosete-CV-EN.pdf",

@@ -61,7 +61,6 @@ export default function AboutSection() {
           },
         }
       );
-
     }, sectionRef);
 
     return () => ctx.revert();
@@ -86,7 +85,7 @@ export default function AboutSection() {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-10 lg:gap-16 items-center space-mt">
-          {/* Bio */}
+          {}
           <div className="about-bio" style={{ opacity: 0 }}>
             <div className="glass rounded-2xl p-6 md:p-8 lg:p-10" style={{ padding: "5%" }}>
               <h3

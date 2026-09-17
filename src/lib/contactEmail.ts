@@ -1,7 +1,4 @@
-// Plantilla del correo de aviso del formulario.
-// Los clientes de correo no entienden flexbox, grid ni hojas externas: todo
-// va en tablas con estilos inline, que es lo único que se renderiza igual en
-// Gmail, Outlook y Apple Mail.
+
 
 const BG = "#0f0f0f";
 const CARD = "#1c1c1c";
@@ -23,7 +20,6 @@ type Mensaje = {
   userAgent?: string | null;
 };
 
-// Escapa HTML: el mensaje viene de un desconocido, no se inyecta crudo.
 function escape(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -44,7 +40,6 @@ export function construirCorreo(m: Mensaje) {
   const name = escape(m.name);
   const email = escape(m.email);
   const fecha = fechaLegible(m.createdAt);
-  // Los saltos del textarea se pierden en HTML si no se convierten.
   const message = escape(m.message).replace(/\n/g, "<br />");
 
   const meta = [

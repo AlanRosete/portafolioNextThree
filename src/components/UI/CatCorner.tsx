@@ -2,23 +2,11 @@
 
 import React from "react";
 
-// Gato en la esquina superior derecha del formulario.
-//
-// El tema no se resuelve en JavaScript: la silueta va en `currentColor` y
-// el color lo pone `.cat-corner` desde `--color-text-primary`, que ya se
-// invierte con el toggle. Sin `useTheme`, sin re-render, sin parpadeo.
-// El ojo es la excepción: va recortado sobre la silueta, así que se pinta
-// del color de lo que hay detrás, que es el fondo de la página.
-//
-// Geometría: la esquina del formulario vive en (150, 64) del viewBox; el
-// tramo de cierre (150,64 → 18,64) es la panza apoyada y lo que queda a la
-// derecha de x=150 o bajo y=64 cuelga fuera. El CSS alinea ese punto con la
-// esquina real — ver `.cat-corner`.
 export default function CatCorner() {
   return (
     <div className="cat-corner" aria-hidden="true">
       <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-        {/* Cola: trazo aparte para poder animarla sin tocar la silueta. */}
+        {}
         <path
           className="cat-corner__tail"
           d="M20,46 C7,44 1,33 8,25 C13,19 21,21 23,28"
@@ -28,15 +16,7 @@ export default function CatCorner() {
           strokeLinecap="round"
         />
 
-        {/* Cuerpo, cabeza y pata escurrida en una sola silueta.
-            Orden del contorno: ancas (izq) → lomo → orejas → hocico →
-            pecho → la pata cayendo POR FUERA del canto derecho → vuelta
-            hacia la esquina → la panza, que cierra el path en recta.
-
-            El borde interno de la pata sale de la esquina (150,64) y se
-            abre hasta x≈156 al bajar: arriba toca el canto del formulario
-            —de ahí "colgada de la esquina"— y el resto queda entero fuera,
-            contra el fondo de la página. */}
+        {}
         <path
           d="M18,64
              C12,57 12,46 18,40
@@ -60,7 +40,7 @@ export default function CatCorner() {
           fill="currentColor"
         />
 
-        {/* Ojo cerrado. */}
+        {}
         <path
           className="cat-corner__eye"
           d="M133,37 Q138,32 143,37"

@@ -4,7 +4,7 @@ import React, { useRef, useMemo, useState, useCallback } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
-// Sin uso desde que #projects pasó a lista + plano 3D (ver ProjectPreview).
+
 import { localizeProjects } from "@/data/projects";
 
 const projects = localizeProjects("en");
@@ -86,7 +86,7 @@ function ProjectCard3D({
 
   return (
     <group ref={groupRef} rotation={rotation}>
-      {/* Glow de fondo — siempre montado, opacity animada */}
+      {}
       <mesh ref={glowRef} position={[0, 0, -0.02]}>
         <planeGeometry args={[2.5, 1.65]} />
         <meshBasicMaterial
@@ -98,7 +98,7 @@ function ProjectCard3D({
         />
       </mesh>
 
-      {/* Card principal */}
+      {}
       <mesh
         ref={meshRef}
         onClick={handleClick}
@@ -125,7 +125,7 @@ function ProjectCard3D({
         />
       </mesh>
 
-      {/* Título del proyecto — posición fija relativa al grupo */}
+      {}
       <Text
         position={[0, -0.85, 0.02]}
         fontSize={0.13}

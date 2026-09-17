@@ -16,14 +16,11 @@ const ProjectPreview = dynamic(
 export default function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const { lang, t } = useTranslation();
-  // Se rehace sólo al cambiar de idioma
+
   const projects = useMemo(() => localizeProjects(lang), [lang]);
   const [active, setActive] = useState(0);
   const selectProject = useStore((s) => s.selectProject);
 
-  /* `null` mientras no se sabe: en el primer frame no se monta ni el canvas
-     ni las miniaturas, así ningún dispositivo descarga los assets del otro.
-     El canvas es de puntero fino porque su único disparador es el hover. */
   const [canHover, setCanHover] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -35,13 +32,9 @@ export default function ProjectsSection() {
   }, []);
 
   useEffect(() => {
-    // Los ScrollTrigger se crean cuando `canHover` ya decidió qué se monta:
-    // antes medirían una altura de fila que todavía va a cambiar.
     if (canHover === null || !sectionRef.current) return;
 
     const ctx = gsap.context(() => {
-      /* El reveal es una máscara que se abre, no un fade + translateY.
-         El texto no se mueve: lo que se mueve es el borde que lo destapa. */
       gsap.utils.toArray<HTMLElement>(".project-row__inner").forEach((row) => {
         gsap.fromTo(
           row,
@@ -127,8 +120,7 @@ export default function ProjectsSection() {
 
                   <p className="project-row__desc">{project.description}</p>
 
-                  {/* Sin hover la captura no puede vivir en la columna
-                      lateral: baja a la fila como miniatura. */}
+                  {}
                   {canHover === false && (
                     <div className="project-row__thumb">
                       <Image
