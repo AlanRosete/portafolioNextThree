@@ -5,21 +5,6 @@ import React, { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { useStore } from "@/hooks/useStore";
 
-/* Morph hoja → brote → planta, sobre las formas del CodePen de
-   recursiveElk. Crece una vez, en paralelo a la barra, sin loop, y
-   hoja→brote ocupa la primera mitad del timeline y brote→planta la segunda.
-
-   Los estados destino son strings y no SVG ocultos: MorphSVG acepta el path
-   data en crudo, así que en el DOM quedan sólo los tres paths que se ven.
-   Para pasar strings ningún padre puede llevar transform —un selector se
-   reencuadra, un string se interpreta tal cual—, y aquí ninguno lo lleva.
-
-   Los `zm0 0` del final de los paths de la planta se quitaron: cerraban el
-   contorno y abrían un subpath vacío detrás, y MorphSVG empareja subpath
-   con subpath. */
-
-/* Estado 1 — una hoja. Los dos "leaf" arrancan con la misma forma y
-   superpuestos: por eso al principio se ve una sola. Se separan al crecer. */
 const LEAF = `M201.38,88.422c113.12-12.44,149.88-84,150-84c1.856-3.567,6.252-4.953,9.819-3.097
 c1.799,0.936,3.126,2.581,3.661,4.537c37.6,127.52,17.08,215.44-26.08,267.6c-16.709,20.331-38.11,36.296-62.36,46.52
 c-22.339,9.474-46.587,13.584-70.8,12c-46.36-3.24-88.68-28-108.32-72.36c-5.032-11.34-8.284-23.388-9.64-35.72
@@ -59,27 +44,12 @@ export default function LoadingScreen() {
   const { t } = useTranslation();
 
   useEffect(() => {
-    // `type: "rotational"` interpola girando los puntos en vez de
-    // arrastrarlos en recta: en formas orgánicas es la diferencia entre una
-    // hoja que se abre y una mancha que se retuerce.
     const morphTo = (shape: string) => ({
       morphSVG: { shape, type: "rotational" as const },
     });
 
     const tl = gsap.timeline({ defaults: { ease: "power3.inOut" } });
 
-    /* El morph corre en paralelo a la barra: la planta termina de crecer
-       justo cuando la barra llena.
-
-       Estas duraciones NO se acortan. El 2026-08-24 se probó la mitad
-       —morph en 0.96s, barra en 1.1s, 2.2s en total— y se revirtió: el hero
-       3D no llega a tiempo y la jardinera de cactus asoma a medio renderizar
-       en cuanto el loader se va. Ese pop se ve peor que la espera.
-
-       Y acortar tampoco arreglaba los tirones, que era la idea: el frame
-       medio no se movió (52ms contra 54.8ms a 6x de throttling). El morph
-       nunca fue el coste —70ms de JS, 4% del hilo— sino Three.js compilando
-       870KB debajo. La espera es el precio de que el hero entre entero. */
     tl.to(".js-leaf-a", { ...morphTo(SAPLING_LEFT), duration: 0.9 }, 0)
       .to(".js-leaf-b", { ...morphTo(SAPLING_RIGHT), duration: 0.9 }, 0)
       .to(".js-stem", { ...morphTo(SAPLING_STEM), duration: 0.9 }, 0)
@@ -106,16 +76,9 @@ export default function LoadingScreen() {
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
       style={{ background: "var(--color-bg-primary)" }}
     >
-      {/* Germinación. El tema entra por los tokens, igual que el resto del
-          sitio: el toggle cambia `data-theme` en <html> y estos `var()` se
-          reevalúan solos. Los verdes saturados del CodePen (#45B549,
-          #4CAF50, #3d7606) se quedaron fuera a propósito — masa apagada y
-          detalle claro, la misma jerarquía por luminancia que el hero. */}
+      {}
       <div className="loading-text mb-8!" role="status" aria-label={t.loading.label}>
-        {/* El disco es el `.circle` del CodePen, pero en tono de superficie
-            del sitio en vez de rosa fijo: la maceta contra la que se lee la
-            planta. `overflow: visible` porque los paths de la planta adulta
-            se salen del viewBox. */}
+        {}
         <div
           style={{
             display: "grid",
@@ -134,8 +97,7 @@ export default function LoadingScreen() {
           >
             <path className="js-leaf-a" d={LEAF} fill="var(--color-accent-tertiary)" />
             <path className="js-leaf-b" d={LEAF} fill="var(--color-accent-primary)" />
-            {/* El tallo se mezcla hacia el color de texto: así contrasta más
-                que las hojas en los DOS temas, sin un token nuevo. */}
+            {}
             <path
               className="js-stem"
               d={LEAF_STEM}
@@ -145,7 +107,7 @@ export default function LoadingScreen() {
         </div>
       </div>
 
-      {/* Progress Bar */}
+      {}
       <div className="loading-text w-40 sm:w-48 h-px overflow-hidden" style={{ background: "var(--color-line)" }}>
         <div
           className="loading-progress h-full"
@@ -156,7 +118,7 @@ export default function LoadingScreen() {
         />
       </div>
 
-      {/* Loading Text */}
+      {}
       <p className="loading-text text-text-muted text-xs sm:text-sm mt-4! tracking-widest uppercase">
         {t.loading.text}
       </p>

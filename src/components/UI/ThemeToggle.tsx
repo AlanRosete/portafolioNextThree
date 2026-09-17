@@ -2,18 +2,12 @@
 
 import React from "react";
 
-// Sin estado de React a propósito: la fuente de verdad es `data-theme` del
-// <html>, que el script inline de `layout.tsx` escribe antes del primer
-// pintado, y qué icono se ve lo decide el CSS.
-// Con `useState` el servidor renderizaría el icono del tema por defecto y el
-// cliente lo corregiría tras hidratar: mismatch y parpadeo. Así el markup es
-// idéntico en servidor y cliente en ambos temas.
 export default function ThemeToggle({
   className = "",
   tabIndex,
 }: {
   className?: string;
-  // El menú móvil lo saca del orden de tabulación mientras está cerrado.
+
   tabIndex?: number;
 }) {
   const toggle = () => {
@@ -23,8 +17,6 @@ export default function ThemeToggle({
     try {
       localStorage.setItem("theme", next);
     } catch {
-      // Safari en navegación privada lanza al escribir: el tema cambia en
-      // esta sesión, solo se pierde la persistencia.
     }
   };
 
@@ -34,12 +26,11 @@ export default function ThemeToggle({
       onClick={toggle}
       tabIndex={tabIndex}
       className={`theme-toggle ${className}`}
-      // Etiqueta estática: correcta en ambos temas y sin estado, que es lo
-      // que mantiene servidor y cliente idénticos.
+
       aria-label="Cambiar tema"
       title="Cambiar tema"
     >
-      {/* En oscuro se ve el sol: el icono anuncia la acción, no el estado. */}
+      {}
       <svg
         className="theme-toggle__sun"
         viewBox="0 0 24 24"

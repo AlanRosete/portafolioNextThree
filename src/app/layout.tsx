@@ -46,34 +46,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // suppressHydrationWarning: el script de abajo escribe data-theme y lang
-    // en <html> antes de hidratar, así que servidor y cliente difieren a
-    // propósito en esos atributos. `lang="es"` es el valor del servidor.
-    //
-    // `lang` no se comporta como `data-theme`: al hidratar React restaura los
-    // atributos que él mismo renderiza, así que el `lang="en"` del script
-    // inline se revierte en cuanto arranca el bundle y el idioma no sobrevive
-    // a una recarga. `suppressHydrationWarning` calla el aviso pero no evita
-    // la restauración. Por eso el idioma se re-aplica desde `LangSync`, ya
-    // dentro del árbol de React, mientras el script inline cubre el hueco
-    // antes de la hidratación. Hacen falta los dos.
+
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/*
-          Va PRIMERO y sin `defer`/`async` a propósito: un script inline en
-          <head> bloquea el parseo, así que corre antes del primer pintado.
-          Ese es justo el punto — si el tema se aplicara desde un useEffect,
-          la pantalla de "Cargando experiencia" alcanzaría a pintarse en
-          oscuro y saltaría a claro (el clásico flash de tema).
-
-          Sin dependencias del bundle: tiene que existir antes que React.
-
-          Hace lo mismo con el IDIOMA, y por el mismo motivo: si `lang` se
-          aplicara desde un useEffect, el primer pintado saldría en español y
-          el texto saltaría a inglés a la vista del usuario. Cuando no hay nada
-          guardado se mira el idioma del navegador — sólo se asume inglés si
-          NO empieza por "es", para que el resto del mundo no caiga en español.
-        */}
+        {}
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'}document.documentElement.dataset.theme=t}catch(e){document.documentElement.dataset.theme='dark'}try{var l=localStorage.getItem('lang');if(l!=='es'&&l!=='en'){l=(navigator.language||'es').toLowerCase().indexOf('es')===0?'es':'en'}document.documentElement.lang=l}catch(e){document.documentElement.lang='es'}})()`,

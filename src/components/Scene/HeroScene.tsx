@@ -7,17 +7,11 @@ import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import { useTheme } from "@/hooks/useTheme";
 
-// Sin shadow maps: el contacto son quads con alphaMap radial.
-// meshLambertMaterial en todo; a este tamaño el microfacetado no se ve.
-
-// Cara superior del tablero; lo que va sobre la mesa cuelga de aquí.
 const TOP = 0;
 const THICK = 0.09;
-// La altura de mesa sale de la diferencia con TOP.
+
 const FLOOR = -0.75;
 
-// El picado se consigue rotando el rig, no la cámara: la cámara encuadra
-// texto y 3D a la vez, y moverla descuadra el copy en cada breakpoint.
 const BASE_TILT = 0.25;
 const BASE_TURN = 0.38;
 
@@ -35,7 +29,6 @@ interface ScenePalette {
   device: string;
   deviceSoft: string;
 
-
   mug: string;
   lampMetal: string;
   lampShade: string;
@@ -51,9 +44,6 @@ interface ScenePalette {
   ambientIntensity: number;
 }
 
-// Los hex del rincón van más altos de lo que parece razonable: el tone
-// mapping ACES comprime los valores bajos, y la pared derecha sólo recibe
-// relleno y ambiental, así que parte del hex más claro de los tres.
 const DARK_PALETTE: ScenePalette = {
   floorBoard: "#443d35",
   wallBack: "#413b34",
@@ -68,14 +58,12 @@ const DARK_PALETTE: ScenePalette = {
   device: "#2a2a2a",
   deviceSoft: "#3a3a3a",
 
-
   mug: "#6b7c70",
   lampMetal: "#2a2a2a",
   lampShade: "#3a3632",
   lampLight: "#FFF6F5",
   lampIntensity: 1.6,
-  /* Gris medio: en blanco competiría con el gato, que ya es
-     el punto claro de la escena y es mucho más pequeño */
+
   chair: "#4a4845",
   chairSoft: "#5c5955",
 
@@ -86,8 +74,6 @@ const DARK_PALETTE: ScenePalette = {
   ambientIntensity: 0.55,
 };
 
-// En claro hay que invertir la jerarquía, no sólo aclarar: sobre hueso un
-// cuerpo oscuro se recorta como silueta y la sombra pide gris cálido.
 const LIGHT_PALETTE: ScenePalette = {
   floorBoard: "#d6cdbe",
   wallBack: "#e9e5de",
@@ -101,7 +87,6 @@ const LIGHT_PALETTE: ScenePalette = {
 
   device: "#d5d1cb",
   deviceSoft: "#e4e1db",
-
 
   mug: "#7d9584",
   lampMetal: "#6b6760",
@@ -118,14 +103,9 @@ const LIGHT_PALETTE: ScenePalette = {
   ambientIntensity: 0.85,
 };
 
-// La paleta va por contexto: por props habría que enhebrar cada color por
-// cinco niveles de <group>.
 const PaletteContext = React.createContext<ScenePalette>(DARK_PALETTE);
 const usePalette = () => React.useContext(PaletteContext);
 
-// alphaMap compartido por el disco de suelo y las cuatro sombras.
-// 256px y no 128: el disco se magnifica a ~700px y el tramado que Chrome
-// mete en el degradado se ve como moteado en el borde.
 function makeRadialTexture(): THREE.CanvasTexture {
   const size = 256;
   const canvas = document.createElement("canvas");
@@ -148,10 +128,6 @@ function makeRadialTexture(): THREE.CanvasTexture {
   return new THREE.CanvasTexture(canvas);
 }
 
-// Editor pintado una vez en canvas. El color va dentro de la textura, no
-// en el material: el editor es oscuro en ambos temas, así que no se
-// regenera con el toggle. Semilla fija para que el código no baile entre
-// cargas, y el canvas toma el aspecto del panel o los renglones se estiran.
 function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -164,11 +140,10 @@ function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
     return seed / 2147483647;
   };
 
-  const u = height / 100; // unidad relativa: vale para cualquier tamaño
+  const u = height / 100;
   const rowH = 4.6 * u;
   const barH = Math.max(2, 2 * u);
 
-  // Fondo del editor y barra lateral
   ctx.fillStyle = "#1d2128";
   ctx.fillRect(0, 0, width, height);
   const sideW = width * 0.22;
@@ -177,7 +152,6 @@ function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
   ctx.fillStyle = "#0f1115";
   ctx.fillRect(sideW, 0, Math.max(1, u * 0.6), height);
 
-  // Barra de título
   ctx.fillStyle = "#14171c";
   ctx.fillRect(0, 0, width, 6 * u);
   ["#d9737d", "#d9b36b", "#8fb996"].forEach((c, i) => {
@@ -187,7 +161,6 @@ function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
     ctx.fill();
   });
 
-  // Árbol de archivos: icono + nombre, con sangrado por carpeta
   const treeDepth = [0, 0, 1, 1, 2, 2, 1, 0, 1, 2, 2, 3, 1, 0, 1, 1, 2, 0, 0, 1];
   treeDepth.forEach((d, i) => {
     const y = 10 * u + i * rowH;
@@ -199,7 +172,6 @@ function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
     ctx.fillRect(x + 3 * u, y, (6 + rand() * 9) * u, barH);
   });
 
-  // Código: número de línea + tokens de colores
   const tokens = ["#8fb996", "#d9a066", "#7fa7c4", "#c8ccd4", "#c8ccd4", "#c792ea"];
   const codeX = sideW + 4 * u;
   let indent = 0;
@@ -210,12 +182,11 @@ function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
     ctx.fillStyle = "#3b4250";
     ctx.fillRect(codeX, y, 2.5 * u, barH);
 
-    // Bloques que abren y cierran: es la silueta en "flecha" del código real
     const r = rand();
     if (r < 0.28 && indent < 4) indent++;
     else if (r < 0.5 && indent > 0) indent--;
     if (i % 9 === 8) indent = 0;
-    if (rand() < 0.08) continue; // línea en blanco
+    if (rand() < 0.08) continue;
 
     let x = codeX + 6 * u + indent * 4 * u;
     const count = 2 + Math.floor(rand() * 4);
@@ -234,10 +205,6 @@ function makeCodeTexture(width: number, height: number): THREE.CanvasTexture {
   return texture;
 }
 
-// Cajas y no planos: el canto del grueso da el aire de cubo recortado; un
-// plano se lee como telón pintado. La pared derecha no llega al frente
-// (z 0.75 frente a 1.45) para no encajonar la silla. Las paredes llevan
-// tonos distintos porque en claro el lambert las dejaba casi idénticas.
 function Room() {
   const p = usePalette();
   const WALL_H = 2.1;
@@ -262,7 +229,6 @@ function Room() {
   );
 }
 
-// Sombra de contacto pintada; sustituye al shadow map.
 function Contact({
   texture,
   position,
@@ -292,11 +258,6 @@ function Contact({
   );
 }
 
-/**
- * Tablero + cajonera a la izquierda + panel macizo a la derecha. La
- * asimetría es lo que evita que lea como mesa de catálogo, y el panel va
- * macizo a propósito: un listón fino ahí se lee como pata rota.
- */
 function Desk() {
   const p = usePalette();
   const legTop = TOP - THICK;
@@ -313,7 +274,7 @@ function Desk() {
         <meshLambertMaterial color={p.deskTop} />
       </RoundedBox>
 
-      {/* Cajonera */}
+      {}
       <RoundedBox
         args={[0.52, legHeight, 0.88]}
         radius={0.02}
@@ -323,7 +284,7 @@ function Desk() {
         <meshLambertMaterial color={p.deskBody} />
       </RoundedBox>
 
-      {/* Tiradores: dos rayas, suficiente para que se lean los cajones */}
+      {}
       {[0.16, -0.1].map((y) => (
         <mesh key={y} position={[-0.66, legTop - 0.22 + y, -0.02]}>
           <boxGeometry args={[0.012, 0.02, 0.26]} />
@@ -331,7 +292,7 @@ function Desk() {
         </mesh>
       ))}
 
-      {/* Costado derecho */}
+      {}
       <RoundedBox
         args={[0.07, legHeight, 0.98]}
         radius={0.02}
@@ -359,15 +320,13 @@ function Monitor({ screen }: { screen: THREE.Texture }) {
         <meshLambertMaterial color={p.device} />
       </mesh>
 
-      {/* El panel se inclina hacia atrás: de frente parecería un cartel */}
+      {}
       <group position={[0, 0.66, 0]} rotation={[-0.07, 0, 0]}>
         <RoundedBox args={[1.26, 0.74, 0.05]} radius={0.015} smoothness={2}>
           <meshLambertMaterial color={p.device} />
         </RoundedBox>
 
-        {/* Encendida: basic sin iluminar y SIN tone mapping — con ACES los
-            colores del código salían apagados. Cuesta cero y ahorra el
-            emissive, que en gama baja se paga cada frame */}
+        {}
         <mesh position={[0, 0.015, 0.027]}>
           <planeGeometry args={[1.18, 0.64]} />
           <meshBasicMaterial map={screen} toneMapped={false} />
@@ -377,8 +336,6 @@ function Monitor({ screen }: { screen: THREE.Texture }) {
   );
 }
 
-// Girado para que la tapa muerda la esquina del monitor: sin ese solape
-// los objetos quedan en fila.
 function Laptop({ screen }: { screen: THREE.Texture }) {
   const p = usePalette();
 
@@ -394,9 +351,7 @@ function Laptop({ screen }: { screen: THREE.Texture }) {
         <meshLambertMaterial color={p.device} />
       </mesh>
 
-      {/* Bisagra en el canto trasero: el grupo pivota ahí, no en el centro.
-          El ángulo es pequeño A PROPÓSITO — la tapa parte de vertical, así
-          que pasarse de -0.5 la tumba por debajo del tablero */}
+      {}
       <group position={[0, 0.026, -0.21]} rotation={[-0.3, 0, 0]}>
         <RoundedBox args={[0.62, 0.4, 0.022]} radius={0.008} smoothness={2}
           position={[0, 0.2, 0]}>
@@ -438,7 +393,7 @@ function Mug() {
         <cylinderGeometry args={[0.058, 0.05, 0.11, 14]} />
         <meshLambertMaterial color={p.mug} />
       </mesh>
-      {/* El asa es lo que lo convierte en taza y no en vaso */}
+      {}
       <mesh position={[0.075, 0.06, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.033, 0.01, 5, 10]} />
         <meshLambertMaterial color={p.mug} />
@@ -447,9 +402,6 @@ function Mug() {
   );
 }
 
-// Una sola pointLight de alcance corto y sin sombras: con Lambert cuesta
-// una suma por fragmento, mientras que el shadow map de una point light
-// son seis pasadas.
 function Lamp() {
   const p = usePalette();
   const POLE = 1.62;
@@ -467,7 +419,7 @@ function Lamp() {
         <meshLambertMaterial color={p.lampMetal} />
       </mesh>
 
-      {/* Codo: cuarto de toro que dobla el mástil hacia la mesa */}
+      {}
       <mesh position={[-0.12, POLE, 0]} rotation={[0, 0, 0]}>
         <torusGeometry args={[0.12, 0.014, 5, 10, Math.PI / 2]} />
         <meshLambertMaterial color={p.lampMetal} />
@@ -479,7 +431,7 @@ function Lamp() {
       </mesh>
 
       <group position={[-0.12 - ARM, POLE + 0.03, 0]}>
-        {/* Pantalla: cono abierto por abajo */}
+        {}
         <mesh>
           <cylinderGeometry args={[0.06, 0.17, 0.2, 18, 1, true]} />
           <meshLambertMaterial color={p.lampShade} side={THREE.DoubleSide} />
@@ -502,7 +454,6 @@ function Lamp() {
   );
 }
 
-// Dos InstancedMesh para las diez piezas: 2 draw calls en vez de 10.
 function ChairStar() {
   const p = usePalette();
   const legsRef = useRef<THREE.InstancedMesh>(null);
@@ -518,7 +469,6 @@ function ChairStar() {
     for (let i = 0; i < 5; i++) {
       const angle = (i / 5) * Math.PI * 2;
 
-      // La pata nace a lo largo de +x; girar -ángulo en Y la manda al radio
       dummy.position.set(Math.cos(angle) * 0.15, 0.07, Math.sin(angle) * 0.15);
       dummy.rotation.set(0, -angle, 0);
       dummy.updateMatrix();
@@ -549,9 +499,6 @@ function ChairStar() {
   );
 }
 
-// Girada un cuarto: a escuadra lee como silla de catálogo. El respaldo
-// pivota desde el canto trasero del asiento; desde el centro se hunde en
-// el cojín.
 function Chair() {
   const p = usePalette();
 
@@ -583,7 +530,7 @@ function Chair() {
           <meshLambertMaterial color={p.chairSoft} />
         </RoundedBox>
 
-        {/* Cabecero: es la pieza que dice "ergonómica" y no "silla de cocina" */}
+        {}
         <RoundedBox
           args={[0.26, 0.14, 0.05]}
           radius={0.025}
@@ -610,8 +557,7 @@ export default function HeroScene() {
   const isMobile = width < 768;
 
   const radial = useMemo(() => makeRadialTexture(), []);
-  // Dos texturas: cada pantalla tiene su aspecto (1.84 y 1.65) y compartir
-  // canvas estiraba el código en una de ellas
+
   const monitorScreen = useMemo(() => makeCodeTexture(736, 400), []);
   const laptopScreen = useMemo(() => makeCodeTexture(396, 240), []);
 
@@ -622,9 +568,6 @@ export default function HeroScene() {
     []
   );
 
-  // Colocación derivada del viewport de r3f, no de breakpoints: en
-  // escritorio el copy va a la izquierda y el rincón al tercio derecho; en
-  // móvil el texto ancla arriba y el rincón baja al pie.
   const layout = useMemo(() => {
     if (isMobile) {
       const scale = THREE.MathUtils.clamp(viewport.width / 5.7, 0.38, 0.66);
@@ -641,9 +584,6 @@ export default function HeroScene() {
     };
   }, [isMobile, viewport.width, viewport.height]);
 
-  /* El rincón entra girando hasta su ángulo base mientras crece,
-     y luego brotan los objetos de encima. Arranca con el mismo retraso que
-     el texto del hero para que lleguen juntos. */
   useLayoutEffect(() => {
     const entry = entryRef.current;
     const props = propRefs.current.filter(Boolean) as THREE.Group[];
@@ -682,9 +622,6 @@ export default function HeroScene() {
     };
   }, [reducedMotion]);
 
-  /* Lo único por frame: el paralaje, que se
-     amortigua con una exponencial del delta, no con un lerp fijo, para que
-     no dependa de los FPS del equipo. */
   useFrame((state, delta) => {
     if (reducedMotion) return;
 
@@ -708,15 +645,11 @@ export default function HeroScene() {
       <group position={layout.position} scale={layout.scale}>
         <group ref={parallaxRef} rotation={[BASE_TILT, BASE_TURN, 0]}>
           <group ref={entryRef}>
-            {/* El rig se centra sobre su propio origen. Con el rincón la
-                caja creció de 3.3 a 3.75 de ancho y de 1.85 a 2.2 de alto
-                (x -1.6 a 2.15, y -0.84 a 1.35), así que el empujón cambió:
-                sin él el paralaje giraría alrededor de un punto descentrado */}
+            {}
             <group position={[-0.28, -0.26, 0]}>
               <Room />
 
-              {/* Ceñidas a la huella real de cada pieza: un disco mayor que
-                  el mueble no lee como contacto, lee como mancha */}
+              {}
               <Contact texture={radial} position={[-0.92, FLOOR + 0.008, -0.02]} scale={[0.42, 0.6]} />
               <Contact texture={radial} position={[1.22, FLOOR + 0.008, -0.02]} scale={[0.24, 0.62]} />
               <Contact texture={radial} position={[1.7, FLOOR + 0.01, 0.05]} scale={[0.26, 0.26]} />
@@ -749,12 +682,10 @@ export default function HeroScene() {
           </group>
         </group>
 
-        {/* Clave alta y por delante-derecha: deja el canto izquierdo del
-            mueble en penumbra, que es lo que da el volumen de maqueta */}
+        {}
         <directionalLight position={[3.2, 5.4, 3.6]} intensity={p.key} />
 
-        {/* Relleno frío por el lado opuesto: sin él las caras en sombra
-            caen a negro puro y el mueble se recorta como silueta */}
+        {}
         <directionalLight
           position={[-4, 1.8, -2.2]}
           intensity={p.fillIntensity}

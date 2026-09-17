@@ -5,7 +5,6 @@ import { gsap } from "@/lib/gsap";
 import { useTranslation } from "@/hooks/useLang";
 import CatCorner from "@/components/UI/CatCorner";
 
-/* Los únicos datos personales de la sección. */
 const CONTACT_EMAIL = "alanroset3@gmail.com";
 const SOCIALS = [
   { name: "GitHub", url: "https://github.com/AlanRosete" },
@@ -33,8 +32,6 @@ export default function ContactSection() {
     if (typeof window === "undefined") return;
 
     const ctx = gsap.context(() => {
-      // Una sola timeline: la columna izquierda entra primero y el
-      // formulario la sigue, en vez de dos reveals compitiendo.
       const tl = gsap.timeline({
         scrollTrigger: { trigger: sectionRef.current, start: "top 70%" },
       });
@@ -59,7 +56,7 @@ export default function ContactSection() {
   ) => {
     const { value } = e.target;
     setFormState((s) => ({ ...s, [field]: value }));
-    // Limpia el error al corregir, no en el siguiente submit.
+
     setErrors((prev) => (prev[field] ? { ...prev, [field]: "" } : prev));
   };
 
@@ -80,7 +77,6 @@ export default function ContactSection() {
     e.preventDefault();
     if (!validate()) return;
 
-    // Honeypot: los bots rellenan campos ocultos, las personas no.
     const honeypot = (e.currentTarget.elements.namedItem(
       "company"
     ) as HTMLInputElement | null)?.value;
@@ -113,7 +109,7 @@ export default function ContactSection() {
     >
       <div className="w-full max-w-6xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* ── Columna izquierda: contexto ── */}
+          {}
           <div className="contact-intro lg:col-span-5 display-flex gap-5 flex-col flex justify-center">
             <p
               className="text-xs font-medium uppercase tracking-[0.18em] text-text-muted mb-5"
@@ -163,10 +159,9 @@ export default function ContactSection() {
             </div>
           </div>
 
-          {/* ── Columna derecha: formulario ── */}
+          {}
           <div className="lg:col-span-7 w-full relative">
-            {/* El gato se apoya en el borde superior del formulario; vive
-                fuera de <form> para no formar parte de su flujo. */}
+            {}
             <CatCorner />
 
             <form
@@ -174,7 +169,7 @@ export default function ContactSection() {
               noValidate
               className="glass rounded-2xl p-[30px]!"
             >
-              {/* Honeypot — invisible para personas, no para bots. */}
+              {}
               <input
                 type="text"
                 name="company"
@@ -258,10 +253,7 @@ export default function ContactSection() {
                 className="contact-field mt-8 pt-8 border-t border-line"
                 style={{ opacity: 0 }}
               >
-                {/* Región viva PERSISTENTE. Tiene que existir en el DOM antes
-                    de que cambie su contenido: un `aria-live` que se monta ya
-                    con texto dentro no lo anuncia en la mayoría de lectores.
-                    Por eso solo cambia su texto y nunca se desmonta. */}
+                {}
                 <p role="status" aria-live="polite" className="sr-only">
                   {status === "sent" &&
                     t.contact.sentBody}
@@ -284,9 +276,7 @@ export default function ContactSection() {
                     >
                       {status === "sending" ? (
                         <>
-                          {/* `border-current` y no `border-white`: el botón es
-                              salvia con texto oscuro, un aro blanco encima se
-                              perdía contra el relleno. */}
+                          {}
                           <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                           {t.contact.sending}
                         </>
@@ -312,9 +302,7 @@ export default function ContactSection() {
                   )}
                 </div>
 
-                {/* Sin `aria-hidden`: aquí dentro va un enlace enfocable, y
-                    esconderlo del árbol de accesibilidad lo dejaría alcanzable
-                    con tabulador pero invisible para el lector. */}
+                {}
                 {status === "error" && (
                   <div className="form-error-note">
                     <p className="form-error-head">

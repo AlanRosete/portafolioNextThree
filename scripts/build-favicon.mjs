@@ -1,20 +1,7 @@
-/**
- * Genera los iconos del sitio a partir de un SVG.
- *
- *   node scripts/build-favicon.mjs public/favicon/palette-mono.svg
- *
- * Escribe src/app/favicon.ico y src/app/apple-icon.png: es el convenio de
- * Next, que emite los <link> con hash de contenido sin tocar layout.tsx.
- *
- * Requiere Chromium de Playwright una vez: npx playwright install chromium
- * Playwright y no una librería de conversión porque rasteriza con el mismo
- * motor que un navegador.
- */
+
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
-// Playwright no es dependencia del proyecto: solo hace falta para regenerar
-// iconos, así que se pide bajo demanda en vez de sumar 100 MB al repo.
 let chromium;
 try {
   ({ chromium } = await import('playwright'));
@@ -34,16 +21,15 @@ if (!SRC) {
 
 const ICO_SIZES = [16, 32, 48];
 const APPLE_SIZE = 180;
-const APPLE_BG = '#141414'; // iOS no respeta transparencia: la rellena de negro
+const APPLE_BG = '#141414';
 
 const svg = readFileSync(resolve(SRC), 'utf8')
-  // Algunos SVG traen width/height fijos que le ganan al viewBox al escalar.
+
   .replace(/\s(width|height)="[^"]*"/g, (m) => (m.includes('100%') ? m : ''));
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
 
-// Rasteriza el SVG a RGBA crudo en el tamaño pedido.
 async function rgba(size) {
   return page.evaluate(async ({ svg, size }) => {
     const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
@@ -56,20 +42,17 @@ async function rgba(size) {
   }, { svg, size });
 }
 
-// Entrada ICO en BMP clásico: BITMAPINFOHEADER + BGRA de abajo a arriba +
-// máscara AND. BMP y no PNG incrustado porque los decodificadores
-// conservadores solo entienden esta variante.
 function bmpEntry(px, size) {
   const head = Buffer.alloc(40);
   head.writeUInt32LE(40, 0);
   head.writeInt32LE(size, 4);
-  head.writeInt32LE(size * 2, 8); // alto doble: imagen XOR + máscara AND
+  head.writeInt32LE(size * 2, 8);
   head.writeUInt16LE(1, 12);
   head.writeUInt16LE(32, 14);
 
   const xor = Buffer.alloc(size * size * 4);
   for (let y = 0; y < size; y++) {
-    const src = size - 1 - y; // BMP va de abajo hacia arriba
+    const src = size - 1 - y;
     for (let x = 0; x < size; x++) {
       const s = (src * size + x) * 4;
       const d = (y * size + x) * 4;
@@ -80,7 +63,6 @@ function bmpEntry(px, size) {
     }
   }
 
-  // Filas de la máscara alineadas a 4 bytes; con alfa de 32bpp va toda a cero.
   const and = Buffer.alloc(Math.ceil(size / 32) * 4 * size, 0);
   return Buffer.concat([head, xor, and]);
 }

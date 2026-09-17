@@ -4,20 +4,6 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { construirCorreo } from "@/lib/contactEmail";
 
-/**
- * Envío del formulario de contacto. El mensaje se guarda en DynamoDB.
- *
- * Variables en .env.local y en Vercel:
- *   CONTACT_AWS_REGION, CONTACT_TABLE_NAME,
- *   CONTACT_AWS_ACCESS_KEY_ID, CONTACT_AWS_SECRET_ACCESS_KEY
- *
- * Las credenciales son de un IAM con un solo permiso: dynamodb:PutItem
- * sobre esa tabla. No pueden leer ni borrar.
- *
- * Con RESEND_API_KEY y CONTACT_TO_EMAIL además llega un correo. El correo
- * es notificación, no almacenamiento: si Resend falla, el mensaje ya quedó.
- */
-
 type Payload = { name?: string; email?: string; message?: string };
 
 type Mensaje = {
@@ -35,8 +21,6 @@ const tableName = process.env.CONTACT_TABLE_NAME;
 const accessKeyId = process.env.CONTACT_AWS_ACCESS_KEY_ID;
 const secretAccessKey = process.env.CONTACT_AWS_SECRET_ACCESS_KEY;
 
-// El cliente se crea una sola vez por instancia y se reutiliza entre
-// invocaciones: abrir la conexión en cada request desperdicia el warm start.
 const docClient =
   tableName && accessKeyId && secretAccessKey
     ? DynamoDBDocumentClient.from(
@@ -65,7 +49,7 @@ async function notificarPorCorreo(mensaje: Mensaje) {
       body: JSON.stringify({
         from: `Portafolio <${from}>`,
         to: [to],
-        // Así, darle "Responder" en Gmail le contesta a quien escribió.
+
         reply_to: mensaje.email,
         subject,
         html,
@@ -92,7 +76,6 @@ export async function POST(request: Request) {
   const email = (body.email ?? "").trim();
   const message = (body.message ?? "").trim();
 
-  // La validación del cliente es UX; esta es la que cuenta.
   if (!name || name.length > 100)
     return NextResponse.json({ error: "Invalid name." }, { status: 400 });
   if (!/^\S+@\S+\.\S+$/.test(email) || email.length > 254)
@@ -114,7 +97,7 @@ export async function POST(request: Request) {
     name,
     email,
     message,
-    // Para rastrear abuso si alguien decide llenar la tabla de basura.
+
     ip: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
     userAgent: request.headers.get("user-agent") ?? null,
   };
@@ -128,8 +111,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Delivery failed." }, { status: 502 });
   }
 
-  // El mensaje ya está a salvo; el correo es un extra que no debe tumbar
-  // la respuesta si falla.
   await notificarPorCorreo(mensaje);
 
   return NextResponse.json({ ok: true });
