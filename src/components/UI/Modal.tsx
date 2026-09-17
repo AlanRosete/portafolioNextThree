@@ -94,17 +94,11 @@ export default function Modal() {
           {selectedProject.title}
         </h2>
 
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {selectedProject.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-3 py-1 rounded-full text-xs font-medium bg-bg-card border border-line text-text-secondary"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        {/* Stack: la MISMA clase que la fila de la lista, no pills. Eran los
+            mismos datos con dos vocabularios a un clic de distancia. */}
+        <p className="project-row__stack mb-5">
+          {selectedProject.tags.join(" · ")}
+        </p>
 
         {/* Description */}
         <p className="text-text-secondary leading-relaxed mb-6">
