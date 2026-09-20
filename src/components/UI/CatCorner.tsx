@@ -2,72 +2,75 @@
 
 import React from "react";
 
-// Gato en la esquina superior derecha del formulario.
+// Gato estirado, dormido sobre el borde superior del formulario.
 //
 // El tema no se resuelve en JavaScript: la silueta va en `currentColor` y
 // el color lo pone `.cat-corner` desde `--color-text-primary`, que ya se
 // invierte con el toggle. Sin `useTheme`, sin re-render, sin parpadeo.
-// El ojo es la excepción: va recortado sobre la silueta, así que se pinta
-// del color de lo que hay detrás, que es el fondo de la página.
+// El ojo va recortado sobre la silueta, así que se pinta del color de lo
+// que hay detrás —el fondo de la página, no la superficie del formulario.
 //
-// Geometría: la esquina del formulario vive en (150, 64) del viewBox; el
-// tramo de cierre (150,64 → 18,64) es la panza apoyada y lo que queda a la
-// derecha de x=150 o bajo y=64 cuelga fuera. El CSS alinea ese punto con la
-// esquina real — ver `.cat-corner`.
+// La proporción es lo que hace la pose: 260×74 de viewBox, es decir 3.5
+// veces más ancho que alto. Un gato dormido tumbado es una forma LARGA y
+// BAJA; en cuanto el cuerpo se compacta deja de leerse como gato estirado
+// y pasa a ser un montículo con orejas.
+//
+// Geometría: la línea de apoyo es y=64 —el suelo donde descansan cuerpo,
+// patas y cabeza—. La cola es lo único que baja de ahí, y aun así se
+// queda dentro del viewBox. Nada se sale de [0, 260] en horizontal, así
+// que el gato no desborda el formulario por los lados: solo sobresale
+// hacia arriba, sobre el hueco que ya deja el grid de la sección.
 export default function CatCorner() {
   return (
     <div className="cat-corner" aria-hidden="true">
-      <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
-        {/* Cola: trazo aparte para poder animarla sin tocar la silueta. */}
+      <svg viewBox="0 0 260 74" xmlns="http://www.w3.org/2000/svg">
+        {/* Cola: nace en la grupa y dibuja una S abierta hacia la
+            derecha —baja, cruza y remonta—. Va en trazo, no en relleno,
+            porque a este tamaño una línea de grosor constante se lee más
+            limpia que un contorno cerrado.
+            La curva NO se cierra sobre sí misma: en cuanto la punta gira
+            de vuelta hacia el cuerpo deja de leerse como cola y pasa a
+            ser una caracola. */}
         <path
-          className="cat-corner__tail"
-          d="M20,46 C7,44 1,33 8,25 C13,19 21,21 23,28"
+          d="M210,52
+             C226,49 236,55 238,62
+             C240,68 247,69 252,64"
           fill="none"
           stroke="currentColor"
-          strokeWidth="7"
+          strokeWidth="8"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
 
-        {/* Cuerpo, cabeza y pata escurrida en una sola silueta.
-            Orden del contorno: ancas (izq) → lomo → orejas → hocico →
-            pecho → la pata cayendo POR FUERA del canto derecho → vuelta
-            hacia la esquina → la panza, que cierra el path en recta.
-
-            El borde interno de la pata sale de la esquina (150,64) y se
-            abre hasta x≈156 al bajar: arriba toca el canto del formulario
-            —de ahí "colgada de la esquina"— y el resto queda entero fuera,
-            contra el fondo de la página. */}
+        {/* Cuerpo, cabeza y patas en una sola silueta cerrada.
+            Orden del contorno: punta de las patas delanteras (izq) →
+            frente y oreja izquierda → entrecejo → oreja derecha → nuca →
+            el lomo, que sube en una loma suave y larga hasta la grupa →
+            baja por el anca hasta el suelo → y la línea de apoyo, que
+            cierra el path en recta sobre y=64. */}
         <path
-          d="M18,64
-             C12,57 12,46 18,40
-             C24,33 34,30 46,30
-             C60,30 72,33 84,33
-             C94,33 100,30 104,26
-             C106,24 108,22 110,21
-             L113,6 L123,16
-             C127,19 132,19 136,17
-             L141,3 L148,18
-             C152,25 154,33 153,42
-             C152,47 149,51 145,54
-             C147,57 156,59 164,64
-             C174,69 181,78 180,89
-             C179,101 176,112 173,121
-             C171,127 163,130 158,126
-             C154,123 155,115 156,107
-             C157,95 157,80 153,71
-             L150,64
+          d="M14,64
+             C8,64 4,61 4,57
+             C4,53 8,50 14,50
+             L34,50
+             C32,45 32,39 35,34
+             L31,18 L46,26
+             C52,23 59,23 65,26
+             L80,18 L76,34
+             C79,38 81,43 81,48
+             C88,44 96,40 106,37
+             C130,29 160,27 186,33
+             C204,37 214,44 216,53
+             C217,59 213,64 206,64
              Z"
           fill="currentColor"
         />
 
-        {/* Ojo cerrado. */}
-        <path
-          className="cat-corner__eye"
-          d="M133,37 Q138,32 143,37"
-          fill="none"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-        />
+        {/* Sin cara. A 190px de ancho la cabeza mide ~35px: cualquier
+            rasgo ahí dentro —ojo, hocico, bigotes— deja de leerse como
+            lo que es y se convierte en una mancha ambigua. La pose ya
+            dice que el gato duerme; la silueta limpia es más minimalista
+            que la silueta con detalle. */}
       </svg>
     </div>
   );

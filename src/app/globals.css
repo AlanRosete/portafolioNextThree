@@ -758,31 +758,36 @@ textarea.field-input {
 }
 
 /* CAT CORNER
-   Gato derretido en la esquina superior derecha del formulario.
+   Gato estirado, dormido sobre el borde superior del formulario.
    El truco del tema está en `color`: la silueta usa `currentColor`, así
    que hereda `--color-text-primary` y se invierte sola con el toggle
    (#f8f8f8 en oscuro, #1a1a1a en claro). No hay JavaScript de por medio.
-   La posición ahora se ancla a un PUNTO, no a un borde: en el viewBox la
-   esquina del formulario está en (150, 64) de 200×140, y hay que hacerla
-   coincidir con la esquina real. Con `top: 0; right: 0` el elemento queda
-   pegado por arriba y por la derecha, y de ahí se corrige en cada eje:
-   X: 1 − 150/200 = 25%      (empuja a la derecha lo que sobresale)
-   Y: −(64/140)  = −45.714%  (sube el cuerpo por encima del borde)
-   Los porcentajes de `translate` son relativos al propio elemento —no al
-   padre—, que es lo que hace que el punto siga clavado en la esquina a
-   cualquier ancho, sin recalcular nada por breakpoint.
-   El ancho manda sobre todo lo demás: de los 200 del viewBox, 150 son
-   cuerpo y 50 es lo que cuelga fuera del formulario. A 150px de ancho eso
-   son ~19px sobresaliendo, que caben en el padding lateral de `.section`
-   incluso en móvil (1.5rem = 24px). */
+
+   La posición se ancla a una RECTA, no a un punto: en el viewBox de
+   260×74 la línea de apoyo es y=64, y esa recta tiene que caer justo
+   sobre el borde del formulario. De ahí el único ajuste vertical:
+   Y: −(64/74) = −86.486%   (sube el cuerpo dejando las patas en el borde)
+   El porcentaje de `translate` es relativo al propio elemento —no al
+   padre—, así que la línea de apoyo sigue clavada al borde a cualquier
+   ancho, sin recalcular nada por breakpoint.
+
+   Horizontalmente NO desborda: el dibujo ocupa los 260 del viewBox y el
+   elemento se ancla con `right`, así que su canto derecho queda dentro
+   del formulario. El único rebase es hacia arriba, sobre el hueco que ya
+   deja el `gap` del grid de la sección.
+
+   El ancho pide más sitio que la versión enroscada —el gato es 3.5 veces
+   más ancho que alto—, pero el alto renderizado es menor: 190px de ancho
+   son solo 54px de alto. El `clamp` lo encoge en móvil para que no se
+   coma el ancho del formulario ni fuerce scroll horizontal. */
 
 .cat-corner {
   position: absolute;
   top: 0;
-  right: 0;
+  right: clamp(0.5rem, 2vw, 1.25rem);
   z-index: 1;
-  width: clamp(104px, 14vw, 150px);
-  transform: translate(25%, -45.714%);
+  width: clamp(124px, 34vw, 190px);
+  transform: translateY(-86.486%);
   color: var(--color-text-primary);
   pointer-events: none;
 }
@@ -793,12 +798,9 @@ textarea.field-input {
   height: auto;
 }
 
-/* El ojo va "recortado" sobre la silueta: se pinta del color de lo que
-   hay detrás de la cabeza, que es el fondo de la página —la cabeza queda
-   por encima del borde del formulario, no sobre su superficie. */
-.cat-corner__eye {
-  stroke: var(--color-bg-primary);
-}
+/* El gato no lleva cara: a este tamaño la silueta sola es más limpia que
+   cualquier rasgo dibujado dentro de la cabeza. Por eso aquí no hay
+   regla de recorte —todo el dibujo es `currentColor`. */
 
 /* PROJECTS
    Índice editorial + un solo plano 3D.

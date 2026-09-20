@@ -85,7 +85,15 @@ export default function HeroSection() {
            De `md` en adelante vuelve a cero y manda `items-center`. */
         className="relative z-10 mx-auto px-6 md:px-12 lg:px-20 w-full pt-[22svh] md:pt-0 pb-12 md:pb-0"
       >
-        <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 lg:max-w-2xl responsive-hero-desktop">
+        {/* De 768 a 1023px el copy comparte el ancho con la escena, y el tope
+           tiene que ser PROPORCIONAL, no fijo: el velo se desvanece en
+           porcentajes del viewport (30/52/72%), así que un `max-w` en rem
+           se sale de la zona legible en cuanto la ventana encoge —a 797px
+           el velo ya era transparente en 574px y el texto seguía llegando
+           a 560. `52vw` lo mantiene siempre dentro del tramo opaco del
+           degradado, a cualquier ancho del tramo. `lg` vuelve a rem porque
+           ahí sobra viewport y el límite pasa a ser la longitud de línea. */}
+        <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 md:max-w-[52vw] lg:max-w-2xl">
           <p
             className="hero-subtitle text-text-muted text-xs md:text-sm font-medium tracking-[0.2em] uppercase mb-4 md:mb-6"
             style={{ opacity: 0 }}
