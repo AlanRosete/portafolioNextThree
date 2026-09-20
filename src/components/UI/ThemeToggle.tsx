@@ -7,7 +7,6 @@ export default function ThemeToggle({
   tabIndex,
 }: {
   className?: string;
-
   tabIndex?: number;
 }) {
   const toggle = () => {
@@ -26,7 +25,6 @@ export default function ThemeToggle({
       onClick={toggle}
       tabIndex={tabIndex}
       className={`theme-toggle ${className}`}
-
       aria-label="Cambiar tema"
       title="Cambiar tema"
     >

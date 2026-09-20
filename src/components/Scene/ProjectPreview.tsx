@@ -8,8 +8,7 @@ import * as THREE from "three";
 import { gsap } from "@/lib/gsap";
 import type { Project } from "@/hooks/useStore";
 
-const vertexShader = /* glsl */ `
-  uniform float uProgress;
+const vertexShader = /* glsl */ `  uniform float uProgress;
   uniform float uAmplitude;
   varying vec2 vUv;
 
@@ -32,8 +31,7 @@ const vertexShader = /* glsl */ `
   }
 `;
 
-const fragmentShader = /* glsl */ `
-  uniform sampler2D uFrom;
+const fragmentShader = /* glsl */ `  uniform sampler2D uFrom;
   uniform sampler2D uTo;
   uniform float uProgress;
   varying vec2 vUv;
@@ -98,7 +96,6 @@ function Slide({ images, index }: { images: string[]; index: number }) {
         duration: 0.85,
         ease: "power2.inOut",
         overwrite: true,
-
         onUpdate: invalidate,
       }
     );

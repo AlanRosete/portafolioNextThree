@@ -4,7 +4,6 @@ import React, { useRef, useMemo, useState, useCallback } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
 import { Text } from "@react-three/drei";
 import * as THREE from "three";
-
 import { localizeProjects } from "@/data/projects";
 
 const projects = localizeProjects("en");

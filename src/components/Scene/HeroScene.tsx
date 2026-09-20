@@ -9,7 +9,6 @@ import { useTheme } from "@/hooks/useTheme";
 
 const TOP = 0;
 const THICK = 0.09;
-
 const FLOOR = -0.75;
 
 const BASE_TILT = 0.25;
@@ -63,7 +62,6 @@ const DARK_PALETTE: ScenePalette = {
   lampShade: "#3a3632",
   lampLight: "#FFF6F5",
   lampIntensity: 1.6,
-
   chair: "#4a4845",
   chairSoft: "#5c5955",
 
@@ -557,7 +555,6 @@ export default function HeroScene() {
   const isMobile = width < 768;
 
   const radial = useMemo(() => makeRadialTexture(), []);
-
   const monitorScreen = useMemo(() => makeCodeTexture(736, 400), []);
   const laptopScreen = useMemo(() => makeCodeTexture(396, 240), []);
 

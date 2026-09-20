@@ -1,5 +1,3 @@
-
-
 const BG = "#0f0f0f";
 const CARD = "#1c1c1c";
 const QUOTE = "#141414";

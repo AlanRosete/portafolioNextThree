@@ -72,7 +72,6 @@ export function localizeProjects(lang: Lang): Project[] {
 
 export interface Role {
   company: string;
-
   from: string;
   to: string;
   current?: boolean;

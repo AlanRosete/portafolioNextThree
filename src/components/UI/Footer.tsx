@@ -74,7 +74,6 @@ export default function Footer() {
               <a
                 key={social.name}
                 href={social.url}
-
                 target={social.url.startsWith("mailto:") ? undefined : "_blank"}
                 rel={
                   social.url.startsWith("mailto:")

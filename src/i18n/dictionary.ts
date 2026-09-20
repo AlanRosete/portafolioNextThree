@@ -1,5 +1,3 @@
-
-
 export type Lang = "es" | "en";
 
 type Entry = Record<Lang, string>;
@@ -57,7 +55,6 @@ const dictionary = {
       en: "I also build mobile apps with React Native (iOS / Android) and enjoy exploring WebGL shaders and performance optimizations when not coding.",
     },
     experience: { es: "Trayectoria", en: "Experience" },
-
     present: { es: "hoy", en: "now" },
   },
 

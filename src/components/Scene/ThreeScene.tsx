@@ -8,9 +8,7 @@ interface ThreeSceneProps {
   children: React.ReactNode;
   className?: string;
   interactive?: boolean;
-
   shadows?: boolean;
-
   camera?: { position: [number, number, number]; fov: number };
   dpr?: [number, number];
 }

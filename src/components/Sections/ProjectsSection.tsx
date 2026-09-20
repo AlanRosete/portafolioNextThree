@@ -16,7 +16,6 @@ const ProjectPreview = dynamic(
 export default function ProjectsSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const { lang, t } = useTranslation();
-
   const projects = useMemo(() => localizeProjects(lang), [lang]);
   const [active, setActive] = useState(0);
   const selectProject = useStore((s) => s.selectProject);

@@ -56,7 +56,6 @@ export default function ContactSection() {
   ) => {
     const { value } = e.target;
     setFormState((s) => ({ ...s, [field]: value }));
-
     setErrors((prev) => (prev[field] ? { ...prev, [field]: "" } : prev));
   };
 

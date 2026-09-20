@@ -53,7 +53,6 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-
       className="relative min-h-svh md:min-h-screen flex items-start md:items-center overflow-hidden"
     >
       {}
@@ -74,10 +73,10 @@ export default function HeroSection() {
       {}
       <div
         ref={textRef}
-
         className="relative z-10 mx-auto px-6 md:px-12 lg:px-20 w-full pt-[22svh] md:pt-0 pb-12 md:pb-0"
       >
-        <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 lg:max-w-2xl responsive-hero-desktop">
+        {}
+        <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0 md:max-w-[52vw] lg:max-w-2xl">
           <p
             className="hero-subtitle text-text-muted text-xs md:text-sm font-medium tracking-[0.2em] uppercase mb-4 md:mb-6"
             style={{ opacity: 0 }}

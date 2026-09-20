@@ -61,6 +61,7 @@ export default function AboutSection() {
           },
         }
       );
+
     }, sectionRef);
 
     return () => ctx.revert();

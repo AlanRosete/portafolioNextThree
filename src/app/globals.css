@@ -134,6 +134,7 @@ a {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0px);
@@ -230,7 +231,6 @@ a {
   gap: 0.5rem;
   padding: 0.875rem 2rem;
   background: var(--color-accent-primary);
-
   color: var(--color-bg-primary);
   border: 1px solid var(--color-accent-primary);
   border-radius: 6px;
@@ -335,7 +335,6 @@ textarea.field-input {
   position: relative;
   display: flex;
   flex-direction: column;
-
   align-items: flex-start;
   gap: 0.25rem;
   padding-left: 1rem;
@@ -519,7 +518,6 @@ textarea.field-input {
   font-size: 0.68rem;
   color: var(--color-text-muted);
   margin-top: 0.5rem;
-
   overflow-wrap: anywhere;
 }
 
@@ -609,7 +607,6 @@ textarea.field-input {
   position: absolute;
   inset: 0;
   pointer-events: none;
-
   background: linear-gradient(
     to bottom,
     var(--color-bg-primary) 0%,
@@ -634,10 +631,10 @@ textarea.field-input {
 .cat-corner {
   position: absolute;
   top: 0;
-  right: 0;
+  right: clamp(0.5rem, 2vw, 1.25rem);
   z-index: 1;
-  width: clamp(104px, 14vw, 150px);
-  transform: translate(25%, -45.714%);
+  width: clamp(124px, 34vw, 190px);
+  transform: translateY(-86.486%);
   color: var(--color-text-primary);
   pointer-events: none;
 }
@@ -646,10 +643,6 @@ textarea.field-input {
   display: block;
   width: 100%;
   height: auto;
-}
-
-.cat-corner__eye {
-  stroke: var(--color-bg-primary);
 }
 
 .projects-head {
@@ -670,7 +663,6 @@ textarea.field-input {
 .projects-head__lead {
   margin-top: 1rem;
   color: var(--color-text-secondary);
-
   font-size: clamp(0.9rem, 1.6vw, 1.05rem);
   line-height: 1.6;
   text-wrap: balance;
@@ -791,7 +783,6 @@ textarea.field-input {
 .project-row__links a {
   color: var(--color-text-secondary);
   padding-bottom: 0.2rem;
-
   background-image: linear-gradient(var(--color-accent-primary), var(--color-accent-primary));
   background-repeat: no-repeat;
   background-position: 0 100%;

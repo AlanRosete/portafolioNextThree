@@ -1,4 +1,3 @@
-
 import { readFileSync, writeFileSync } from 'fs';
 import { resolve } from 'path';
 
@@ -24,7 +23,6 @@ const APPLE_SIZE = 180;
 const APPLE_BG = '#141414';
 
 const svg = readFileSync(resolve(SRC), 'utf8')
-
   .replace(/\s(width|height)="[^"]*"/g, (m) => (m.includes('100%') ? m : ''));
 
 const browser = await chromium.launch();

@@ -49,7 +49,6 @@ async function notificarPorCorreo(mensaje: Mensaje) {
       body: JSON.stringify({
         from: `Portafolio <${from}>`,
         to: [to],
-
         reply_to: mensaje.email,
         subject,
         html,
@@ -97,7 +96,6 @@ export async function POST(request: Request) {
     name,
     email,
     message,
-
     ip: request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
     userAgent: request.headers.get("user-agent") ?? null,
   };
