@@ -63,7 +63,6 @@ export default function Header() {
           className="mx-auto px-6 flex items-center justify-between"
           style={{ paddingInline: "1.5rem" }}
         >
-          {}
           <a
             href="#hero"
             onClick={(e) => {
@@ -82,7 +81,6 @@ export default function Header() {
             />
           </a>
 
-          {}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <a
@@ -104,7 +102,6 @@ export default function Header() {
             <ThemeToggle />
           </nav>
 
-          {}
           <button
             onClick={toggleMobileMenu}
             className="md:hidden relative flex h-6 w-6 items-center justify-center"
@@ -141,7 +138,6 @@ export default function Header() {
         </div>
       </header>
 
-      {}
       <div
         className={`md:hidden fixed inset-0 z-40 flex flex-col items-center justify-center gap-8 px-6 transition-opacity duration-300 ${
           isMobileMenuOpen
