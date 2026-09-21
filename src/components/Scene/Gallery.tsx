@@ -85,6 +85,7 @@ function ProjectCard3D({
 
   return (
     <group ref={groupRef} rotation={rotation}>
+      {}
       <mesh ref={glowRef} position={[0, 0, -0.02]}>
         <planeGeometry args={[2.5, 1.65]} />
         <meshBasicMaterial
@@ -96,6 +97,7 @@ function ProjectCard3D({
         />
       </mesh>
 
+      {}
       <mesh
         ref={meshRef}
         onClick={handleClick}
@@ -122,6 +124,7 @@ function ProjectCard3D({
         />
       </mesh>
 
+      {}
       <Text
         position={[0, -0.85, 0.02]}
         fontSize={0.13}

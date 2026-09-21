@@ -83,6 +83,7 @@ export default function ThreeScene({
         >
           {children}
 
+          {}
           {interactive && (
             <OrbitControls
               enableZoom={false}

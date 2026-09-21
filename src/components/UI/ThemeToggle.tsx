@@ -28,6 +28,7 @@ export default function ThemeToggle({
       aria-label="Cambiar tema"
       title="Cambiar tema"
     >
+      {}
       <svg
         className="theme-toggle__sun"
         viewBox="0 0 24 24"

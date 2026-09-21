@@ -272,6 +272,7 @@ function Desk() {
         <meshLambertMaterial color={p.deskTop} />
       </RoundedBox>
 
+      {}
       <RoundedBox
         args={[0.52, legHeight, 0.88]}
         radius={0.02}
@@ -281,6 +282,7 @@ function Desk() {
         <meshLambertMaterial color={p.deskBody} />
       </RoundedBox>
 
+      {}
       {[0.16, -0.1].map((y) => (
         <mesh key={y} position={[-0.66, legTop - 0.22 + y, -0.02]}>
           <boxGeometry args={[0.012, 0.02, 0.26]} />
@@ -288,6 +290,7 @@ function Desk() {
         </mesh>
       ))}
 
+      {}
       <RoundedBox
         args={[0.07, legHeight, 0.98]}
         radius={0.02}
@@ -315,11 +318,13 @@ function Monitor({ screen }: { screen: THREE.Texture }) {
         <meshLambertMaterial color={p.device} />
       </mesh>
 
+      {}
       <group position={[0, 0.66, 0]} rotation={[-0.07, 0, 0]}>
         <RoundedBox args={[1.26, 0.74, 0.05]} radius={0.015} smoothness={2}>
           <meshLambertMaterial color={p.device} />
         </RoundedBox>
 
+        {}
         <mesh position={[0, 0.015, 0.027]}>
           <planeGeometry args={[1.18, 0.64]} />
           <meshBasicMaterial map={screen} toneMapped={false} />
@@ -344,6 +349,7 @@ function Laptop({ screen }: { screen: THREE.Texture }) {
         <meshLambertMaterial color={p.device} />
       </mesh>
 
+      {}
       <group position={[0, 0.026, -0.21]} rotation={[-0.3, 0, 0]}>
         <RoundedBox args={[0.62, 0.4, 0.022]} radius={0.008} smoothness={2}
           position={[0, 0.2, 0]}>
@@ -385,6 +391,7 @@ function Mug() {
         <cylinderGeometry args={[0.058, 0.05, 0.11, 14]} />
         <meshLambertMaterial color={p.mug} />
       </mesh>
+      {}
       <mesh position={[0.075, 0.06, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[0.033, 0.01, 5, 10]} />
         <meshLambertMaterial color={p.mug} />
@@ -410,6 +417,7 @@ function Lamp() {
         <meshLambertMaterial color={p.lampMetal} />
       </mesh>
 
+      {}
       <mesh position={[-0.12, POLE, 0]} rotation={[0, 0, 0]}>
         <torusGeometry args={[0.12, 0.014, 5, 10, Math.PI / 2]} />
         <meshLambertMaterial color={p.lampMetal} />
@@ -421,6 +429,7 @@ function Lamp() {
       </mesh>
 
       <group position={[-0.12 - ARM, POLE + 0.03, 0]}>
+        {}
         <mesh>
           <cylinderGeometry args={[0.06, 0.17, 0.2, 18, 1, true]} />
           <meshLambertMaterial color={p.lampShade} side={THREE.DoubleSide} />
@@ -519,6 +528,7 @@ function Chair() {
           <meshLambertMaterial color={p.chairSoft} />
         </RoundedBox>
 
+        {}
         <RoundedBox
           args={[0.26, 0.14, 0.05]}
           radius={0.025}
@@ -632,9 +642,11 @@ export default function HeroScene() {
       <group position={layout.position} scale={layout.scale}>
         <group ref={parallaxRef} rotation={[BASE_TILT, BASE_TURN, 0]}>
           <group ref={entryRef}>
+            {}
             <group position={[-0.28, -0.26, 0]}>
               <Room />
 
+              {}
               <Contact texture={radial} position={[-0.92, FLOOR + 0.008, -0.02]} scale={[0.42, 0.6]} />
               <Contact texture={radial} position={[1.22, FLOOR + 0.008, -0.02]} scale={[0.24, 0.62]} />
               <Contact texture={radial} position={[1.7, FLOOR + 0.01, 0.05]} scale={[0.26, 0.26]} />
@@ -667,8 +679,10 @@ export default function HeroScene() {
           </group>
         </group>
 
+        {}
         <directionalLight position={[3.2, 5.4, 3.6]} intensity={p.key} />
 
+        {}
         <directionalLight
           position={[-4, 1.8, -2.2]}
           intensity={p.fillIntensity}

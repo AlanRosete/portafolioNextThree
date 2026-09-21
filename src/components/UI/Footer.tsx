@@ -54,6 +54,7 @@ export default function Footer() {
     <footer className="relative z-10 border-t border-line">
       <div className="mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          {}
           <div className="text-center md:text-left">
             <h3
               className="text-xl font-bold mb-1"
@@ -67,6 +68,7 @@ export default function Footer() {
             </p>
           </div>
 
+          {}
           <div className="flex items-center gap-4">
             {socialLinks.map((social) => (
               <a
@@ -86,6 +88,7 @@ export default function Footer() {
             ))}
           </div>
 
+          {}
           <p className="text-text-muted text-sm">
             © {currentYear} Alan Rosete. {t.footer.rights}
           </p>

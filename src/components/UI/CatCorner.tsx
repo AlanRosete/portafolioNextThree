@@ -6,6 +6,7 @@ export default function CatCorner() {
   return (
     <div className="cat-corner" aria-hidden="true">
       <svg viewBox="0 0 260 74" xmlns="http://www.w3.org/2000/svg">
+        {}
         <path
           d="M210,52
              C226,49 236,55 238,62
@@ -17,6 +18,7 @@ export default function CatCorner() {
           strokeLinejoin="round"
         />
 
+        {}
         <path
           d="M14,64
              C8,64 4,61 4,57
@@ -35,6 +37,7 @@ export default function CatCorner() {
           fill="currentColor"
         />
 
+        {}
       </svg>
     </div>
   );

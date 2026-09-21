@@ -50,14 +50,17 @@ export default function Modal() {
       onClick={closeModal}
       style={{ opacity: 0 }}
     >
+      {}
       <div className="absolute inset-0 bg-black/80" />
 
+      {}
       <div
         ref={contentRef}
         className="relative bg-bg-secondary border border-line rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto p-8"
         onClick={(e) => e.stopPropagation()}
         style={{ opacity: 0 }}
       >
+        {}
         <button
           onClick={closeModal}
           className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-card transition-colors duration-200"
@@ -68,6 +71,7 @@ export default function Modal() {
           </svg>
         </button>
 
+        {}
         <div className="w-full h-48 rounded-xl mb-6 flex items-center justify-center text-6xl relative overflow-hidden bg-bg-card border border-line">
         {selectedProject.image ? (
           <Image
@@ -81,6 +85,7 @@ export default function Modal() {
         )}
         </div>
 
+        {}
         <h2
           className="text-3xl font-bold mb-3"
           style={{ fontFamily: "var(--font-family-heading)" }}
@@ -88,14 +93,17 @@ export default function Modal() {
           {selectedProject.title}
         </h2>
 
+        {}
         <p className="project-row__stack mb-5">
           {selectedProject.tags.join(" · ")}
         </p>
 
+        {}
         <p className="text-text-secondary leading-relaxed mb-6">
           {selectedProject.longDescription}
         </p>
 
+        {}
         <div className="flex flex-wrap gap-3">
           {selectedProject.liveUrl && (
             <a
