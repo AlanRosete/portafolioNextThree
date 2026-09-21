@@ -77,6 +77,19 @@ function stripJs(src) {
         out += src.slice(i, j);
         prev += src.slice(i, j);
       } else {
+        // Comentario de JSX: `{/* ... */}`. Las llaves son codigo, no parte
+        // del comentario, asi que hay que llevarselas tambien. Si no, queda
+        // un `{}` huerfano: React lo ignora al renderizar, pero ensucia el
+        // fuente. Solo cuando la llave de apertura es lo ultimo emitido y
+        // la de cierre sigue al comentario, para no tocar un objeto real.
+        const antes = out.replace(/[ \t]*$/, "");
+        let k = j;
+        while (k < src.length && (src[k] === " " || src[k] === "\t")) k++;
+        if (antes.endsWith("{") && src[k] === "}") {
+          out = antes.slice(0, -1);
+          j = k + 1;
+        }
+
         const lineStart = out.lastIndexOf("\n") + 1;
         const soloEnLinea =
           out.slice(lineStart).trim() === "" &&
