@@ -76,9 +76,7 @@ export default function LoadingScreen() {
       className="fixed inset-0 z-[200] flex flex-col items-center justify-center"
       style={{ background: "var(--color-bg-primary)" }}
     >
-      {}
       <div className="loading-text mb-8!" role="status" aria-label={t.loading.label}>
-        {}
         <div
           style={{
             display: "grid",
@@ -97,7 +95,6 @@ export default function LoadingScreen() {
           >
             <path className="js-leaf-a" d={LEAF} fill="var(--color-accent-tertiary)" />
             <path className="js-leaf-b" d={LEAF} fill="var(--color-accent-primary)" />
-            {}
             <path
               className="js-stem"
               d={LEAF_STEM}
@@ -107,7 +104,6 @@ export default function LoadingScreen() {
         </div>
       </div>
 
-      {}
       <div className="loading-text w-40 sm:w-48 h-px overflow-hidden" style={{ background: "var(--color-line)" }}>
         <div
           className="loading-progress h-full"
@@ -118,7 +114,6 @@ export default function LoadingScreen() {
         />
       </div>
 
-      {}
       <p className="loading-text text-text-muted text-xs sm:text-sm mt-4! tracking-widest uppercase">
         {t.loading.text}
       </p>

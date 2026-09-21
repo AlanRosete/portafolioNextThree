@@ -119,7 +119,6 @@ export default function ProjectsSection() {
 
                   <p className="project-row__desc">{project.description}</p>
 
-                  {}
                   {canHover === false && (
                     <div className="project-row__thumb">
                       <Image

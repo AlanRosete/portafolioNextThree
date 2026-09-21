@@ -108,7 +108,6 @@ export default function ContactSection() {
     >
       <div className="w-full max-w-6xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {}
           <div className="contact-intro lg:col-span-5 display-flex gap-5 flex-col flex justify-center">
             <p
               className="text-xs font-medium uppercase tracking-[0.18em] text-text-muted mb-5"
@@ -158,9 +157,7 @@ export default function ContactSection() {
             </div>
           </div>
 
-          {}
           <div className="lg:col-span-7 w-full relative">
-            {}
             <CatCorner />
 
             <form
@@ -168,7 +165,6 @@ export default function ContactSection() {
               noValidate
               className="glass rounded-2xl p-[30px]!"
             >
-              {}
               <input
                 type="text"
                 name="company"
@@ -252,7 +248,6 @@ export default function ContactSection() {
                 className="contact-field mt-8 pt-8 border-t border-line"
                 style={{ opacity: 0 }}
               >
-                {}
                 <p role="status" aria-live="polite" className="sr-only">
                   {status === "sent" &&
                     t.contact.sentBody}
@@ -275,7 +270,6 @@ export default function ContactSection() {
                     >
                       {status === "sending" ? (
                         <>
-                          {}
                           <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                           {t.contact.sending}
                         </>
@@ -301,7 +295,6 @@ export default function ContactSection() {
                   )}
                 </div>
 
-                {}
                 {status === "error" && (
                   <div className="form-error-note">
                     <p className="form-error-head">
